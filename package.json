@@ -20,6 +20,7 @@
     "@netlify/functions": "^4.0.0",
     "@tailwindcss/postcss": "^4",
     "@types/estree": "^1.0.7",
+    "@types/json-schema": "^7.0.15",
     "@types/node": "^20",
     "@types/papaparse": "^5.3.16",
     "@types/react": "^19",
