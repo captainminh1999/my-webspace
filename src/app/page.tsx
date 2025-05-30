@@ -334,7 +334,7 @@ export default function HomePage() {
           <Section title="Recommendations Received">
             {recommendationsReceivedData.map((rec, index) => (
               <div key={index} className="mb-6 pb-6 border-b border-gray-200 dark:border-gray-700 last:border-b-0 last:pb-0">
-                <p className="text-gray-700 dark:text-gray-300 italic mb-2 whitespace-pre-line">"{rec.text}"</p>
+                <p className="text-gray-700 dark:text-gray-300 italic mb-2 whitespace-pre-line">&quot;{rec.text}&quot;</p>
                 <p className="text-sm font-semibold text-gray-800 dark:text-white">
                   {rec.firstName} {rec.lastName}
                 </p>
