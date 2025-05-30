@@ -1,1 +1,7 @@
-[]
+[
+  {
+    "title": "Employee of the Month",
+    "description": "Recognized for outstanding performance and contributions to team projects.",
+    "issuedOn": "2023-03"
+  }
+]

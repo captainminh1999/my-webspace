@@ -1,0 +1,10 @@
+# netlify.toml
+
+# Example existing build and functions configuration
+[build]
+  command = "next build"
+  publish = ".next"
+
+[functions]
+  directory = "netlify/functions"
+  node_bundler = "esbuild"

@@ -1,1 +1,9 @@
-[]
+[
+  {
+    "title": "Personal Portfolio Website",
+    "startedOn": "2024-05",
+    "finishedOn": "Present",
+    "description": "Interactive CV website built with Next.js, Tailwind CSS, and Netlify.",
+    "url": "https://github.com/captainminh1999/my-interactive-cv"
+  }
+]

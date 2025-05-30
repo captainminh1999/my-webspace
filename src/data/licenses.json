@@ -1,1 +1,10 @@
-[]
+[
+  {
+    "name": "Google Data Analytics Professional Certificate",
+    "authority": "Google",
+    "startedOn": "2022-01",
+    "finishedOn": "2022-06",
+    "licenseNumber": "XYZ123ABC",
+    "url": "https://coursera.org/verify/professional-cert/XYZ123ABC"
+  }
+]

@@ -1,1 +1,10 @@
-[]
+[
+  {
+    "companyName": "Code for Australia",
+    "role": "Mentor",
+    "startedOn": "2023-01",
+    "finishedOn": "Present",
+    "cause": "Technology for Good", 
+    "description": "Mentoring junior developers contributing to civic tech projects."
+  }
+]

@@ -1,15 +1,15 @@
 {
-  "name": "Minh (Jose) Nguyen",
+  "firstName": "Minh",
+  "lastName": "Nguyen",
+  "maidenName": "Jose",
+  "address": "Sydney, New South Wales, Australia",
+  "birthDate": "1990-01-01",
   "headline": "Data Management Specialist @ NEXTGEN oSpace",
-  "companyName": "NEXTGEN oSpace",
-  "location": "Sydney, New South Wales, Australia",
-  "volunteeringInterests": [
-    "Animal Welfare",
-    "Disaster and Humanitarian Relief",
-    "Education",
-    "Economic Empowerment",
-    "Environment",
-    "Health",
-    "Humanitarian Causes"
-  ]
+  "summary": "I utilize my skills and experiences...",
+  "industry": "Information Technology and Services",
+  "zipCode": "2000",
+  "geoLocation": "Sydney, New South Wales",
+  "twitterHandles": "",
+  "websites": ["https://www.linkedin.com/in/captainminh1999/"],
+  "instantMessengers": ""
 }

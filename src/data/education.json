@@ -1,1 +1,10 @@
-[]
+[
+  {
+    "schoolName": "University of Technology Sydney",
+    "startDate": "2017",
+    "endDate": "2021",
+    "degreeName": "Bachelor of Computer Science",
+    "notes": "Specialized in Data Science and AI.",
+    "activities": "Member of the UTS Tech Society"
+  }
+]

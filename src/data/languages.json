@@ -1,1 +1,14 @@
-[]
+[
+  {
+    "name": "English",
+    "proficiency": "Native or Bilingual Proficiency"
+  },
+  {
+    "name": "Vietnamese",
+    "proficiency": "Native or Bilingual Proficiency"
+  },
+  {
+    "name": "Spanish",
+    "proficiency": "Professional Working Proficiency"
+  }
+]
