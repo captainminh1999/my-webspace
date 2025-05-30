@@ -124,7 +124,7 @@ export default function UploadCVPage() {
 
           <div>
             <label htmlFor="cvFile" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-              CV Data File (must be 'cv-data.json')
+              CV Data File (must be &apos;cv-data.json&apos;)
             </label>
             <div className="mt-1">
               <input
