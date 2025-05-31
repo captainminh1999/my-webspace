@@ -50,9 +50,9 @@ const EXPECTED_HEADERS: { [key: string]: string[] } = {
   skills: [ 
     "Skill Name"
   ],
+  // MODIFIED: Updated headers for Recommendations Received
   recommendationsReceived: [
-    "Recommender First Name", "Recommender Last Name", "Recommender Job Title", 
-    "Recommender Company", "Recommendation Text", "Date Received"
+    "First Name", "Last Name", "Company", "Job Title", "Text", "Creation Date", "Status"
   ],
   recommendationsGiven: [ 
     "Recipient First Name", "Recipient Last Name", "Recipient Job Title",
@@ -109,7 +109,7 @@ export default function UploadForm() {
     setMessage(null);
     setSelectedFile(null);
     setIsFileValid(false);
-    setUploadInitiationTime(null);
+    setUploadInitiationTime(null); // Ensure this is reset
     if (clearFileInputValue && fileInputRef.current) {
       fileInputRef.current.value = ""; 
     }
@@ -121,6 +121,7 @@ export default function UploadForm() {
     setSelectedFile(null); 
     setProgress(0);
     setProgressMessage('');
+    // Do not call resetFormState() here as it clears uploadInitiationTime too soon.
 
     const file = event.target.files?.[0];
 
@@ -187,7 +188,7 @@ export default function UploadForm() {
         }
       });
     } else {
-        resetFormState();
+        resetFormState(); // Call full reset if no file is selected (e.g., user cancels)
     }
   };
 
@@ -200,9 +201,12 @@ export default function UploadForm() {
     setSecretKey(event.target.value);
   };
 
-  const checkDeployStatus = async () => {
-    if (!uploadInitiationTime) { 
-        setProgressMessage("Waiting for upload to start...");
+  // MODIFIED: checkDeployStatus now accepts an optional initiationTime for the first call
+  const checkDeployStatus = async (initialCallTime?: number) => {
+    const timeToCompare = initialCallTime || uploadInitiationTime; // Use passed time for first call, state for subsequent
+
+    if (!timeToCompare) { 
+        setProgressMessage("Waiting for upload process to fully start..."); // Changed message
         return;
     }
     try {
@@ -221,14 +225,14 @@ export default function UploadForm() {
 
       setProgressMessage(`Current deploy status: ${statusData.status || 'unknown'}. Checking again in 10s...`);
       
-      if ((statusData.status === 'ready' || statusData.status === 'current') && deployCreatedAt >= uploadInitiationTime) {
+      if ((statusData.status === 'ready' || statusData.status === 'current') && deployCreatedAt >= timeToCompare) {
         setProgress(100);
         setProgressMessage('Site successfully updated!');
         setMessage({ type: 'success', text: 'Deployment complete and site is live with new data.' });
         if (pollingIntervalRef.current) clearInterval(pollingIntervalRef.current);
         setIsProcessing(false);
         setUploadInitiationTime(null); 
-      } else if (statusData.status === 'building' || ((statusData.status === 'ready' || statusData.status === 'current') && deployCreatedAt < uploadInitiationTime) ) {
+      } else if (statusData.status === 'building' || ((statusData.status === 'ready' || statusData.status === 'current') && deployCreatedAt < timeToCompare) ) {
         setProgressMessage(`Netlify build in progress (status: ${statusData.status}). Checking again in 10s...`);
         setProgress(prev => Math.min(prev + 5, 95)); 
       } else if (statusData.status === 'error' || statusData.status === 'failed') {
@@ -261,7 +265,9 @@ export default function UploadForm() {
     if (message?.type === 'error') setMessage(null); 
     setProgress(10); 
     setProgressMessage('Reading file...');
-    setUploadInitiationTime(Date.now());
+    
+    const initiationTime = Date.now(); // MODIFIED: Get current time
+    setUploadInitiationTime(initiationTime); // MODIFIED: Set state
 
     const reader = new FileReader();
     reader.readAsDataURL(selectedFile);
@@ -295,8 +301,8 @@ export default function UploadForm() {
           }
           
           if (pollingIntervalRef.current) clearInterval(pollingIntervalRef.current); 
-          pollingIntervalRef.current = setInterval(checkDeployStatus, 10000); 
-          await checkDeployStatus(); 
+          pollingIntervalRef.current = setInterval(() => checkDeployStatus(), 10000); // Subsequent calls use state
+          await checkDeployStatus(initiationTime); // MODIFIED: Pass initiationTime to the first call
 
         } else {
           setMessage({ type: 'error', text: uploadResult.message || `Upload to function failed (Status: ${uploadResponse.status}).` });
@@ -371,7 +377,6 @@ export default function UploadForm() {
                 disabled={isProcessing}
               />
             </div>
-            {/* MODIFIED: Safer check for message.text before calling string methods */}
             {selectedFile && (isFileValid || (message && message.type === 'error' && typeof message.text === 'string' && message.text.toLowerCase().includes('file'))) && (
               <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">Selected: {selectedFile.name}</p>
             )}
