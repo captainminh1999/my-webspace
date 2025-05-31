@@ -4,7 +4,7 @@ import { Octokit } from "@octokit/rest";
 import Papa from "papaparse";
 
 // Configuration
-const GITHUB_OWNER = "your-github-username"; // Replace
+const GITHUB_OWNER = "captainminh1999"; // Replace
 const GITHUB_REPO = "my-interactive-cv";    // Replace
 const DATA_BASE_PATH = "src/data";          // Base path for data files in your repo
 const GITHUB_BRANCH = "main";
