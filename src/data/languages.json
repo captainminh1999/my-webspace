@@ -1,14 +1,18 @@
 [
   {
     "name": "English",
-    "proficiency": "Native or Bilingual Proficiency"
+    "proficiency": "Full professional proficiency"
   },
   {
     "name": "Vietnamese",
-    "proficiency": "Native or Bilingual Proficiency"
+    "proficiency": "Native or bilingual proficiency"
   },
   {
-    "name": "Spanish",
-    "proficiency": "Professional Working Proficiency"
+    "name": "French",
+    "proficiency": "Elementary proficiency"
+  },
+  {
+    "name": "Chinese",
+    "proficiency": "Elementary proficiency"
   }
 ]
