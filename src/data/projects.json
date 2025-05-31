@@ -3,35 +3,35 @@
     "title": "AI-Based Web Application for Customer Feedback Analytics",
     "description": "Developed and deployed an AI-based web application for customer feedback analytics, featuring an Emotion Detection system built with Watson AI libraries. This project processed text feedback to identify specific emotions, providing valuable insights for e-commerce. Responsible for full-stack development, including Flask deployment, unit testing, and error handling.",
     "url": null,
-    "startedOn": "May-25",
-    "finishedOn": "May-25"
+    "startedOn": "May 25",
+    "finishedOn": "May 25"
   },
   {
     "title": "HubSpot API Integration with Node.js",
     "description": "Developed a Node.js web application to integrate with the HubSpot CRM API. This project involved creating and managing custom objects in HubSpot, implementing GET/POST routes with Express.js and Axios, and using Pug templating for the UI. Gained hands-on experience in API integration, full-stack development, and Git workflow.",
     "url": null,
-    "startedOn": "May-25",
-    "finishedOn": "May-25"
+    "startedOn": "May 25",
+    "finishedOn": "May 25"
   },
   {
     "title": "Sales and Marketing Campaign to promote Sydney Olympic Park to Business",
     "description": "Through this three-month project working with Sydney Olympic Park Business Association, the key aims to come up with a sales and marketing plan to acquire more businesses to locate, relocate or expand to Sydney Olympic Park.",
     "url": "https://github.com/captainminh1999/Sales-and-Marketing-SOPBA",
-    "startedOn": "Jan-21",
-    "finishedOn": "Apr-21"
+    "startedOn": "Jan 21",
+    "finishedOn": "Apr 21"
   },
   {
     "title": "Applied Data Science Capstone Project - Sydney City Nightlife Choice",
     "description": "The final assignment of the IBM Data Science course is the so-called \"Capstone Project\" in which many of the tools and methods learned throughout the recent months are applied in a self-chosen challenge around the general idea of a \"Battle of Neighbourhoods\", e. g. the analysis and useful preparation of data on venues in city environments. I chose the city of Sydney as a case. To pass the final assignment, creating a Jupyter Notebook with Python as the programming language and all the necessary code and comments is required, as are a blogpost or presentation and a final report.",
     "url": "https://github.com/captainminh1999/applied-data-science-capstone",
-    "startedOn": "Dec-20",
-    "finishedOn": "Jan-21"
+    "startedOn": "Dec 20",
+    "finishedOn": "Jan 21"
   },
   {
     "title": "Property Technology and Its Impact on Real Estate Sales & Marketing Strategies",
     "description": "To what extent is Property Technology disrupting UAE’s real estate industry. Gone through data analysis: correlation of trust in online pictures with certain property technologies.",
     "url": null,
-    "startedOn": "Jan-19",
-    "finishedOn": "Apr-19"
+    "startedOn": "Jan 19",
+    "finishedOn": "Apr 19"
   }
 ]
