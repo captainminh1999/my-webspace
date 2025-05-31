@@ -1,5 +1,7 @@
 // src/app/page.tsx
 import React from 'react';
+// Import icons from lucide-react
+import { Github, Linkedin, Twitter, Facebook, Instagram, Dribbble, Link as LinkIcon, ExternalLink } from 'lucide-react';
 
 // Import data from JSON files
 import profileDataFromFile from '@/data/profile.json';
@@ -15,8 +17,7 @@ import recommendationsReceivedDataFromFile from '@/data/recommendationsReceived.
 import honorsAwardsDataFromFile from '@/data/honorsAwards.json';
 import languagesDataFromFile from '@/data/languages.json';
 
-// --- TypeScript Interfaces (Updated for more robustness) ---
-
+// --- TypeScript Interfaces ---
 interface ProfileData {
   firstName: string;
   lastName: string;
@@ -29,12 +30,12 @@ interface ProfileData {
   zipCode?: string | number | null;
   geoLocation?: string | null;
   twitterHandles?: string | null;
-  websites?: string | string[] | null; // Ideally string[], function should ensure this. String for temp robustness.
+  websites?: string | string[] | null;
   instantMessengers?: string | null;
 }
 
 interface AboutData {
-  content?: string | null; // Allow for empty/null content
+  content?: string | null;
 }
 
 interface RoleItem {
@@ -42,8 +43,8 @@ interface RoleItem {
   startDate: string;
   endDate: string;
   duration?: string | null;
-  responsibilities: string[]; // Assume function ensures array, even if empty
-  skills: string[];         // Assume function ensures array, even if empty
+  responsibilities: string[];
+  skills: string[];
   location?: string | null;
 }
 
@@ -52,13 +53,13 @@ interface CompanyExperience {
   employmentType?: string | null;
   totalDurationAtCompany?: string | null;
   location?: string | null;
-  roles: RoleItem[]; // Assume function ensures array, even if empty
+  roles: RoleItem[];
 }
 
 interface EducationEntry {
   schoolName: string;
-  startDate: string | number; // CHANGE: Allow number
-  endDate: string | number;   // CHANGE: Allow number
+  startDate: string | number;
+  endDate: string | number;
   degreeName?: string | null;
   notes?: string | null;
   activities?: string | null;
@@ -77,7 +78,7 @@ interface ProjectEntry {
   title: string;
   startedOn?: string | null;
   finishedOn?: string | null;
-  description: string; // If can be empty, add | null
+  description: string;
   url?: string | null;
 }
 
@@ -86,11 +87,11 @@ interface VolunteeringEntry {
   role: string;
   startedOn?: string | null;
   finishedOn?: string | null;
-  cause?: string | null; // Stores transformed, display-friendly cause
+  cause?: string | null;
   description?: string | null;
 }
 
-type SkillsData = string[] | null; // Allow null if the file might not exist or be empty JSON
+type SkillsData = string[] | null;
 
 interface RecommendationReceivedEntry {
   firstName: string;
@@ -112,22 +113,85 @@ interface LanguageEntry {
   proficiency: string;
 }
 
-// --- Helper function for display transformations ---
+// --- Helper functions ---
 const getDisplayCause = (rawCause?: string | null): string => {
   if (!rawCause) return "N/A";
   const causeMap: { [key: string]: string } = {
-    economicEmpowerment: "Economic Empowerment",
-    scienceAndTechnology: "Science and Technology",
-    // Add more mappings as needed
+    economicempowerment: "Economic Empowerment",
+    scienceandtechnology: "Science and Technology",
   };
-  return causeMap[rawCause] || rawCause.replace(/([A-Z0-9])/g, ' $1').replace(/^./, (str) => str.toUpperCase()).trim();
+  const saneKey = rawCause.toLowerCase().replace(/[^a-z0-9]/g, '');
+  return causeMap[saneKey] || rawCause.replace(/([A-Z0-9])/g, ' $1').replace(/^./, (str) => str.toUpperCase()).trim();
+};
+
+interface ParsedWebsite {
+  label: string;
+  url: string;
+  icon?: React.ElementType; // Type for a React component (like an icon)
+  siteName?: string; // Detected site name
+}
+
+const parseWebsiteString = (websiteStr?: string | null): ParsedWebsite | null => {
+  if (typeof websiteStr !== 'string' || !websiteStr.trim()) return null;
+
+  let explicitLabel: string | null = null;
+  let urlPart = websiteStr.trim();
+
+  const formattedMatch = websiteStr.match(/^\[(.*?):(.*?)\]$/);
+  if (formattedMatch && formattedMatch[1] && formattedMatch[2]) {
+    explicitLabel = formattedMatch[1].trim();
+    urlPart = formattedMatch[2].trim();
+  }
+
+  if (!urlPart.startsWith('http://') && !urlPart.startsWith('https://')) {
+    urlPart = 'https://' + urlPart;
+  }
+
+  try {
+    const urlObj = new URL(urlPart);
+    const hostname = urlObj.hostname.toLowerCase().replace(/^www\./, '');
+    let detectedSiteName: string | undefined;
+    let icon: React.ElementType | undefined;
+
+    if (hostname.includes('github.com')) {
+      detectedSiteName = 'GitHub';
+      icon = Github;
+    } else if (hostname.includes('linkedin.com')) {
+      detectedSiteName = 'LinkedIn';
+      icon = Linkedin;
+    } else if (hostname.includes('twitter.com') || hostname.includes('x.com')) {
+      detectedSiteName = 'Twitter/X';
+      icon = Twitter;
+    } else if (hostname.includes('facebook.com')) {
+      detectedSiteName = 'Facebook';
+      icon = Facebook;
+    } else if (hostname.includes('instagram.com')) {
+      detectedSiteName = 'Instagram';
+      icon = Instagram;
+    } else if (hostname.includes('dribbble.com')) {
+      detectedSiteName = 'Dribbble';
+      icon = Dribbble;
+    } else {
+      icon = LinkIcon; // Default link icon
+    }
+
+    const finalLabel = explicitLabel || detectedSiteName || hostname.charAt(0).toUpperCase() + hostname.slice(1);
+
+    return { label: finalLabel, url: urlPart, icon, siteName: detectedSiteName };
+
+  } catch (e) {
+    console.warn("Could not parse as URL:", websiteStr, e);
+    // If it's not a valid URL but was explicitly labeled, maybe still show it?
+    if (explicitLabel) {
+        return { label: explicitLabel, url: urlPart, icon: LinkIcon };
+    }
+    return null;
+  }
 };
 
 
 // --- Main Page Component ---
 export default function HomePage() {
-  // Type assertions - these assume the files exist and have a root structure that can be cast.
-  // Consider adding checks if a file might be missing or completely empty.
   const profileData = profileDataFromFile as ProfileData || {} as ProfileData;
   const aboutData = aboutDataFromFile as AboutData || {} as AboutData;
   const experienceData = experienceDataFromFile as CompanyExperience[] || [];
@@ -140,9 +204,8 @@ export default function HomePage() {
   const honorsAwardsData = honorsAwardsDataFromFile as HonorAwardEntry[] || [];
   const languagesData = languagesDataFromFile as LanguageEntry[] || [];
 
-  // Calculated display fields
   const getFullName = () => {
-    if (!profileData.firstName && !profileData.lastName) return "Your Name"; // Fallback
+    if (!profileData.firstName && !profileData.lastName) return "Your Name";
     let name = profileData.firstName || "";
     if (profileData.maidenName) {
       name += ` (${profileData.maidenName})`;
@@ -152,8 +215,18 @@ export default function HomePage() {
     }
     return name.trim();
   };
-
   const fullName = getFullName();
+
+  const websiteEntries = React.useMemo(() => {
+    if (!profileData.websites) {
+      return [];
+    }
+    const websitesArray = Array.isArray(profileData.websites) ? profileData.websites : [profileData.websites];
+    
+    return websitesArray
+      .map(siteStr => parseWebsiteString(siteStr))
+      .filter(parsedSite => parsedSite !== null) as ParsedWebsite[];
+  }, [profileData.websites]);
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-start bg-gray-100 dark:bg-gray-900 p-4 sm:p-8">
@@ -178,15 +251,31 @@ export default function HomePage() {
                 </p>
             )}
             {profileData.twitterHandles && <p>Twitter: <a href={`https://twitter.com/${profileData.twitterHandles.replace('@', '')}`} target="_blank" rel="noopener noreferrer" className="text-indigo-500 hover:underline">{profileData.twitterHandles}</a></p>}
-            {profileData.websites && (Array.isArray(profileData.websites) ? profileData.websites : [profileData.websites]).filter(Boolean).length > 0 && (
-              <p>Websites: {(Array.isArray(profileData.websites) ? profileData.websites : [profileData.websites]).filter(Boolean).map((site, index, arr) => (
-                <React.Fragment key={index}>
-                  <a href={site as string} target="_blank" rel="noopener noreferrer" className="text-indigo-500 hover:underline">{(site as string).replace(/^https?:\/\//, '')}</a>
-                  {index < arr.length - 1 && ', '}
-                </React.Fragment>
-              ))}</p>
+            
+            {/* MODIFIED WEBSITES DISPLAY with ICONS */}
+            {websiteEntries.length > 0 && (
+              <div className="mt-4 flex flex-wrap justify-center items-center gap-3">
+                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">My Links:</span>
+                {websiteEntries.map((site, index) => {
+                  const IconComponent = site.icon || LinkIcon; // Fallback to generic LinkIcon
+                  return (
+                    <a
+                      key={index}
+                      href={site.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 px-3 py-1.5 bg-indigo-500 text-white text-xs font-semibold rounded-md shadow-sm hover:bg-indigo-700 transition duration-150 transform hover:scale-105"
+                      title={site.url} // Show full URL on hover
+                    >
+                      <IconComponent size={14} /> 
+                      {site.label}
+                    </a>
+                  );
+                })}
+              </div>
             )}
-            {profileData.instantMessengers && <p>{profileData.instantMessengers}</p>}
+
+            {profileData.instantMessengers && <p className="mt-2">{profileData.instantMessengers}</p>}
           </div>
         </header>
 
@@ -216,7 +305,7 @@ export default function HomePage() {
                   <div key={roleIndex} className="ml-4 mt-2 pb-4 border-b border-gray-200 dark:border-gray-700 last:border-b-0 last:pb-0">
                     <h4 className="text-xl font-medium text-gray-700 dark:text-white">{role.title}</h4>
                     <p className="text-sm text-indigo-500 dark:text-indigo-400 mb-1">
-                      {role.startDate} – {role.endDate} {role.duration && `(${role.duration})`}
+                      {String(role.startDate)} – {String(role.endDate)} {role.duration && `(${role.duration})`}
                     </p>
                     {role.location && <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">{role.location}</p>}
                     {role.responsibilities && role.responsibilities.length > 0 && (
@@ -248,14 +337,14 @@ export default function HomePage() {
               <div key={index} className="mb-6 pb-6 border-b border-gray-200 dark:border-gray-700 last:border-b-0 last:pb-0">
                 <h3 className="text-xl font-semibold text-gray-800 dark:text-white">{edu.schoolName}</h3>
                 {edu.degreeName && <p className="text-md text-gray-700 dark:text-gray-300">{edu.degreeName}</p>}
-                <p className="text-sm text-indigo-500 dark:text-indigo-400 mb-1">{edu.startDate} – {edu.endDate}</p>
+                <p className="text-sm text-indigo-500 dark:text-indigo-400 mb-1">{String(edu.startDate)} – {String(edu.endDate)}</p>
                 {edu.notes && <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">{edu.notes}</p>}
                 {edu.activities && <p className="text-sm text-gray-600 dark:text-gray-300 mt-1"><em>Activities:</em> {edu.activities}</p>}
               </div>
             ))}
           </Section>
         )}
-
+        
         {/* 5. Licenses & Certifications Section */}
         {licensesData && licensesData.length > 0 && (
           <Section title="Licenses & Certifications">
@@ -274,9 +363,9 @@ export default function HomePage() {
                     href={lic.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="mt-2 inline-block px-4 py-2 bg-indigo-600 text-white text-xs font-semibold rounded-md shadow-sm hover:bg-indigo-700 transition duration-150"
+                    className="mt-2 inline-flex items-center gap-1 px-4 py-2 bg-indigo-600 text-white text-xs font-semibold rounded-md shadow-sm hover:bg-indigo-700 transition duration-150"
                   >
-                    Show Credential
+                    <ExternalLink size={14} /> Show Credential
                   </a>
                 )}
               </div>
@@ -296,7 +385,16 @@ export default function HomePage() {
                     </p>
                 )}
                 {proj.description && <p className="text-sm text-gray-600 dark:text-gray-300 my-2 whitespace-pre-line">{proj.description}</p>}
-                {proj.url && <a href={proj.url} target="_blank" rel="noopener noreferrer" className="text-indigo-500 hover:underline text-sm">View Project</a>}
+                {proj.url && 
+                  <a 
+                    href={proj.url} 
+                    target="_blank" 
+                    rel="noopener noreferrer" 
+                    className="inline-flex items-center gap-1 text-indigo-500 hover:underline text-sm"
+                  >
+                    <ExternalLink size={14} /> View Project
+                  </a>
+                }
               </div>
             ))}
           </Section>
@@ -383,7 +481,7 @@ export default function HomePage() {
   );
 }
 
-// --- Reusable Section Component (Optional but good for consistency) ---
+// --- Reusable Section Component ---
 interface SectionProps {
   title: string;
   children: React.ReactNode;
