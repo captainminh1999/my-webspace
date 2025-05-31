@@ -15,82 +15,82 @@ import recommendationsReceivedDataFromFile from '@/data/recommendationsReceived.
 import honorsAwardsDataFromFile from '@/data/honorsAwards.json';
 import languagesDataFromFile from '@/data/languages.json';
 
-// --- TypeScript Interfaces (as defined in cv_data_structures_v2) ---
+// --- TypeScript Interfaces (Updated for more robustness) ---
 
 interface ProfileData {
   firstName: string;
   lastName: string;
-  maidenName?: string;
-  address?: string;
-  birthDate?: string; // Hidden
+  maidenName?: string | null;
+  address?: string | null;
+  birthDate?: string | null; // Hidden
   headline: string;
-  summary?: string; // This populates about.json
-  industry?: string; // Hidden
-  zipCode?: string;
-  geoLocation?: string;
-  twitterHandles?: string;
-  websites?: string[];
-  instantMessengers?: string;
+  summary?: string | null;    // This populates about.json
+  industry?: string | null;   // Hidden
+  zipCode?: string | number | null;
+  geoLocation?: string | null;
+  twitterHandles?: string | null;
+  websites?: string | string[] | null; // Ideally string[], function should ensure this. String for temp robustness.
+  instantMessengers?: string | null;
 }
 
 interface AboutData {
-  content: string;
+  content?: string | null; // Allow for empty/null content
 }
 
 interface RoleItem {
   title: string;
   startDate: string;
   endDate: string;
-  duration?: string;
-  responsibilities: string[];
-  skills: string[];
-  location?: string;
+  duration?: string | null;
+  responsibilities: string[]; // Assume function ensures array, even if empty
+  skills: string[];         // Assume function ensures array, even if empty
+  location?: string | null;
 }
 
 interface CompanyExperience {
   companyName: string;
-  employmentType?: string;
-  totalDurationAtCompany?: string;
-  location?: string;
-  roles: RoleItem[];
+  employmentType?: string | null;
+  totalDurationAtCompany?: string | null;
+  location?: string | null;
+  roles: RoleItem[]; // Assume function ensures array, even if empty
 }
 
 interface EducationEntry {
   schoolName: string;
   startDate: string;
   endDate: string;
-  degreeName?: string;
-  notes?: string;
-  activities?: string;
+  degreeName?: string | null;
+  notes?: string | null;
+  activities?: string | null;
 }
 
 interface LicenseCertificationEntry {
   name: string;
   authority: string;
-  startedOn?: string;
-  finishedOn?: string;
-  licenseNumber?: string;
-  url?: string;
+  startedOn?: string | null;
+  finishedOn?: string | null;
+  licenseNumber?: string | null;
+  url?: string | null;
 }
 
 interface ProjectEntry {
   title: string;
-  startedOn?: string;
-  finishedOn?: string;
-  description: string;
-  url?: string;
+  startedOn?: string | null;
+  finishedOn?: string | null;
+  description: string; // If can be empty, add | null
+  url?: string | null;
 }
 
 interface VolunteeringEntry {
   companyName: string;
   role: string;
-  startedOn?: string;
-  finishedOn?: string;
-  cause: string; // Stores transformed, display-friendly cause
-  description?: string;
+  startedOn?: string | null;
+  finishedOn?: string | null;
+  cause?: string | null; // Stores transformed, display-friendly cause
+  description?: string | null;
 }
 
-type SkillsData = string[];
+type SkillsData = string[] | null; // Allow null if the file might not exist or be empty JSON
 
 interface RecommendationReceivedEntry {
   firstName: string;
@@ -101,19 +101,9 @@ interface RecommendationReceivedEntry {
   creationDate: string;
 }
 
-// Interface for Recommendations: Given (though section is hidden)
-// interface RecommendationGivenEntry {
-//   recipientFirstName: string;
-//   recipientLastName: string;
-//   recipientJobTitle?: string;
-//   recipientCompany?: string;
-//   text: string;
-//   creationDate: string;
-// }
-
 interface HonorAwardEntry {
   title: string;
-  description?: string;
+  description?: string | null;
   issuedOn: string;
 }
 
@@ -122,40 +112,45 @@ interface LanguageEntry {
   proficiency: string;
 }
 
-// --- Helper function for display transformations (optional, can be inline) ---
-const getDisplayCause = (rawCause: string): string => {
-  // This logic should ideally be in the Netlify function when creating JSON,
-  // but can be a fallback here.
+// --- Helper function for display transformations ---
+const getDisplayCause = (rawCause?: string | null): string => {
+  if (!rawCause) return "N/A";
   const causeMap: { [key: string]: string } = {
     economicEmpowerment: "Economic Empowerment",
     scienceAndTechnology: "Science and Technology",
     // Add more mappings as needed
   };
-  return causeMap[rawCause] || rawCause.replace(/([A-Z])/g, ' $1').replace(/^./, (str) => str.toUpperCase());
+  return causeMap[rawCause] || rawCause.replace(/([A-Z0-9])/g, ' $1').replace(/^./, (str) => str.toUpperCase()).trim();
 };
 
 
 // --- Main Page Component ---
 export default function HomePage() {
-  // Type assertions
-  const profileData = profileDataFromFile as ProfileData;
-  const aboutData = aboutDataFromFile as unknown as AboutData;
-  const experienceData = experienceDataFromFile as CompanyExperience[];
-  const educationData = educationDataFromFile as EducationEntry[];
-  const licensesData = licensesDataFromFile as LicenseCertificationEntry[];
-  const projectsData = projectsDataFromFile as ProjectEntry[];
-  const volunteeringData = volunteeringDataFromFile as VolunteeringEntry[];
-  const skillsData = skillsDataFromFile as SkillsData;
-  const recommendationsReceivedData = recommendationsReceivedDataFromFile as RecommendationReceivedEntry[];
-  const honorsAwardsData = honorsAwardsDataFromFile as HonorAwardEntry[];
-  const languagesData = languagesDataFromFile as LanguageEntry[];
+  // Type assertions - these assume the files exist and have a root structure that can be cast.
+  // Consider adding checks if a file might be missing or completely empty.
+  const profileData = profileDataFromFile as ProfileData || {} as ProfileData;
+  const aboutData = aboutDataFromFile as AboutData || {} as AboutData;
+  const experienceData = experienceDataFromFile as CompanyExperience[] || [];
+  const educationData = educationDataFromFile as EducationEntry[] || [];
+  const licensesData = licensesDataFromFile as LicenseCertificationEntry[] || [];
+  const projectsData = projectsDataFromFile as ProjectEntry[] || [];
+  const volunteeringData = volunteeringDataFromFile as VolunteeringEntry[] || [];
+  const skillsData = skillsDataFromFile as SkillsData || [];
+  const recommendationsReceivedData = recommendationsReceivedDataFromFile as RecommendationReceivedEntry[] || [];
+  const honorsAwardsData = honorsAwardsDataFromFile as HonorAwardEntry[] || [];
+  const languagesData = languagesDataFromFile as LanguageEntry[] || [];
 
   // Calculated display fields
   const getFullName = () => {
+    if (!profileData.firstName && !profileData.lastName) return "Your Name"; // Fallback
+    let name = profileData.firstName || "";
     if (profileData.maidenName) {
-      return `${profileData.firstName} (${profileData.maidenName}) ${profileData.lastName}`;
+      name += ` (${profileData.maidenName})`;
     }
-    return `${profileData.firstName} ${profileData.lastName}`;
+    if (profileData.lastName) {
+      name += ` ${profileData.lastName}`;
+    }
+    return name.trim();
   };
 
   const fullName = getFullName();
@@ -168,18 +163,26 @@ export default function HomePage() {
           <h1 className="text-4xl sm:text-5xl font-bold text-gray-800 dark:text-white mb-2">
             {fullName}
           </h1>
-          <p className="text-xl sm:text-2xl text-indigo-600 dark:text-indigo-400 mb-4">
-            {profileData.headline}
-          </p>
-          <div className="text-sm text-gray-600 dark:text-gray-400 space-y-1">
+          {profileData.headline && (
+            <p className="text-xl sm:text-2xl text-indigo-600 dark:text-indigo-400 mb-4">
+              {profileData.headline}
+            </p>
+          )}
+          <div className="text-sm text-gray-600 dark:text-gray-400 space-y-1 px-4">
             {profileData.address && <p>{profileData.address}</p>}
-            {profileData.geoLocation && <p>{profileData.geoLocation}{profileData.zipCode && `, ${profileData.zipCode}`}</p>}
+            {(profileData.geoLocation || profileData.zipCode) && (
+                <p>
+                    {profileData.geoLocation}
+                    {profileData.geoLocation && profileData.zipCode && `, `}
+                    {profileData.zipCode}
+                </p>
+            )}
             {profileData.twitterHandles && <p>Twitter: <a href={`https://twitter.com/${profileData.twitterHandles.replace('@', '')}`} target="_blank" rel="noopener noreferrer" className="text-indigo-500 hover:underline">{profileData.twitterHandles}</a></p>}
-            {profileData.websites && profileData.websites.length > 0 && (
-              <p>Websites: {profileData.websites.map((site, index) => (
+            {profileData.websites && (Array.isArray(profileData.websites) ? profileData.websites : [profileData.websites]).filter(Boolean).length > 0 && (
+              <p>Websites: {(Array.isArray(profileData.websites) ? profileData.websites : [profileData.websites]).filter(Boolean).map((site, index, arr) => (
                 <React.Fragment key={index}>
-                  <a href={site} target="_blank" rel="noopener noreferrer" className="text-indigo-500 hover:underline">{site.replace(/^https?:\/\//, '')}</a>
-                  {index < (profileData.websites?.length ?? 0) - 1 && ', '}
+                  <a href={site as string} target="_blank" rel="noopener noreferrer" className="text-indigo-500 hover:underline">{(site as string).replace(/^https?:\/\//, '')}</a>
+                  {index < arr.length - 1 && ', '}
                 </React.Fragment>
               ))}</p>
             )}
@@ -188,7 +191,7 @@ export default function HomePage() {
         </header>
 
         {/* 2. About Section */}
-        {aboutData && aboutData.content && (
+        {aboutData?.content && (
           <Section title="About">
             <p className="text-gray-700 dark:text-gray-300 leading-relaxed whitespace-pre-line">
               {aboutData.content}
@@ -209,18 +212,20 @@ export default function HomePage() {
                     {companyExp.totalDurationAtCompany && ` · ${companyExp.totalDurationAtCompany}`}
                   </p>
                 )}
-                {companyExp.roles.map((role, roleIndex) => (
+                {companyExp.roles && companyExp.roles.map((role, roleIndex) => (
                   <div key={roleIndex} className="ml-4 mt-2 pb-4 border-b border-gray-200 dark:border-gray-700 last:border-b-0 last:pb-0">
                     <h4 className="text-xl font-medium text-gray-700 dark:text-white">{role.title}</h4>
                     <p className="text-sm text-indigo-500 dark:text-indigo-400 mb-1">
                       {role.startDate} – {role.endDate} {role.duration && `(${role.duration})`}
                     </p>
                     {role.location && <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">{role.location}</p>}
-                    <ul className="list-disc list-inside text-gray-600 dark:text-gray-300 text-sm space-y-1 mt-2">
-                      {role.responsibilities.map((resp, respIndex) => (
-                        <li key={respIndex}>{resp}</li>
-                      ))}
-                    </ul>
+                    {role.responsibilities && role.responsibilities.length > 0 && (
+                        <ul className="list-disc list-inside text-gray-600 dark:text-gray-300 text-sm space-y-1 mt-2">
+                        {role.responsibilities.map((resp, respIndex) => (
+                            <li key={respIndex}>{resp}</li>
+                        ))}
+                        </ul>
+                    )}
                     {role.skills && role.skills.length > 0 && (
                       <div className="mt-3">
                         <strong className="text-xs font-semibold text-gray-700 dark:text-white uppercase">Skills: </strong>
@@ -260,7 +265,7 @@ export default function HomePage() {
                 <p className="text-md text-gray-700 dark:text-gray-300">{lic.authority}</p>
                 {(lic.startedOn || lic.finishedOn) && (
                     <p className="text-sm text-indigo-500 dark:text-indigo-400 mb-1">
-                        Issued: {lic.startedOn}{lic.finishedOn && lic.startedOn ? ` - ${lic.finishedOn}` : lic.finishedOn}
+                        Issued: {lic.startedOn}{lic.finishedOn && lic.startedOn ? ` - ${lic.finishedOn}` : lic.finishedOn || ''}
                     </p>
                 )}
                 {lic.licenseNumber && <p className="text-sm text-gray-600 dark:text-gray-300">Credential ID: {lic.licenseNumber}</p>}
@@ -287,10 +292,10 @@ export default function HomePage() {
                 <h3 className="text-xl font-semibold text-gray-800 dark:text-white">{proj.title}</h3>
                 {(proj.startedOn || proj.finishedOn) && (
                     <p className="text-sm text-indigo-500 dark:text-indigo-400 mb-1">
-                        {proj.startedOn}{proj.finishedOn && proj.startedOn ? ` - ${proj.finishedOn}` : proj.finishedOn}
+                        {proj.startedOn}{proj.finishedOn && proj.startedOn ? ` - ${proj.finishedOn}` : proj.finishedOn || ''}
                     </p>
                 )}
-                <p className="text-sm text-gray-600 dark:text-gray-300 my-2 whitespace-pre-line">{proj.description}</p>
+                {proj.description && <p className="text-sm text-gray-600 dark:text-gray-300 my-2 whitespace-pre-line">{proj.description}</p>}
                 {proj.url && <a href={proj.url} target="_blank" rel="noopener noreferrer" className="text-indigo-500 hover:underline text-sm">View Project</a>}
               </div>
             ))}
@@ -306,10 +311,10 @@ export default function HomePage() {
                 <p className="text-md text-gray-700 dark:text-gray-300">{vol.companyName}</p>
                 {(vol.startedOn || vol.finishedOn) && (
                      <p className="text-sm text-indigo-500 dark:text-indigo-400 mb-1">
-                        {vol.startedOn}{vol.finishedOn && vol.startedOn ? ` - ${vol.finishedOn}` : vol.finishedOn}
+                        {vol.startedOn}{vol.finishedOn && vol.startedOn ? ` - ${vol.finishedOn}` : vol.finishedOn || ''}
                     </p>
                 )}
-                <p className="text-sm text-gray-600 dark:text-gray-300">Cause: {getDisplayCause(vol.cause)}</p>
+                {vol.cause && <p className="text-sm text-gray-600 dark:text-gray-300">Cause: {getDisplayCause(vol.cause)}</p>}
                 {vol.description && <p className="text-sm text-gray-600 dark:text-gray-300 mt-1 whitespace-pre-line">{vol.description}</p>}
               </div>
             ))}
@@ -394,4 +399,3 @@ const Section: React.FC<SectionProps> = ({ title, children }) => {
     </section>
   );
 };
-
