@@ -2,13 +2,12 @@
 "use client"; 
 
 import React, { useState, ChangeEvent, FormEvent, useEffect, useRef } from 'react';
-// MODIFIED: Removed unused ParseError and ParseMeta. Kept ParseResult.
 import Papa, { ParseResult } from 'papaparse'; 
 
 // Define sections for the dropdown
 const cvSections = [
   { id: "profile", name: "Profile" },
-  { id: "about", name: "About" }, // About is special, populated from Profile's summary
+  { id: "about", name: "About" }, 
   { id: "experience", name: "Experience" },
   { id: "education", name: "Education" },
   { id: "licenses", name: "Licenses & Certifications" },
@@ -67,13 +66,11 @@ const EXPECTED_HEADERS: { [key: string]: string[] } = {
   ],
 };
 
-// Interface for the expected response from the upload-cv-data function
 interface UploadFunctionResponse {
   message: string;
-  error?: string; // Optional error details
+  error?: string; 
 }
 
-// Interface for the expected response from the get-deploy-status function
 interface DeployStatusResponse {
   deployId?: string;
   status?: string;
@@ -81,7 +78,7 @@ interface DeployStatusResponse {
   publishedAt?: string;
   commitRef?: string;
   context?: string;
-  message?: string; // For error messages from the function itself
+  message?: string; 
 }
 
 export default function UploadForm() {
@@ -106,25 +103,31 @@ export default function UploadForm() {
     };
   }, []);
 
-  const resetFormState = () => {
+  const resetFormState = (clearFileInputValue: boolean = true) => {
     setProgress(0);
     setProgressMessage('');
     setMessage(null);
     setSelectedFile(null);
     setIsFileValid(false);
     setUploadInitiationTime(null);
-    if (fileInputRef.current) {
+    if (clearFileInputValue && fileInputRef.current) {
       fileInputRef.current.value = ""; 
     }
   };
 
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
-    resetFormState(); 
+    setMessage(null);
+    setIsFileValid(false);
+    setSelectedFile(null); 
+    setProgress(0);
+    setProgressMessage('');
+
     const file = event.target.files?.[0];
 
     if (file) {
       if (!file.name.toLowerCase().endsWith(".csv")) {
         setMessage({ type: 'error', text: 'Invalid file type. Please upload a CSV file.' });
+        if (fileInputRef.current) fileInputRef.current.value = ""; 
         return;
       }
 
@@ -137,10 +140,6 @@ export default function UploadForm() {
         complete: (results: ParseResult<Record<string, unknown>>) => { 
           const actualHeaders = results.meta.fields || [];
           const expected = EXPECTED_HEADERS[selectedSection];
-
-          if (selectedSection === "about" && EXPECTED_HEADERS["about"]?.length > 0) {
-            // Handle 'about' section special case
-          }
 
           if (!expected) {
             setMessage({ type: 'info', text: `No specific header validation for section: ${selectedSection}. Please ensure format is correct.` });
@@ -166,6 +165,7 @@ export default function UploadForm() {
               )
             });
             setIsFileValid(false);
+            if (fileInputRef.current) fileInputRef.current.value = ""; 
           } else {
             let validationMessage = "CSV headers are correct.";
             if (extraHeaders.length > 0) {
@@ -180,12 +180,14 @@ export default function UploadForm() {
             setProgressMessage('File selected and headers validated. Ready for upload.');
           }
         },
-        // MODIFIED: Removed unused 'file' parameter from error callback
         error: (err: Error) => { 
           setMessage({ type: 'error', text: `Error parsing CSV for validation: ${err.message}` });
           setIsFileValid(false);
+          if (fileInputRef.current) fileInputRef.current.value = ""; 
         }
       });
+    } else {
+        resetFormState();
     }
   };
 
@@ -286,7 +288,11 @@ export default function UploadForm() {
         if (uploadResponse.ok) {
           setProgress(30); 
           setProgressMessage('Data submitted to GitHub. Build triggered. Monitoring deployment...');
-          setMessage({ type: 'success', text: uploadResult.message || 'File processing initiated successfully!' });
+          if (message?.type !== 'error') {
+            setMessage({ type: 'success', text: uploadResult.message || 'File processing initiated successfully!' });
+          } else {
+             setMessage({ type: 'success', text: uploadResult.message || 'File processing initiated successfully!' });
+          }
           
           if (pollingIntervalRef.current) clearInterval(pollingIntervalRef.current); 
           pollingIntervalRef.current = setInterval(checkDeployStatus, 10000); 
@@ -360,15 +366,13 @@ export default function UploadForm() {
             <div className="mt-1">
               <input
                 ref={fileInputRef} 
-                id="cvFile" name="cvFile" type="file" accept=".csv" onChange={handleFileChange} required
+                id="cvFile" name="cvFile" type="file" accept=".csv" onChange={handleFileChange} 
                 className="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white bg-white dark:bg-gray-700 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
                 disabled={isProcessing}
               />
             </div>
-            {selectedFile && !isFileValid && message && message.type === 'error' && ( 
-                <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">Selected: {selectedFile.name}</p>
-            )}
-             {selectedFile && isFileValid && (
+            {/* MODIFIED: Safer check for message.text before calling string methods */}
+            {selectedFile && (isFileValid || (message && message.type === 'error' && typeof message.text === 'string' && message.text.toLowerCase().includes('file'))) && (
               <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">Selected: {selectedFile.name}</p>
             )}
           </div>
