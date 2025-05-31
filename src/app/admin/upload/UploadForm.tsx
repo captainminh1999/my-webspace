@@ -70,8 +70,11 @@ export default function UploadForm() {
     try {
       const statusResponse = await fetch('/.netlify/functions/get-deploy-status');
       if (!statusResponse.ok) {
-        setProgressMessage(`Error checking deploy status: ${statusResponse.status}`);
+        // If the status function itself returns an error (like 404)
+        setProgressMessage(`Error checking deploy status: ${statusResponse.statusText || statusResponse.status}. Function may not be deployed.`);
+        setMessage({ type: 'error', text: `Failed to get deployment status. Please check Netlify function logs for 'get-deploy-status'.` });
         if (pollingIntervalRef.current) clearInterval(pollingIntervalRef.current);
+        setIsProcessing(false); // MODIFIED: Reset processing state on polling function error
         return;
       }
       const statusData = await statusResponse.json();
@@ -94,8 +97,10 @@ export default function UploadForm() {
       }
     } catch (error) {
       console.error("Error polling deploy status:", error);
-      setProgressMessage('Could not retrieve deploy status.');
+      setProgressMessage('Could not retrieve deploy status. Network error or function issue.');
+      setMessage({ type: 'error', text: 'Error while trying to check deployment status.' });
       if (pollingIntervalRef.current) clearInterval(pollingIntervalRef.current);
+      setIsProcessing(false); // MODIFIED: Reset processing state on catch
     }
   };
 
@@ -217,7 +222,7 @@ export default function UploadForm() {
           </div>
           
           {isProcessing && (
-            <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5">
+            <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5 mt-4">
               <div
                 className="bg-indigo-600 h-2.5 rounded-full transition-all duration-300 ease-out"
                 style={{ width: `${progress}%` }}
@@ -234,14 +239,14 @@ export default function UploadForm() {
             <button
               type="submit"
               disabled={isProcessing || !selectedFile}
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:bg-gray-400 dark:disabled:bg-gray-600"
+              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:bg-gray-400 dark:disabled:bg-gray-600 mt-6"
             >
               {isProcessing ? `Processing (${progress}%)` : 'Upload CSV for Section'}
             </button>
           </div>
 
           {message && (
-            <div className={`p-4 rounded-md text-sm ${message.type === 'success' && progress === 100 ? 'bg-green-100 dark:bg-green-700 text-green-700 dark:text-green-100' : message.type === 'error' ? 'bg-red-100 dark:bg-red-700 text-red-700 dark:text-red-100' : 'bg-blue-100 dark:bg-blue-700 text-blue-700 dark:text-blue-100'}`}>
+            <div className={`p-4 rounded-md text-sm mt-4 ${message.type === 'success' && progress === 100 ? 'bg-green-100 dark:bg-green-700 text-green-700 dark:text-green-100' : message.type === 'error' ? 'bg-red-100 dark:bg-red-700 text-red-700 dark:text-red-100' : 'bg-blue-100 dark:bg-blue-700 text-blue-700 dark:text-blue-100'}`}>
               {message.text}
             </div>
           )}
