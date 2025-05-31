@@ -242,8 +242,8 @@ export default function NewHomePage() {
       <div className="mt-8 p-4 bg-yellow-100 dark:bg-yellow-900/50 border border-yellow-300 dark:border-yellow-700 rounded-md text-yellow-700 dark:text-yellow-200 text-sm">
         <p><strong>Note on React Grid Layout CSS:</strong> Ensure <code>react-grid-layout/css/styles.css</code> and <code>react-resizable/css/styles.css</code> are imported, e.g., in <code>globals.css</code>.</p>
         <pre className="mt-2 text-xs bg-gray-200 dark:bg-gray-700 p-2 rounded"><code>
-          @import 'react-grid-layout/css/styles.css';<br/>
-          @import 'react-resizable/css/styles.css';
+          @import &#39;react-grid-layout/css/styles.css&#39;;<br/>
+          @import &#39;react-resizable/css/styles.css&#39;;
         </code></pre>
       </div>
     </main>
