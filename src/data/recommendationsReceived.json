@@ -1,10 +1,29 @@
 [
   {
-    "firstName": "Jane",
-    "lastName": "Doe",
-    "jobTitle": "Senior Engineering Manager",
-    "company": "Tech Innovations Ltd.",
-    "text": "Minh is an exceptional data specialist with a keen eye for detail and a proactive approach to problem-solving. Highly recommended!",
-    "creationDate": "2023-11-15"
+    "firstName": "Jag",
+    "lastName": "Sidhu",
+    "company": "Selling Simplified",
+    "jobTitle": "Chief Operating Officer",
+    "text": "I had the opportunity to work with Minh when he was almost fresh out of university. What a dynamic and learned personality! Most organizations will fly the plane as they build it and Minh is exactly the type of talent that excels at this feat. Going from individual contributor to leader, he has the experience to build and grow a strong team. A problem solver and tireless hard worker, I believe any organization lucky to have him would be quite pleased.",
+    "creationDate": "05/06/23, 07:44 AM",
+    "status": "VISIBLE"
+  },
+  {
+    "firstName": "Blake",
+    "lastName": "Sandman",
+    "company": "Foundry",
+    "jobTitle": "Director of Data Analytics",
+    "text": "Minh is an extremely hard working individual with a great technical skills background. Ive had the honor of being Minhs direct report for almost a year and he never ceased to amaze me. He uses his critical thinking skills to analyze and create more efficient ways to complete daily tasks. Not only are his hard skills finely tuned but his soft skills make him a great leader, i can always count on Minh to brief his team with any information in a timely manner. He has great time management and communication skills and really puts forth the effort to earn his teams trust. Minh is an extremely talented employee and individual who will do whatever it takes to get the job done and it has been an absolute pleasure to have worked with him.",
+    "creationDate": "04/24/23, 05:28 PM",
+    "status": "VISIBLE"
+  },
+  {
+    "firstName": "Makarand",
+    "lastName": "Prabhu",
+    "company": "Foundry",
+    "jobTitle": "Vice President",
+    "text": "I had the pleasure of working with Minh as a data team lead for Foundry, and I can confidently say that they are a highly skilled and effective leader. Minh has a deep understanding of data analysis and is able to communicate complex insights in a clear and concise manner.  As a team lead, Minh is always willing to go above and beyond to support their team and ensure that projects are delivered on time and to a high standard. They are able to balance the needs of the business with the needs of their team, creating a collaborative and supportive environment where everyone feels valued.  In addition to their technical expertise, Minh has exceptional communication and interpersonal skills. They are able to build strong relationships with stakeholders across the organization, from executives to front-line staff, and are able to articulate the value of data-driven insights to non-technical audiences.  I would highly recommend Minh as a data team lead to any organization looking for a strategic thinker who can lead a team to success.",
+    "creationDate": "04/19/23, 12:30 AM",
+    "status": "VISIBLE"
   }
 ]
