@@ -57,8 +57,8 @@ interface CompanyExperience {
 
 interface EducationEntry {
   schoolName: string;
-  startDate: string;
-  endDate: string;
+  startDate: string | number; // CHANGE: Allow number
+  endDate: string | number;   // CHANGE: Allow number
   degreeName?: string | null;
   notes?: string | null;
   activities?: string | null;
