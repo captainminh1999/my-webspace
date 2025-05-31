@@ -1,50 +1,10 @@
 [
   {
-    "endorsementDate": "2022/08/28 07:03:51 UTC",
-    "skillName": "Leadership",
-    "endorserFirstName": "Daisy ",
-    "endorserLastName": "P.",
-    "endorserPublicUrl": "www.linkedin.com/in/phanthikhanhdiem",
-    "endorsementStatus": "ACCEPTED"
-  },
-  {
-    "endorsementDate": "2022/08/28 07:03:47 UTC",
-    "skillName": "Analytical Skills",
-    "endorserFirstName": "Daisy ",
-    "endorserLastName": "P.",
-    "endorserPublicUrl": "www.linkedin.com/in/phanthikhanhdiem",
-    "endorsementStatus": "ACCEPTED"
-  },
-  {
-    "endorsementDate": "2022/04/12 01:03:06 UTC",
-    "skillName": "Analytical Skills",
-    "endorserFirstName": "Ashley",
-    "endorserLastName": "Chung",
-    "endorserPublicUrl": "www.linkedin.com/in/ashley-chung-b5848a204",
-    "endorsementStatus": "ACCEPTED"
-  },
-  {
-    "endorsementDate": "2022/04/11 10:03:03 UTC",
-    "skillName": "Analytical Skills",
-    "endorserFirstName": "Joe",
-    "endorserLastName": "Fazzari",
-    "endorserPublicUrl": "www.linkedin.com/in/joe-fazzari",
-    "endorsementStatus": "ACCEPTED"
-  },
-  {
-    "endorsementDate": "2021/02/02 02:53:20 UTC",
-    "skillName": "Videography",
-    "endorserFirstName": "Diem",
-    "endorserLastName": "Vo",
-    "endorserPublicUrl": "www.linkedin.com/in/vocaohongdiem",
-    "endorsementStatus": "ACCEPTED"
-  },
-  {
-    "endorsementDate": "2019/06/12 03:04:33 UTC",
-    "skillName": "Creative Content Production",
-    "endorserFirstName": "An",
-    "endorserLastName": "Pham Binh Nguyen",
-    "endorserPublicUrl": "www.linkedin.com/in/annguyenevents",
-    "endorsementStatus": "ACCEPTED"
+    "firstName": "Jane",
+    "lastName": "Doe",
+    "jobTitle": "Senior Engineering Manager",
+    "company": "Tech Innovations Ltd.",
+    "text": "Minh is an exceptional data specialist with a keen eye for detail and a proactive approach to problem-solving. Highly recommended!",
+    "creationDate": "2023-11-15"
   }
 ]
