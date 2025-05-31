@@ -84,25 +84,90 @@ export default function UploadForm() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isFileValid, setIsFileValid] = useState(false); 
   const [selectedSection, setSelectedSection] = useState<string>(cvSections[0].id);
-  const [isProcessing, setIsProcessing] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false); // True during entire upload + polling cycle
   const [progress, setProgress] = useState(0);
   const [progressMessage, setProgressMessage] = useState('');
   const [message, setMessage] = useState<{ type: 'success' | 'error' | 'info'; text: string | React.ReactNode } | null>(null);
   const [secretKey, setSecretKey] = useState('');
   
-  // This state is set but its direct usage in checkDeployStatus was causing issues with closures.
-  // We'll rely on passing the specific initiationTime to checkDeployStatus.
   const [uploadInitiationTime, setUploadInitiationTime] = useState<number | null>(null); 
   const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null); 
 
+  // Effect to manage polling based on uploadInitiationTime and isProcessing state
   useEffect(() => {
+    // Function to be called by interval, now defined inside useEffect to capture current state
+    const pollStatus = async () => {
+      if (!uploadInitiationTime || !isProcessing) { // Ensure we should be polling
+        if (pollingIntervalRef.current) clearInterval(pollingIntervalRef.current);
+        return;
+      }
+      try {
+        const statusResponse = await fetch('/.netlify/functions/get-deploy-status');
+        const statusData = await statusResponse.json() as DeployStatusResponse; 
+
+        if (!statusResponse.ok) {
+          setProgressMessage(`Error checking deploy status: ${statusData.message || statusResponse.statusText || statusResponse.status}.`);
+          setMessage({ type: 'error', text: `Failed to get deployment status. Function 'get-deploy-status' might not be deployed or API key is invalid.` });
+          if (pollingIntervalRef.current) clearInterval(pollingIntervalRef.current);
+          setIsProcessing(false); 
+          setUploadInitiationTime(null); 
+          return;
+        }
+        
+        const deployCreatedAt = statusData.createdAt ? new Date(statusData.createdAt).getTime() : 0;
+
+        if ((statusData.status === 'ready' || statusData.status === 'current') && deployCreatedAt >= uploadInitiationTime) {
+          setProgress(100);
+          setProgressMessage('Site successfully updated!');
+          setMessage({ type: 'success', text: 'Deployment complete and site is live with new data. You may need to refresh the main CV page.' });
+          if (pollingIntervalRef.current) clearInterval(pollingIntervalRef.current);
+          setIsProcessing(false); 
+          setUploadInitiationTime(null); 
+        } else if (statusData.status === 'building') {
+          setProgressMessage(`Netlify build in progress (status: ${statusData.status}). Checking again in 10s...`);
+          setProgress(prev => Math.min(prev + 5, 95)); 
+        } else if ((statusData.status === 'ready' || statusData.status === 'current') && deployCreatedAt < uploadInitiationTime) {
+          setProgressMessage(`Waiting for new deployment (last live deploy was older). API status: ${statusData.status}. Checking again in 10s...`);
+          setProgress(prev => Math.min(prev, 95)); 
+        } else if (statusData.status === 'error' || statusData.status === 'failed') {
+          setProgressMessage(`Deployment failed: ${statusData.status}`);
+          setMessage({ type: 'error', text: `Netlify deployment failed. Check deploy logs on Netlify.` });
+          if (pollingIntervalRef.current) clearInterval(pollingIntervalRef.current);
+          setIsProcessing(false);
+          setUploadInitiationTime(null); 
+        } else { 
+           setProgressMessage(`Deployment status: ${statusData.status || 'pending'}. Checking again in 10s...`);
+           setProgress(prev => Math.min(prev + 1, 90)); // Slower progress for other pending states
+        }
+      } catch (error) {
+        console.error("Error polling deploy status:", error);
+        setProgressMessage('Could not retrieve deploy status. Network error or function issue.');
+        setMessage({ type: 'error', text: 'Error while trying to check deployment status.' });
+        if (pollingIntervalRef.current) clearInterval(pollingIntervalRef.current);
+        setIsProcessing(false); 
+        setUploadInitiationTime(null);
+      }
+    };
+
+    // Start polling if conditions are met
+    if (uploadInitiationTime && isProcessing && progress >= 30 && progress < 100) {
+      if (pollingIntervalRef.current) clearInterval(pollingIntervalRef.current); // Clear any old one
+      pollStatus(); // Initial immediate check
+      pollingIntervalRef.current = setInterval(pollStatus, 10000); // Then poll every 10 seconds
+    } else if (!isProcessing && pollingIntervalRef.current) {
+      // If processing stopped for other reasons (e.g. error before polling stage), clear interval
+      clearInterval(pollingIntervalRef.current);
+    }
+
+    // Cleanup function for the effect
     return () => {
       if (pollingIntervalRef.current) {
         clearInterval(pollingIntervalRef.current);
       }
     };
-  }, []);
+  }, [uploadInitiationTime, isProcessing, progress]); // Dependencies for the polling effect
+
 
   const resetFormOnNewSelection = (clearFileInput: boolean = true) => {
     setProgress(0);
@@ -110,7 +175,7 @@ export default function UploadForm() {
     setMessage(null);
     setSelectedFile(null);
     setIsFileValid(false);
-    setUploadInitiationTime(null); // Reset this for clarity, though polling relies on passed param
+    setUploadInitiationTime(null); 
     if (pollingIntervalRef.current) { 
         clearInterval(pollingIntervalRef.current);
         pollingIntervalRef.current = null;
@@ -118,7 +183,7 @@ export default function UploadForm() {
     if (clearFileInput && fileInputRef.current) {
       fileInputRef.current.value = ""; 
     }
-    // setIsProcessing(false); // Only set isProcessing to false when a process truly ends
+    setIsProcessing(false); // Ensure form is re-enabled if reset is called
   };
 
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -131,13 +196,8 @@ export default function UploadForm() {
     if (isProcessing && pollingIntervalRef.current) {
         clearInterval(pollingIntervalRef.current);
         pollingIntervalRef.current = null;
-        // setIsProcessing(false); // Let submit button re-enable if user changes file mid-poll
     }
-     if (!isProcessing && pollingIntervalRef.current) { // If somehow an interval is orphaned
-        clearInterval(pollingIntervalRef.current);
-        pollingIntervalRef.current = null;
-    }
-
+    setIsProcessing(false); // Allow new file selection to reset processing state
 
     const file = event.target.files?.[0];
 
@@ -224,62 +284,7 @@ export default function UploadForm() {
     setSecretKey(event.target.value);
   };
 
-  // MODIFIED: checkDeployStatus now takes the specific upload's start time as a parameter
-  const checkDeployStatus = async (currentUploadCycleStartTime: number) => {
-    if (!currentUploadCycleStartTime) {
-        setProgressMessage("Error: Cannot check deploy status without upload initiation time for this cycle.");
-        if (pollingIntervalRef.current) clearInterval(pollingIntervalRef.current);
-        setIsProcessing(false); 
-        return;
-    }
-    try {
-      const statusResponse = await fetch('/.netlify/functions/get-deploy-status');
-      const statusData = await statusResponse.json() as DeployStatusResponse; 
-
-      if (!statusResponse.ok) {
-        setProgressMessage(`Error checking deploy status: ${statusData.message || statusResponse.statusText || statusResponse.status}.`);
-        setMessage({ type: 'error', text: `Failed to get deployment status. Function 'get-deploy-status' might not be deployed or API key is invalid.` });
-        if (pollingIntervalRef.current) clearInterval(pollingIntervalRef.current);
-        setIsProcessing(false); 
-        // setUploadInitiationTime(null); // Keep current cycle's time until it resolves or errors fully
-        return;
-      }
-      
-      const deployCreatedAt = statusData.createdAt ? new Date(statusData.createdAt).getTime() : 0;
-
-      if ((statusData.status === 'ready' || statusData.status === 'current') && deployCreatedAt >= currentUploadCycleStartTime) {
-        setProgress(100);
-        setProgressMessage('Site successfully updated!');
-        setMessage({ type: 'success', text: 'Deployment complete and site is live with new data. You may need to refresh the main CV page.' });
-        if (pollingIntervalRef.current) clearInterval(pollingIntervalRef.current);
-        setIsProcessing(false); 
-        setUploadInitiationTime(null); // Reset for next potential upload
-      } else if (statusData.status === 'building') {
-        setProgressMessage(`Netlify build in progress (status: ${statusData.status}). Checking again in 10s...`);
-        setProgress(prev => Math.min(prev + 5, 95)); 
-      } else if ((statusData.status === 'ready' || statusData.status === 'current') && deployCreatedAt < currentUploadCycleStartTime) {
-        // This is an old 'ready' deploy, the new one is still building or hasn't started/shown up
-        setProgressMessage(`Waiting for new deployment (last live deploy was older). Current API status: ${statusData.status}. Checking again in 10s...`);
-        setProgress(prev => Math.min(prev, 95)); // Keep progress high but not 100%
-      } else if (statusData.status === 'error' || statusData.status === 'failed') {
-        setProgressMessage(`Deployment failed: ${statusData.status}`);
-        setMessage({ type: 'error', text: `Netlify deployment failed. Check deploy logs on Netlify.` });
-        if (pollingIntervalRef.current) clearInterval(pollingIntervalRef.current);
-        setIsProcessing(false);
-        setUploadInitiationTime(null); 
-      } else { 
-         setProgressMessage(`Deployment status: ${statusData.status || 'pending'}. Checking again in 10s...`);
-         setProgress(prev => Math.min(prev + 2, 90)); 
-      }
-    } catch (error) {
-      console.error("Error polling deploy status:", error);
-      setProgressMessage('Could not retrieve deploy status. Network error or function issue.');
-      setMessage({ type: 'error', text: 'Error while trying to check deployment status.' });
-      if (pollingIntervalRef.current) clearInterval(pollingIntervalRef.current);
-      setIsProcessing(false); 
-      setUploadInitiationTime(null);
-    }
-  };
+  // Removed checkDeployStatus from here, it's now managed by useEffect
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -288,15 +293,16 @@ export default function UploadForm() {
       return;
     }
 
-    setIsProcessing(true); 
+    setIsProcessing(true); // This will trigger the useEffect for polling if uploadInitiationTime is also set
     if (message?.type === 'error') {
         setMessage(null); 
     }
     setProgress(10); 
     setProgressMessage('Reading file...');
     
-    const currentUploadStartTimeForThisSubmit = Date.now(); // Capture time for THIS specific upload
-    setUploadInitiationTime(currentUploadStartTimeForThisSubmit); // Set state, primarily for potential direct use if needed elsewhere
+    // Set uploadInitiationTime. The useEffect will pick this up to start polling
+    // after the upload-cv-data function call is successful (progress >= 30).
+    setUploadInitiationTime(Date.now()); 
 
     const reader = new FileReader();
     reader.readAsDataURL(selectedFile);
@@ -321,26 +327,21 @@ export default function UploadForm() {
         const uploadResult = await uploadResponse.json() as UploadFunctionResponse; 
 
         if (uploadResponse.ok) {
-          setProgress(30); 
+          setProgress(30); // Signal that upload to function was successful
           setProgressMessage('Data submitted to GitHub. Build triggered. Monitoring deployment...');
           setMessage({ type: 'success', text: uploadResult.message || 'File processing initiated successfully!' });
-          
-          if (pollingIntervalRef.current) clearInterval(pollingIntervalRef.current); 
-          // Pass currentUploadStartTimeForThisSubmit to the interval's closure
-          pollingIntervalRef.current = setInterval(() => checkDeployStatus(currentUploadStartTimeForThisSubmit), 10000); 
-          // Also pass to the initial immediate check
-          await checkDeployStatus(currentUploadStartTimeForThisSubmit); 
-
+          // Polling will now be initiated by the useEffect hook because isProcessing is true,
+          // uploadInitiationTime is set, and progress will be >= 30.
         } else {
           setMessage({ type: 'error', text: uploadResult.message || `Upload to function failed (Status: ${uploadResponse.status}).` });
-          setIsProcessing(false); 
+          setIsProcessing(false); // Stop processing on failure
           setProgress(0);
           setUploadInitiationTime(null); 
         }
       } catch (error) {
         console.error('Upload error:', error);
         setMessage({ type: 'error', text: 'An unexpected error occurred during upload processing.' });
-        setIsProcessing(false); 
+        setIsProcessing(false); // Stop processing on failure
         setProgress(0);
         setUploadInitiationTime(null); 
       }
@@ -348,7 +349,7 @@ export default function UploadForm() {
     reader.onerror = (error) => {
       console.error('File reading error:', error);
       setMessage({ type: 'error', text: 'Error reading file.' });
-      setIsProcessing(false); 
+      setIsProcessing(false); // Stop processing on failure
       setProgress(0);
       setUploadInitiationTime(null);
     };
