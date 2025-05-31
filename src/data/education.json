@@ -1,10 +1,18 @@
 [
   {
-    "schoolName": "University of Technology Sydney",
-    "startDate": "2017",
-    "endDate": "2021",
-    "degreeName": "Bachelor of Computer Science",
-    "notes": "Specialized in Data Science and AI.",
-    "activities": "Member of the UTS Tech Society"
+    "schoolName": "S P Jain School of Global Management",
+    "startDate": 2017,
+    "endDate": 2021,
+    "notes": "• Student Council President of S P Jain Sydney 2019-2020. • School's representative to participate in the Amity University Dubai Media Fest 2019 at the Reel Short Film competition, I successfully secured the first-runner up position. • School's representative to participate in the UOWD Inter-University Business Pitch Competition 2018, in which our team successfully secured the second-runner up position. • Event organizer: Hosted the 2019 Diwali and 2019 & 2020 Lunar New Year Celebrations for 150 students (including the undergraduate, postgraduate cohort and the school faculties) in SP Jain School of Global Management, Sydney & Dubai Campus. • Student Ambassador at S P Jain Singapore 2017-2018.",
+    "degreeName": "Bachelor of Business Administration - BBA",
+    "activities": null
+  },
+  {
+    "schoolName": "Dan Phuong Highschool",
+    "startDate": 2013,
+    "endDate": 2017,
+    "notes": "• Members of the Executive Committee 2016-2017 • 2 Runner-Ups in Provincial Competitions for Excellent Student in Physics • First Place in \"I love Dan Phuong\" Filming Contest • First Place in \"Study in the UK\" - a competition by IDP",
+    "degreeName": "High School Diploma",
+    "activities": null
   }
 ]
