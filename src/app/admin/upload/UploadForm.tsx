@@ -80,8 +80,9 @@ interface DeployStatusResponse {
   message?: string; 
 }
 
-const POLLING_INTERVAL_BUILDING = 10000; // 10 seconds for 'building'
-const POLLING_INTERVAL_PENDING = 3000;  // 3 seconds for other pending states
+const POLLING_INTERVAL_BUILDING = 5000; // 5 seconds for 'building'
+const POLLING_INTERVAL_PENDING = 2000;  // 2 seconds for other pending states
+const PROGRESS_ANIMATION_INTERVAL = 1000; // ms for smooth progress animation
 
 export default function UploadForm() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -89,111 +90,137 @@ export default function UploadForm() {
   const [selectedSection, setSelectedSection] = useState<string>(cvSections[0].id);
   const [isProcessing, setIsProcessing] = useState(false); 
   const [progress, setProgress] = useState(0);
+  const [targetProgress, setTargetProgress] = useState(0); // MODIFIED: For animation target
   const [progressMessage, setProgressMessage] = useState('');
   const [message, setMessage] = useState<{ type: 'success' | 'error' | 'info'; text: string | React.ReactNode } | null>(null);
   const [secretKey, setSecretKey] = useState('');
   
   const [uploadInitiationTime, setUploadInitiationTime] = useState<number | null>(null); 
-  const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null);
-  const currentPollIntervalDurationRef = useRef<number>(POLLING_INTERVAL_PENDING); // Ref to store current interval for cleanup
+  const pollingTimeoutRef = useRef<NodeJS.Timeout | null>(null); // MODIFIED: Using setTimeout for polling
+  const progressAnimationIntervalRef = useRef<NodeJS.Timeout | null>(null); // MODIFIED: For progress animation
+  const currentPollIntervalDurationRef = useRef<number>(POLLING_INTERVAL_PENDING);
   const fileInputRef = useRef<HTMLInputElement>(null); 
 
-  // useEffect for polling logic
+  // Effect for smooth progress bar animation
+  useEffect(() => {
+    if (isProcessing && progress < targetProgress) {
+      if (progressAnimationIntervalRef.current) clearInterval(progressAnimationIntervalRef.current);
+      progressAnimationIntervalRef.current = setInterval(() => {
+        setProgress(prev => {
+          if (prev < targetProgress) {
+            return prev + 1;
+          }
+          if (progressAnimationIntervalRef.current) clearInterval(progressAnimationIntervalRef.current);
+          return prev;
+        });
+      }, PROGRESS_ANIMATION_INTERVAL);
+    } else if (progressAnimationIntervalRef.current && progress >= targetProgress) {
+        clearInterval(progressAnimationIntervalRef.current);
+    }
+    return () => {
+      if (progressAnimationIntervalRef.current) clearInterval(progressAnimationIntervalRef.current);
+    };
+  }, [isProcessing, progress, targetProgress]);
+
+
+  // Effect for API polling logic
   useEffect(() => {
     const pollStatus = async () => {
-      if (!uploadInitiationTime || !isProcessing || progress >= 100) {
-        if (pollingIntervalRef.current) clearInterval(pollingIntervalRef.current);
+      if (!uploadInitiationTime || !isProcessing || targetProgress >= 100) { // Use targetProgress here
+        if (pollingTimeoutRef.current) clearTimeout(pollingTimeoutRef.current);
         return;
       }
 
       try {
         const statusResponse = await fetch('/.netlify/functions/get-deploy-status');
-        const statusData = await statusResponse.json() as DeployStatusResponse;
+        const statusData = await statusResponse.json() as DeployStatusResponse; 
 
         if (!statusResponse.ok) {
           setProgressMessage(`Error checking deploy status: ${statusData.message || statusResponse.statusText || statusResponse.status}.`);
-          setMessage({ type: 'error', text: `Failed to get deployment status. Function 'get-deploy-status' might not be deployed or API key is invalid.` });
-          if (pollingIntervalRef.current) clearInterval(pollingIntervalRef.current);
+          setMessage({ type: 'error', text: `Failed to get deployment status. Check logs for 'get-deploy-status'.` });
+          if (pollingTimeoutRef.current) clearTimeout(pollingTimeoutRef.current);
           setIsProcessing(false); 
+          setTargetProgress(progress); // Keep current visual progress
           setUploadInitiationTime(null); 
           return;
         }
         
         const deployCreatedAt = statusData.createdAt ? new Date(statusData.createdAt).getTime() : 0;
-        let nextPollInterval = POLLING_INTERVAL_PENDING; // Default to faster polling
+        let nextPollInterval = POLLING_INTERVAL_PENDING;
 
         if ((statusData.status === 'ready' || statusData.status === 'current') && deployCreatedAt >= uploadInitiationTime) {
-          setProgress(100);
+          setTargetProgress(100);
           setProgressMessage('Site successfully updated!');
-          setMessage({ type: 'success', text: 'Deployment complete and site is live with new data. You may need to refresh the main CV page.' });
-          if (pollingIntervalRef.current) clearInterval(pollingIntervalRef.current);
+          setMessage({ type: 'success', text: 'Deployment complete! Refresh CV page to see updates.' });
+          if (pollingTimeoutRef.current) clearTimeout(pollingTimeoutRef.current);
           setIsProcessing(false); 
           setUploadInitiationTime(null); 
         } else if (statusData.status === 'building') {
-          setProgressMessage(`Netlify build in progress (status: ${statusData.status}). Checking again in ${POLLING_INTERVAL_BUILDING/1000}s...`);
-          setProgress(prev => Math.min(prev + 5, 95)); 
+          setProgressMessage(`Netlify build in progress (status: ${statusData.status})...`);
+          setTargetProgress(prev => Math.min(prev + 15, 95)); // Aim for a higher chunk
           nextPollInterval = POLLING_INTERVAL_BUILDING;
         } else if ((statusData.status === 'ready' || statusData.status === 'current') && deployCreatedAt < uploadInitiationTime) {
-          setProgressMessage(`Waiting for new deployment. Current API status: ${statusData.status} (older deploy). Checking again in ${POLLING_INTERVAL_PENDING/1000}s...`);
-          setProgress(prev => Math.min(prev, 90)); 
+          setProgressMessage(`Waiting for new deployment (current status: ${statusData.status} - older deploy)...`);
+          setTargetProgress(prev => Math.min(prev + 5, 90)); // Small increment while waiting
         } else if (statusData.status === 'error' || statusData.status === 'failed') {
           setProgressMessage(`Deployment failed: ${statusData.status}`);
           setMessage({ type: 'error', text: `Netlify deployment failed. Check deploy logs on Netlify.` });
-          if (pollingIntervalRef.current) clearInterval(pollingIntervalRef.current);
+          if (pollingTimeoutRef.current) clearTimeout(pollingTimeoutRef.current);
           setIsProcessing(false);
+          setTargetProgress(progress); // Keep current visual progress
           setUploadInitiationTime(null); 
         } else { 
-           setProgressMessage(`Deployment status: ${statusData.status || 'pending'}. Checking again in ${POLLING_INTERVAL_PENDING/1000}s...`);
-           setProgress(prev => prev < 85 ? Math.min(prev + 2, 85) : prev); 
+           setProgressMessage(`Deployment status: ${statusData.status || 'pending'}...`);
+           setTargetProgress(prev => Math.min(prev + 5, 85)); 
         }
 
-        // If still processing, set up the next poll with the determined interval
-        if (isProcessing && progress < 100 && uploadInitiationTime) { // Check uploadInitiationTime again for safety
-            if (pollingIntervalRef.current) clearInterval(pollingIntervalRef.current);
+        if (isProcessing && targetProgress < 100 && uploadInitiationTime) {
+            if (pollingTimeoutRef.current) clearTimeout(pollingTimeoutRef.current);
             currentPollIntervalDurationRef.current = nextPollInterval;
-            pollingIntervalRef.current = setTimeout(pollStatus, currentPollIntervalDurationRef.current);
+            pollingTimeoutRef.current = setTimeout(pollStatus, currentPollIntervalDurationRef.current);
         }
 
       } catch (error) {
         console.error("Error polling deploy status:", error);
-        setProgressMessage('Could not retrieve deploy status. Network error or function issue.');
+        setProgressMessage('Could not retrieve deploy status.');
         setMessage({ type: 'error', text: 'Error while trying to check deployment status.' });
-        if (pollingIntervalRef.current) clearInterval(pollingIntervalRef.current);
+        if (pollingTimeoutRef.current) clearTimeout(pollingTimeoutRef.current);
         setIsProcessing(false); 
+        setTargetProgress(progress);
         setUploadInitiationTime(null);
       }
     };
 
-    // Start polling if conditions are met
-    if (uploadInitiationTime && isProcessing && progress >= 30 && progress < 100) {
-      // Clear any existing interval before starting a new one or the first call
-      if (pollingIntervalRef.current) {
-        clearInterval(pollingIntervalRef.current);
-      }
-      // Initial call to pollStatus
-      const initialCallTimeout = setTimeout(pollStatus, 100); // Small delay for state to settle
-      return () => clearTimeout(initialCallTimeout);
+    if (uploadInitiationTime && isProcessing && progress >= 30 && targetProgress < 100) {
+      if (pollingTimeoutRef.current) clearTimeout(pollingTimeoutRef.current);
+      // Initial call to pollStatus, use a short delay or call directly
+      const initialPollTimer = setTimeout(pollStatus, 100); // Start polling shortly after hitting 30%
+      return () => clearTimeout(initialPollTimer);
     }
     
-    // Cleanup function for the effect
-    return () => {
-      if (pollingIntervalRef.current) {
-        clearInterval(pollingIntervalRef.current);
+    return () => { // General cleanup for the effect
+      if (pollingTimeoutRef.current) {
+        clearTimeout(pollingTimeoutRef.current);
       }
     };
-  }, [uploadInitiationTime, isProcessing, progress]); // Re-run effect if these change
+  }, [uploadInitiationTime, isProcessing, progress, targetProgress]); // Add targetProgress
 
 
   const resetFormOnNewSelection = (clearFileInput: boolean = true) => {
     setProgress(0);
+    setTargetProgress(0); // Reset target progress
     setProgressMessage('');
     setMessage(null);
     setSelectedFile(null);
     setIsFileValid(false);
     setUploadInitiationTime(null); 
-    if (pollingIntervalRef.current) { 
-        clearInterval(pollingIntervalRef.current);
-        pollingIntervalRef.current = null;
+    if (pollingTimeoutRef.current) { 
+        clearTimeout(pollingTimeoutRef.current);
+        pollingTimeoutRef.current = null;
+    }
+    if (progressAnimationIntervalRef.current) {
+        clearInterval(progressAnimationIntervalRef.current);
+        progressAnimationIntervalRef.current = null;
     }
     if (clearFileInput && fileInputRef.current) {
       fileInputRef.current.value = ""; 
@@ -202,17 +229,20 @@ export default function UploadForm() {
   };
 
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
+    // Reset relevant states when a new file is chosen
     setMessage(null);
     setIsFileValid(false);
     setSelectedFile(null); 
     setProgress(0);
+    setTargetProgress(0);
     setProgressMessage('');
     
-    if (isProcessing && pollingIntervalRef.current) {
-        clearInterval(pollingIntervalRef.current);
-        pollingIntervalRef.current = null;
+    if (isProcessing && pollingTimeoutRef.current) {
+        clearTimeout(pollingTimeoutRef.current);
     }
-    // If user selects a new file, ensure isProcessing is false to allow new validation/upload
+    if (progressAnimationIntervalRef.current) {
+        clearInterval(progressAnimationIntervalRef.current);
+    }
     setIsProcessing(false); 
 
     const file = event.target.files?.[0];
@@ -227,10 +257,8 @@ export default function UploadForm() {
       const csvFile: File = file; 
 
       Papa.parse<Record<string, unknown>, File>(csvFile, { 
-        preview: 1, 
-        header: true, 
-        skipEmptyLines: true,
-        complete: (results: ParseResult<Record<string, unknown>>) => { 
+        preview: 1, header: true, skipEmptyLines: true,
+        complete: (results: ParseResult<Record<string, unknown>>) => { /* ... (same validation logic) ... */ 
           const actualHeaders = results.meta.fields || [];
           const expected = EXPECTED_HEADERS[selectedSection];
 
@@ -238,7 +266,7 @@ export default function UploadForm() {
             setMessage({ type: 'info', text: `No specific header validation for section: ${selectedSection}. Please ensure format is correct.` });
             setSelectedFile(csvFile); 
             setIsFileValid(true);
-            setProgress(5);
+            setProgress(5); setTargetProgress(5);
             setProgressMessage('File selected. Assuming correct format.');
             return;
           }
@@ -256,34 +284,24 @@ export default function UploadForm() {
           if (missingHeaders.length > 0) {
             setMessage({ 
               type: 'error', 
-              text: (
-                <>
-                  <strong>Header mismatch!</strong> Please check your CSV.
-                  <br />Missing expected columns: {missingHeaders.join(', ')}
-                  {extraHeaders.length > 0 && <><br />Your file also has extra columns: {extraHeaders.join(', ')}</>}
-                </>
-              )
+              text: ( <>{/* ... */}<strong>Header mismatch!</strong> Please check your CSV.<br />Missing expected columns: {missingHeaders.join(', ')}{extraHeaders.length > 0 && <><br />Your file also has extra columns: {extraHeaders.join(', ')}</>}</> )
             });
-            setIsFileValid(false);
-            if (fileInputRef.current) fileInputRef.current.value = ""; 
+            setIsFileValid(false); if (fileInputRef.current) fileInputRef.current.value = ""; 
           } else {
             let validationMessage = "CSV headers are correct.";
             if (extraHeaders.length > 0) {
-              validationMessage += ` (Note: Your file has extra columns: ${extraHeaders.join(', ')}. These will be ignored if not mapped by the backend.)`;
+              validationMessage += ` (Note: Your file has extra columns: ${extraHeaders.join(', ')}. These will be ignored.)`;
               setMessage({ type: 'info', text: validationMessage });
             } else {
               setMessage({ type: 'success', text: validationMessage });
             }
-            setSelectedFile(csvFile);
-            setIsFileValid(true);
-            setProgress(5);
+            setSelectedFile(csvFile); setIsFileValid(true); setProgress(5); setTargetProgress(5);
             setProgressMessage('File selected and headers validated. Ready for upload.');
           }
         },
-        error: (err: Error) => { 
-          setMessage({ type: 'error', text: `Error parsing CSV for validation: ${err.message}` });
-          setIsFileValid(false);
-          if (fileInputRef.current) fileInputRef.current.value = ""; 
+        error: (err: Error) => { /* ... (same error handling) ... */ 
+            setMessage({ type: 'error', text: `Error parsing CSV for validation: ${err.message}` });
+            setIsFileValid(false); if (fileInputRef.current) fileInputRef.current.value = ""; 
         }
       });
     } else {
@@ -308,19 +326,16 @@ export default function UploadForm() {
     }
 
     setIsProcessing(true); 
-    if (message?.type === 'error') {
-        setMessage(null); 
-    }
-    setProgress(10); 
+    if (message?.type === 'error') setMessage(null); 
+    setProgress(10); setTargetProgress(10);
     setProgressMessage('Reading file...');
-    
-    setUploadInitiationTime(Date.now()); // This triggers the useEffect for polling after next step
+    setUploadInitiationTime(Date.now()); 
 
     const reader = new FileReader();
     reader.readAsDataURL(selectedFile);
     reader.onload = async () => {
       try {
-        setProgress(15);
+        setProgress(15); setTargetProgress(15);
         setProgressMessage('Sending data to server...');
         const base64Full = reader.result as string;
         const base64Content = base64Full.split(',')[1];
@@ -339,122 +354,65 @@ export default function UploadForm() {
         const uploadResult = await uploadResponse.json() as UploadFunctionResponse; 
 
         if (uploadResponse.ok) {
-          setProgress(30); // Polling will start via useEffect due to this and isProcessing/uploadInitiationTime
-          setProgressMessage('Data submitted to GitHub. Build triggered. Monitoring deployment...');
-          setMessage({ type: 'success', text: uploadResult.message || 'File processing initiated successfully!' });
-          // useEffect will handle starting the pollStatus calls
+          setProgress(30); setTargetProgress(30); // Base for polling
+          setProgressMessage('Data submitted. Build triggered. Monitoring deployment...');
+          setMessage({ type: 'success', text: uploadResult.message || 'File processing initiated!' });
+          // useEffect for polling will now take over based on isProcessing, uploadInitiationTime, and progress
         } else {
-          setMessage({ type: 'error', text: uploadResult.message || `Upload to function failed (Status: ${uploadResponse.status}).` });
-          setIsProcessing(false); 
-          setProgress(0);
-          setUploadInitiationTime(null); 
+          setMessage({ type: 'error', text: uploadResult.message || `Upload to function failed.` });
+          setIsProcessing(false); setProgress(0); setTargetProgress(0); setUploadInitiationTime(null); 
         }
       } catch (error) {
         console.error('Upload error:', error);
-        setMessage({ type: 'error', text: 'An unexpected error occurred during upload processing.' });
-        setIsProcessing(false); 
-        setProgress(0);
-        setUploadInitiationTime(null); 
+        setMessage({ type: 'error', text: 'An unexpected error occurred during upload.' });
+        setIsProcessing(false); setProgress(0); setTargetProgress(0); setUploadInitiationTime(null); 
       }
     };
     reader.onerror = (error) => {
       console.error('File reading error:', error);
       setMessage({ type: 'error', text: 'Error reading file.' });
-      setIsProcessing(false); 
-      setProgress(0);
-      setUploadInitiationTime(null);
+      setIsProcessing(false); setProgress(0); setTargetProgress(0); setUploadInitiationTime(null);
     };
   };
 
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-gray-900 flex flex-col items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8 bg-white dark:bg-gray-800 p-10 rounded-xl shadow-lg">
-        <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900 dark:text-white">
-            Upload CV Section Data (CSV)
-          </h2>
-        </div>
+        <div><h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900 dark:text-white">Upload CV Section Data (CSV)</h2></div>
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+           {/* Form fields ... (same as before, ensure disabled={isProcessing} is on them) ... */}
            <div>
-            <label htmlFor="section" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-              Select Section
-            </label>
-            <select
-              id="section" name="section" value={selectedSection} onChange={handleSectionChange} required
-              className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
-              disabled={isProcessing}
-            >
-              {cvSections.map((section) => (
-                <option key={section.id} value={section.id}>
-                  {section.name}
-                </option>
-              ))}
+            <label htmlFor="section" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Select Section</label>
+            <select id="section" name="section" value={selectedSection} onChange={handleSectionChange} required disabled={isProcessing}
+              className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+              {cvSections.map((section) => (<option key={section.id} value={section.id}>{section.name}</option>))}
             </select>
           </div>
-
           <div>
-            <label htmlFor="secretKey" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-              Secret Key (if configured)
-            </label>
-            <input
-              id="secretKey" name="secretKey" type="password" value={secretKey} onChange={handleSecretKeyChange}
+            <label htmlFor="secretKey" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Secret Key (if configured)</label>
+            <input id="secretKey" name="secretKey" type="password" value={secretKey} onChange={handleSecretKeyChange} disabled={isProcessing}
               className="mt-1 appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white bg-white dark:bg-gray-700 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-              placeholder="Enter secret key"
-              disabled={isProcessing}
-            />
+              placeholder="Enter secret key" />
           </div>
-
           <div>
-            <label htmlFor="cvFile" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-              CSV Data File
-            </label>
+            <label htmlFor="cvFile" className="block text-sm font-medium text-gray-700 dark:text-gray-300">CSV Data File</label>
             <div className="mt-1">
-              <input
-                ref={fileInputRef} 
-                id="cvFile" name="cvFile" type="file" accept=".csv" onChange={handleFileChange} 
-                className="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white bg-white dark:bg-gray-700 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                disabled={isProcessing}
-              />
+              <input ref={fileInputRef} id="cvFile" name="cvFile" type="file" accept=".csv" onChange={handleFileChange} disabled={isProcessing}
+                className="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white bg-white dark:bg-gray-700 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm" />
             </div>
-            {selectedFile && (isFileValid || (message && message.type === 'error' && typeof message.text === 'string' && message.text.toLowerCase().includes('file'))) && (
-              <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">Selected: {selectedFile.name}</p>
-            )}
+            {selectedFile && (isFileValid || (message && message.type === 'error' && typeof message.text === 'string' && message.text.toLowerCase().includes('file'))) && 
+              (<p className="mt-2 text-sm text-gray-600 dark:text-gray-400">Selected: {selectedFile.name}</p>)}
           </div>
-          
-          {message && (
-            <div 
-                className={`p-3 rounded-md text-xs mt-4 ${
-                message.type === 'success' ? 'bg-green-100 dark:bg-green-800 text-green-700 dark:text-green-200' : 
-                message.type === 'error' ? 'bg-red-100 dark:bg-red-800 text-red-700 dark:text-red-200' : 
-                'bg-blue-100 dark:bg-blue-800 text-blue-700 dark:text-blue-200'}`}
-            >
-                {message.text}
-            </div>
-          )}
-
-          {isProcessing && (
-            <>
+          {message && (<div className={`p-3 rounded-md text-xs mt-4 ${message.type === 'success' ? 'bg-green-100 dark:bg-green-800 text-green-700 dark:text-green-200' : message.type === 'error' ? 'bg-red-100 dark:bg-red-800 text-red-700 dark:text-red-200' : 'bg-blue-100 dark:bg-blue-800 text-blue-700 dark:text-blue-200'}`}>{message.text}</div>)}
+          {isProcessing && (<>
               <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5 mt-4">
-                <div
-                  className="bg-indigo-600 h-2.5 rounded-full transition-all duration-300 ease-out"
-                  style={{ width: `${progress}%` }}
-                ></div>
+                <div className="bg-indigo-600 h-2.5 rounded-full transition-all duration-300 ease-linear" style={{ width: `${progress}%` }}></div> {/* Changed to ease-linear for smoother visual */}
               </div>
-              {progressMessage && (
-                <p className="text-center text-sm text-gray-600 dark:text-gray-400 mt-2">
-                  {progressMessage}
-                </p>
-              )}
-            </>
-          )}
-
-
+              {progressMessage && (<p className="text-center text-sm text-gray-600 dark:text-gray-400 mt-2">{progressMessage}</p>)}
+            </>)}
           <div>
-            <button
-              type="submit"
-              disabled={isProcessing || !selectedFile || !isFileValid} 
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:bg-gray-400 dark:disabled:bg-gray-600 mt-6"
-            >
+            <button type="submit" disabled={isProcessing || !selectedFile || !isFileValid} 
+              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:bg-gray-400 dark:disabled:bg-gray-600 mt-6">
               {isProcessing ? `Processing (${progress}%)` : 'Upload CSV for Section'}
             </button>
           </div>
