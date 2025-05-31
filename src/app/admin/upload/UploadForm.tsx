@@ -2,7 +2,8 @@
 "use client"; 
 
 import React, { useState, ChangeEvent, FormEvent, useEffect, useRef } from 'react';
-import Papa, { ParseError, ParseMeta, ParseResult } from 'papaparse'; // Import ParseResult for more specific typing
+// MODIFIED: Removed unused ParseError and ParseMeta. Kept ParseResult.
+import Papa, { ParseResult } from 'papaparse'; 
 
 // Define sections for the dropdown
 const cvSections = [
@@ -179,11 +180,8 @@ export default function UploadForm() {
             setProgressMessage('File selected and headers validated. Ready for upload.');
           }
         },
-        // MODIFIED: Updated error callback signature
-        error: (err: Error, file?: File) => { 
-          // err will be a PapaParseError instance, which extends Error.
-          // We can access err.message. If needed, you could check if err is instanceof PapaParseError
-          // to access specific properties like err.code or err.type.
+        // MODIFIED: Removed unused 'file' parameter from error callback
+        error: (err: Error) => { 
           setMessage({ type: 'error', text: `Error parsing CSV for validation: ${err.message}` });
           setIsFileValid(false);
         }
