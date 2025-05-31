@@ -1,28 +1,22 @@
-// src/app/experience/page.tsx
+// src/app/about-me/experience/page.tsx // MODIFIED: Path assumes it's moved here
 
 import React from 'react';
 import Link from 'next/link';
-// ExternalLink removed as it's not used in this file
-import { ArrowLeft } from 'lucide-react'; 
+import { ArrowLeft, ExternalLink } from 'lucide-react'; 
 import type { Metadata } from 'next';
 
 // Import shared types
-import type { CompanyExperience } from '@/types'; // Assuming @/ is configured for src/
+import type { CompanyExperience } from '@/types'; 
 
 // Import shared helper functions
-import { formatTextWithLineBreaks } from '@/utils/formatters'; // Assuming @/ is configured for src/
+import { formatTextWithLineBreaks } from '@/utils/formatters'; 
 
 // Import the full experience data
-import experienceDataFromFile from '@/data/experience.json';
-
-
-// --- TypeScript Interfaces are now imported from '@/types' ---
-// --- Helper Functions are now imported from '@/utils/formatters' ---
-
+import experienceDataFromFile from '@/data/experience.json'; // Assuming data file is still at src/data/
 
 // --- Metadata for this specific page ---
 export const metadata: Metadata = {
-  title: 'All Work Experience - My Space', 
+  title: 'All Work Experience - My CV', 
   description: 'A detailed overview of all work experience.',
 };
 
@@ -33,10 +27,11 @@ export default function AllExperiencePage() {
     <main className="min-h-screen bg-gray-50 dark:bg-gray-950 py-10 px-4 sm:px-6 lg:px-8">
       <div className="max-w-3xl mx-auto">
         
+        {/* MODIFIED: Back to Home Link */}
         <div className="mb-8">
-          <Link href="/" className="inline-flex items-center text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-200 transition-colors duration-150 group">
+          <Link href="/about-me" className="inline-flex items-center text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-200 transition-colors duration-150 group">
             <ArrowLeft size={20} className="mr-2 transition-transform duration-150 group-hover:-translate-x-1" />
-            Back to Home
+            Back to Main CV
           </Link>
         </div>
 

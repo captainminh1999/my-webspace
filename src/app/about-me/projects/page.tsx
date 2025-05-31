@@ -1,22 +1,22 @@
-// src/app/projects/page.tsx
+// src/app/about-me/projects/page.tsx // MODIFIED: Path assumes it's moved here
 
 import React from 'react';
 import Link from 'next/link';
-import { ArrowLeft, ExternalLink } from 'lucide-react'; // For back button and external links
+import { ArrowLeft, ExternalLink } from 'lucide-react'; 
 import type { Metadata } from 'next';
 
 // Import shared types
-import type { ProjectEntry } from '@/types'; // Assuming @/ is configured for src/
+import type { ProjectEntry } from '@/types'; 
 
 // Import shared helper functions
-import { formatTextWithLineBreaks } from '@/utils/formatters'; // Assuming @/ is configured for src/
+import { formatTextWithLineBreaks } from '@/utils/formatters'; 
 
 // Import the full projects data
-import projectsDataFromFile from '@/data/projects.json';
+import projectsDataFromFile from '@/data/projects.json'; // Assuming data file is still at src/data/
 
 // --- Metadata for this specific page ---
 export const metadata: Metadata = {
-  title: `All Projects - My Space`,
+  title: `All Projects - My CV`,
   description: 'A detailed list of all projects.',
 };
 
@@ -27,10 +27,11 @@ export default function AllProjectsPage() {
     <main className="min-h-screen bg-gray-50 dark:bg-gray-950 py-10 px-4 sm:px-6 lg:px-8">
       <div className="max-w-3xl mx-auto">
         
+        {/* MODIFIED: Back to Home Link */}
         <div className="mb-8">
-          <Link href="/" className="inline-flex items-center text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-200 transition-colors duration-150 group">
+          <Link href="/about-me" className="inline-flex items-center text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-200 transition-colors duration-150 group">
             <ArrowLeft size={20} className="mr-2 transition-transform duration-150 group-hover:-translate-x-1" />
-            Back to Home
+            Back to Main CV
           </Link>
         </div>
 

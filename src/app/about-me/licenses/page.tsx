@@ -1,19 +1,19 @@
-// src/app/licenses/page.tsx
+// src/app/about-me/licenses/page.tsx // MODIFIED: Path assumes it's moved here
 
 import React from 'react';
 import Link from 'next/link';
-import { ArrowLeft, ExternalLink } from 'lucide-react'; // For back button and external links
+import { ArrowLeft, ExternalLink } from 'lucide-react'; 
 import type { Metadata } from 'next';
 
 // Import shared types
-import type { LicenseCertificationEntry } from '@/types'; // Assuming @/ is configured for src/
+import type { LicenseCertificationEntry } from '@/types'; 
 
 // Import the full licenses & certifications data
-import licensesDataFromFile from '@/data/licenses.json';
+import licensesDataFromFile from '@/data/licenses.json'; // Assuming data file is still at src/data/
 
 // --- Metadata for this specific page ---
 export const metadata: Metadata = {
-  title: `All Licenses & Certifications - My Space`,
+  title: `All Licenses & Certifications - My CV`,
   description: 'A detailed list of all licenses and certifications.',
 };
 
@@ -24,10 +24,11 @@ export default function AllLicensesPage() {
     <main className="min-h-screen bg-gray-50 dark:bg-gray-950 py-10 px-4 sm:px-6 lg:px-8">
       <div className="max-w-3xl mx-auto">
         
+        {/* MODIFIED: Back to Home Link */}
         <div className="mb-8">
-          <Link href="/" className="inline-flex items-center text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-200 transition-colors duration-150 group">
+          <Link href="/about-me" className="inline-flex items-center text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-200 transition-colors duration-150 group">
             <ArrowLeft size={20} className="mr-2 transition-transform duration-150 group-hover:-translate-x-1" />
-            Back to Home
+            Back to Main CV
           </Link>
         </div>
 

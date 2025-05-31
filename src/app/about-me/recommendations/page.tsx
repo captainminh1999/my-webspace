@@ -1,22 +1,22 @@
-// src/app/recommendations/page.tsx
+// src/app/about-me/recommendations/page.tsx // MODIFIED: Path assumes it's moved here
 
 import React from 'react';
 import Link from 'next/link';
-import { ArrowLeft } from 'lucide-react'; // For back button
+import { ArrowLeft } from 'lucide-react'; 
 import type { Metadata } from 'next';
 
 // Import shared types
-import type { RecommendationReceivedEntry } from '@/types'; // Assuming @/ is configured for src/
+import type { RecommendationReceivedEntry } from '@/types'; 
 
 // Import shared helper functions
-import { formatTextWithLineBreaks } from '@/utils/formatters'; // Assuming @/ is configured for src/
+import { formatTextWithLineBreaks } from '@/utils/formatters'; 
 
 // Import the full recommendations received data
-import recommendationsReceivedDataFromFile from '@/data/recommendationsReceived.json';
+import recommendationsReceivedDataFromFile from '@/data/recommendationsReceived.json'; // Assuming data file is still at src/data/
 
 // --- Metadata for this specific page ---
 export const metadata: Metadata = {
-  title: `All Recommendations Received - My Space`,
+  title: `All Recommendations Received - My CV`,
   description: 'A detailed list of all recommendations received.',
 };
 
@@ -27,10 +27,11 @@ export default function AllRecommendationsReceivedPage() {
     <main className="min-h-screen bg-gray-50 dark:bg-gray-950 py-10 px-4 sm:px-6 lg:px-8">
       <div className="max-w-3xl mx-auto">
         
+        {/* MODIFIED: Back to Home Link */}
         <div className="mb-8">
-          <Link href="/" className="inline-flex items-center text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-200 transition-colors duration-150 group">
+          <Link href="/about-me" className="inline-flex items-center text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-200 transition-colors duration-150 group">
             <ArrowLeft size={20} className="mr-2 transition-transform duration-150 group-hover:-translate-x-1" />
-            Back to Home
+            Back to Main CV
           </Link>
         </div>
 
