@@ -2,23 +2,25 @@
 import React from 'react';
 import Link from 'next/link';
 // Import icons from lucide-react that are used directly in this page's JSX
-// Ensuring ExternalLink is imported as it's used. ArrowLeft is not used here.
 import { Link as LinkIcon, ExternalLink } from 'lucide-react'; 
-// Note: Github, Linkedin, Twitter etc. are imported in formatters.ts for parseWebsiteString
+// Note: Github, Linkedin, Twitter etc. are now imported in formatters.ts for parseWebsiteString
 
 // Import shared types
 import type {
   ProfileData, AboutData, CompanyExperience, EducationEntry,
   LicenseCertificationEntry, ProjectEntry, VolunteeringEntry, SkillsData,
   RecommendationReceivedEntry, HonorAwardEntry, LanguageEntry, ParsedWebsite
-} from '@/types'; // Assuming @/ is configured for src/
+} from '@/types'; 
 
 // Import shared helper functions
 import {
   getDisplayCause,
   parseWebsiteString,
   formatTextWithLineBreaks
-} from '@/utils/formatters'; // Assuming @/ is configured for src/
+} from '@/utils/formatters'; 
+
+// Import the new ExpandableText component
+import ExpandableText from '@/components/ExpandableText'; // Assuming you place it in src/components/
 
 // Import data from JSON files
 import profileDataFromFile from '@/data/profile.json';
@@ -33,8 +35,15 @@ import recommendationsReceivedDataFromFile from '@/data/recommendationsReceived.
 import honorsAwardsDataFromFile from '@/data/honorsAwards.json';
 import languagesDataFromFile from '@/data/languages.json';
 
-// --- TypeScript Interfaces are now imported from '@/types' ---
-// --- Helper functions are now imported from '@/utils/formatters' ---
+// Predefined styles for the skill cloud for variety
+const skillCloudStyles = [
+  "text-base font-medium text-indigo-700 dark:text-indigo-300 bg-indigo-100 dark:bg-indigo-900/60 px-4 py-2 rounded-lg shadow-sm hover:shadow-md transform hover:scale-105 transition-all duration-200 cursor-default",
+  "text-sm font-medium text-purple-700 dark:text-purple-300 bg-purple-100 dark:bg-purple-900/60 px-3 py-1.5 rounded-md shadow-sm hover:shadow-md transform hover:scale-105 transition-all duration-200 cursor-default",
+  "text-xs font-normal text-sky-700 dark:text-sky-300 bg-sky-100 dark:bg-sky-900/60 px-3 py-1 rounded-md shadow-sm hover:shadow transform hover:scale-105 transition-all duration-200 cursor-default",
+  "text-sm font-semibold text-emerald-700 dark:text-emerald-300 bg-emerald-100 dark:bg-emerald-900/60 px-3.5 py-1.5 rounded-lg shadow-sm hover:shadow-md transform hover:scale-105 transition-all duration-200 cursor-default",
+  "text-base font-medium text-rose-700 dark:text-rose-300 bg-rose-100 dark:bg-rose-900/60 px-4 py-1.5 rounded-md shadow-sm hover:shadow-md transform hover:scale-105 transition-all duration-200 cursor-default",
+  "text-xs font-semibold text-amber-700 dark:text-amber-300 bg-amber-100 dark:bg-amber-900/60 px-2.5 py-1 rounded-lg shadow-sm hover:shadow transform hover:scale-105 transition-all duration-200 cursor-default",
+];
 
 
 // --- Main Page Component ---
@@ -67,6 +76,7 @@ export default function HomePage() {
   }, [profileData.websites]);
 
   const MAX_ITEMS_MAIN_PAGE = 3;
+  const DESCRIPTION_LINE_CLAMP = 2; // Number of lines for descriptions before "see more"
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-start bg-gray-100 dark:bg-gray-900 p-4 sm:p-8">
@@ -92,12 +102,10 @@ export default function HomePage() {
           </div>
         </header>
 
-        {/* 2. About Section (Fully displayed) */}
+        {/* 2. About Section (Fully displayed, uses ExpandableText) */}
         {aboutData?.content && (
           <Section title="About">
-            <p className="text-gray-700 dark:text-gray-300 leading-relaxed whitespace-pre-line">
-              {formatTextWithLineBreaks(aboutData.content)}
-            </p>
+            <ExpandableText text={formatTextWithLineBreaks(aboutData.content)} lineClamp={5} className="text-gray-700 dark:text-gray-300 leading-relaxed" />
           </Section>
         )}
 
@@ -114,9 +122,11 @@ export default function HomePage() {
                     <p className="text-sm text-indigo-500 dark:text-indigo-400 mb-1">{String(role.startDate)} – {String(role.endDate)} {role.duration && `(${role.duration})`}</p>
                     {role.location && <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">{role.location}</p>}
                     {role.responsibilities && role.responsibilities.length > 0 && (
-                        <ul className="list-none pl-0 text-gray-600 dark:text-gray-300 text-sm space-y-1 mt-2 whitespace-pre-line">
-                        {role.responsibilities.map((resp, respIndex) => ( <li key={respIndex}>{formatTextWithLineBreaks(resp)}</li> ))}
-                        </ul>
+                        <div className="text-gray-600 dark:text-gray-300 text-sm space-y-0 mt-2">
+                        {role.responsibilities.map((resp, respIndex) => (
+                            <ExpandableText key={respIndex} text={formatTextWithLineBreaks(resp)} lineClamp={DESCRIPTION_LINE_CLAMP} className="mb-1"/>
+                        ))}
+                        </div>
                     )}
                     {role.skills && role.skills.length > 0 && <div className="mt-3"><strong className="text-xs font-semibold text-gray-700 dark:text-white uppercase">Skills: </strong><span className="text-xs text-gray-600 dark:text-gray-300">{role.skills.join(' · ')}</span></div>}
                   </div>
@@ -137,8 +147,8 @@ export default function HomePage() {
                 <h3 className="text-xl font-semibold text-gray-800 dark:text-white">{edu.schoolName}</h3>
                 {edu.degreeName && <p className="text-md text-gray-700 dark:text-gray-300">{edu.degreeName}</p>}
                 <p className="text-sm text-indigo-500 dark:text-indigo-400 mb-1">{String(edu.startDate)} – {String(edu.endDate)}</p>
-                {edu.notes && <p className="text-sm text-gray-600 dark:text-gray-300 mt-1 whitespace-pre-line">{formatTextWithLineBreaks(edu.notes)}</p>}
-                {edu.activities && <p className="text-sm text-gray-600 dark:text-gray-300 mt-1 whitespace-pre-line"><em>Activities:</em> {formatTextWithLineBreaks(edu.activities)}</p>}
+                {edu.notes && <ExpandableText text={formatTextWithLineBreaks(edu.notes)} lineClamp={DESCRIPTION_LINE_CLAMP} className="text-sm text-gray-600 dark:text-gray-300 mt-1"/>}
+                {edu.activities && <div className="mt-1"><em className="text-sm text-gray-500 dark:text-gray-400">Activities: </em><ExpandableText text={formatTextWithLineBreaks(edu.activities)} lineClamp={DESCRIPTION_LINE_CLAMP} className="text-sm text-gray-600 dark:text-gray-300 inline"/></div>}
               </div>
             ))}
             {educationData.length > MAX_ITEMS_MAIN_PAGE && (
@@ -172,8 +182,8 @@ export default function HomePage() {
                 <div key={index} className="mb-6 pb-6 border-b border-gray-200 dark:border-gray-700 last:border-b-0 last:pb-0">
                     <h3 className="text-xl font-semibold text-gray-800 dark:text-white">{proj.title}</h3>
                     {(proj.startedOn || proj.finishedOn) && <p className="text-sm text-indigo-500 dark:text-indigo-400 mb-1">{proj.startedOn}{proj.finishedOn && proj.startedOn ? ` - ${proj.finishedOn}` : proj.finishedOn || ''}</p>}
-                    {proj.description && <p className="text-sm text-gray-600 dark:text-gray-300 my-2 whitespace-pre-line">{formatTextWithLineBreaks(proj.description)}</p>}
-                    {proj.url && <a href={proj.url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-indigo-500 hover:underline text-sm"><ExternalLink size={14} /> View Project</a>}
+                    {proj.description && <ExpandableText text={formatTextWithLineBreaks(proj.description)} lineClamp={DESCRIPTION_LINE_CLAMP} className="text-sm text-gray-600 dark:text-gray-300 my-2"/>}
+                    {proj.url && <a href={proj.url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-indigo-500 hover:underline text-sm mt-2"><ExternalLink size={14} /> View Project</a>}
                 </div>
             ))}
             {projectsData.length > MAX_ITEMS_MAIN_PAGE && (
@@ -191,7 +201,7 @@ export default function HomePage() {
                     <p className="text-md text-gray-700 dark:text-gray-300">{vol.companyName}</p>
                     {(vol.startedOn || vol.finishedOn) && <p className="text-sm text-indigo-500 dark:text-indigo-400 mb-1">{vol.startedOn}{vol.finishedOn && vol.startedOn ? ` - ${vol.finishedOn}` : vol.finishedOn || ''}</p>}
                     {vol.cause && <p className="text-sm text-gray-600 dark:text-gray-300">{getDisplayCause(vol.cause)}</p>}
-                    {vol.description && <p className="text-sm text-gray-600 dark:text-gray-300 mt-1 whitespace-pre-line">{formatTextWithLineBreaks(vol.description)}</p>}
+                    {vol.description && <ExpandableText text={formatTextWithLineBreaks(vol.description)} lineClamp={DESCRIPTION_LINE_CLAMP} className="text-sm text-gray-600 dark:text-gray-300 mt-1"/>}
                 </div>
             ))}
             {volunteeringData.length > MAX_ITEMS_MAIN_PAGE && (
@@ -200,12 +210,15 @@ export default function HomePage() {
           </Section>
         )}
 
-        {/* 8. Skills Section (Displayed fully) */}
+        {/* 8. Skills Section (Skill Cloud) */}
         {skillsData && skillsData.length > 0 && (
           <Section title="Skills">
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap justify-center items-center gap-x-3 gap-y-4 p-4 -m-2"> 
               {skillsData.map((skill, index) => (
-                <span key={index} className="bg-indigo-100 dark:bg-indigo-700 text-indigo-700 dark:text-indigo-100 px-3 py-1 rounded-full text-sm font-medium">
+                <span 
+                  key={index} 
+                  className={skillCloudStyles[index % skillCloudStyles.length]} 
+                >
                   {skill}
                 </span>
               ))}
@@ -218,8 +231,8 @@ export default function HomePage() {
           <Section title="Recommendations Received">
             {recommendationsReceivedData.slice(0, MAX_ITEMS_MAIN_PAGE).map((rec, index) => (
                 <div key={index} className="mb-6 pb-6 border-b border-gray-200 dark:border-gray-700 last:border-b-0 last:pb-0">
-                    <p className="text-gray-700 dark:text-gray-300 italic mb-2 whitespace-pre-line">&quot;{formatTextWithLineBreaks(rec.text)}&quot;</p>
-                    <p className="text-sm font-semibold text-gray-800 dark:text-white">{rec.firstName} {rec.lastName}</p>
+                    <ExpandableText text={`"${formatTextWithLineBreaks(rec.text)}"`} lineClamp={DESCRIPTION_LINE_CLAMP + 1} className="text-gray-700 dark:text-gray-300 italic mb-2"/>
+                    <p className="text-sm font-semibold text-gray-800 dark:text-white mt-2">{rec.firstName} {rec.lastName}</p>
                     <p className="text-xs text-gray-600 dark:text-gray-400">{rec.jobTitle} at {rec.company}</p>
                     <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">Received: {rec.creationDate}</p>
                 </div>
@@ -239,7 +252,7 @@ export default function HomePage() {
                 <div key={index} className="mb-6 pb-6 border-b border-gray-200 dark:border-gray-700 last:border-b-0 last:pb-0">
                     <h3 className="text-xl font-semibold text-gray-800 dark:text-white">{honor.title}</h3>
                     <p className="text-sm text-indigo-500 dark:text-indigo-400 mb-1">Issued: {honor.issuedOn}</p>
-                    {honor.description && <p className="text-sm text-gray-600 dark:text-gray-300 mt-1 whitespace-pre-line">{formatTextWithLineBreaks(honor.description)}</p>}
+                    {honor.description && <ExpandableText text={formatTextWithLineBreaks(honor.description)} lineClamp={DESCRIPTION_LINE_CLAMP} className="text-sm text-gray-600 dark:text-gray-300 mt-1"/>}
                 </div>
             ))}
             {honorsAwardsData.length > MAX_ITEMS_MAIN_PAGE && (
