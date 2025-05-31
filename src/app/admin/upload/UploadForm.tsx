@@ -2,7 +2,7 @@
 "use client"; 
 
 import React, { useState, ChangeEvent, FormEvent, useEffect, useRef } from 'react';
-import Papa from 'papaparse'; // Import papaparse for client-side parsing
+import Papa, { ParseError, ParseMeta, ParseResult } from 'papaparse'; // Import ParseResult for more specific typing
 
 // Define sections for the dropdown
 const cvSections = [
@@ -83,7 +83,6 @@ interface DeployStatusResponse {
   message?: string; // For error messages from the function itself
 }
 
-
 export default function UploadForm() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isFileValid, setIsFileValid] = useState(false); 
@@ -128,11 +127,13 @@ export default function UploadForm() {
         return;
       }
 
-      Papa.parse(file, {
+      const csvFile: File = file; 
+
+      Papa.parse<Record<string, unknown>, File>(csvFile, { 
         preview: 1, 
         header: true, 
         skipEmptyLines: true,
-        complete: (results) => {
+        complete: (results: ParseResult<Record<string, unknown>>) => { 
           const actualHeaders = results.meta.fields || [];
           const expected = EXPECTED_HEADERS[selectedSection];
 
@@ -142,7 +143,7 @@ export default function UploadForm() {
 
           if (!expected) {
             setMessage({ type: 'info', text: `No specific header validation for section: ${selectedSection}. Please ensure format is correct.` });
-            setSelectedFile(file); 
+            setSelectedFile(csvFile); 
             setIsFileValid(true);
             setProgress(5);
             setProgressMessage('File selected. No specific header validation for this section.');
@@ -172,14 +173,18 @@ export default function UploadForm() {
             } else {
               setMessage({ type: 'success', text: validationMessage });
             }
-            setSelectedFile(file);
+            setSelectedFile(csvFile);
             setIsFileValid(true);
             setProgress(5);
             setProgressMessage('File selected and headers validated. Ready for upload.');
           }
         },
-        error: (error: any) => { // error from PapaParse is 'any' by default
-          setMessage({ type: 'error', text: `Error parsing CSV for validation: ${error.message}` });
+        // MODIFIED: Updated error callback signature
+        error: (err: Error, file?: File) => { 
+          // err will be a PapaParseError instance, which extends Error.
+          // We can access err.message. If needed, you could check if err is instanceof PapaParseError
+          // to access specific properties like err.code or err.type.
+          setMessage({ type: 'error', text: `Error parsing CSV for validation: ${err.message}` });
           setIsFileValid(false);
         }
       });
@@ -202,7 +207,7 @@ export default function UploadForm() {
     }
     try {
       const statusResponse = await fetch('/.netlify/functions/get-deploy-status');
-      const statusData = await statusResponse.json() as DeployStatusResponse; // MODIFIED: Type assertion
+      const statusData = await statusResponse.json() as DeployStatusResponse; 
 
       if (!statusResponse.ok) {
         setProgressMessage(`Error checking deploy status: ${statusData.message || statusResponse.statusText || statusResponse.status}. Function may not be deployed.`);
@@ -278,10 +283,7 @@ export default function UploadForm() {
           }),
         });
 
-        // MODIFIED: Type assertion for uploadResult
         const uploadResult = await uploadResponse.json() as UploadFunctionResponse; 
-        // Line 171 would be around here if we count from the start of the file.
-        // The error is specifically about the result of .json() being 'any'.
 
         if (uploadResponse.ok) {
           setProgress(30); 
