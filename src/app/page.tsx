@@ -28,7 +28,8 @@ const CVLinkWidget: React.FC = () => (
   </div>
 );
 
-const GenericWidgetContent: React.FC<{ title: string, defaultHeight: number }> = ({ title, defaultHeight }) => (
+// MODIFIED: Removed unused 'defaultHeight' prop
+const GenericWidgetContent: React.FC<{ title: string }> = ({ title }) => (
   <div className="p-4 h-full flex flex-col items-center justify-center text-center">
     <h3 className="font-bold text-lg mb-2">{title}</h3>
     <p className="text-sm text-gray-500">Content for {title} widget will go here.</p>
@@ -118,14 +119,15 @@ export default function NewHomePage() {
             ) {
                 const layoutArray = parsedLayoutsFromStorage[breakpointKey];
                 if (Array.isArray(layoutArray)) {
-                    const validSavedItems = layoutArray.filter((item: any) => 
+                    // MODIFIED: Explicitly type 'item' as 'Layout' from react-grid-layout
+                    const validSavedItems = layoutArray.filter((item: Layout) => 
                         typeof item === 'object' && item !== null &&
                         typeof item.i === 'string' &&
                         currentWidgetIds.has(item.i) && 
                         typeof item.x === 'number' && typeof item.y === 'number' &&
                         typeof item.w === 'number' && typeof item.h === 'number'
-                    ).map((item: any) => { 
-                        const widgetConfig = initialWidgets.find(w=>w.id === item.i)!;
+                    ).map((item: Layout) => { // MODIFIED: Explicitly type 'item' as 'Layout'
+                        const widgetConfig = initialWidgets.find(w=>w.id === item.i)!; // Should always find if currentWidgetIds.has(item.i)
                         const numColsForBp = colsConfig[breakpointKey as keyof typeof colsConfig];
                         return { 
                             i: item.i, x: item.x, y: item.y, w: item.w, h: item.h,
@@ -141,9 +143,8 @@ export default function NewHomePage() {
                     });
                     
                     const savedItemIds = new Set(validSavedItems.map(l => l.i));
-                    const defaultBreakpointLayout = finalLayoutsToSet[breakpointKey as keyof typeof colsConfig] || []; // Ensure it's an array
+                    const defaultBreakpointLayout = finalLayoutsToSet[breakpointKey as keyof typeof colsConfig] || [];
 
-                    // MODIFIED: Explicitly type defaultItem as Layout
                     const itemsToAddFromDefault = defaultBreakpointLayout.filter((defaultItem: Layout) => !savedItemIds.has(defaultItem.i));
                     
                     if (validSavedItems.length > 0 || itemsToAddFromDefault.length > 0) {
@@ -233,7 +234,8 @@ export default function NewHomePage() {
                 <h3 className="text-xs font-semibold text-gray-700 dark:text-gray-200 truncate">{widget.title}</h3>
             </div>
             <div className="widget-content flex-grow p-2"> 
-              {widget.content || <GenericWidgetContent title={widget.title} defaultHeight={widget.defaultSize.h} />}
+              {/* MODIFIED: Removed defaultHeight prop from GenericWidgetContent call */}
+              {widget.content || <GenericWidgetContent title={widget.title} />}
             </div>
           </div>
         ))}
