@@ -129,11 +129,10 @@ export default function UploadForm() {
         clearInterval(pollingIntervalRef.current);
         pollingIntervalRef.current = null;
     }
-    if (!isProcessing && pollingIntervalRef.current) { // Clear interval if not processing but it somehow exists
+    if (!isProcessing && pollingIntervalRef.current) { 
         clearInterval(pollingIntervalRef.current);
         pollingIntervalRef.current = null;
     }
-
 
     const file = event.target.files?.[0];
 
@@ -220,10 +219,8 @@ export default function UploadForm() {
     setSecretKey(event.target.value);
   };
 
-  // MODIFIED: checkDeployStatus now uses the uploadInitiationTime state variable
   const checkDeployStatus = async () => {
-    // The uploadInitiationTime state variable will be used for comparison
-    if (uploadInitiationTime === null) { // Check state directly
+    if (uploadInitiationTime === null) { 
         setProgressMessage("Error: Upload initiation time not available for polling.");
         if (pollingIntervalRef.current) clearInterval(pollingIntervalRef.current);
         setIsProcessing(false); 
@@ -244,16 +241,23 @@ export default function UploadForm() {
       
       const deployCreatedAt = statusData.createdAt ? new Date(statusData.createdAt).getTime() : 0;
 
-      // Compare with the state variable uploadInitiationTime
-      if ((statusData.status === 'ready' || statusData.status === 'current') && deployCreatedAt >= uploadInitiationTime) {
-        setProgress(100);
-        setProgressMessage('Site successfully updated!');
-        setMessage({ type: 'success', text: 'Deployment complete and site is live with new data. You may need to refresh the main CV page.' });
-        if (pollingIntervalRef.current) clearInterval(pollingIntervalRef.current);
-        setIsProcessing(false); 
-        setUploadInitiationTime(null); 
-      } else if (statusData.status === 'building' || ((statusData.status === 'ready' || statusData.status === 'current') && deployCreatedAt < uploadInitiationTime) ) {
-        setProgressMessage(`Netlify build in progress (status: ${statusData.status}). This might be the new build or an older one. Checking again in 10s...`);
+      // MODIFIED: Refined logic for deploy status checking
+      if (statusData.status === 'ready' || statusData.status === 'current') {
+        if (deployCreatedAt >= uploadInitiationTime) {
+          // This is the new deploy we were waiting for
+          setProgress(100);
+          setProgressMessage('Site successfully updated!');
+          setMessage({ type: 'success', text: 'Deployment complete and site is live with new data. You may need to refresh the main CV page.' });
+          if (pollingIntervalRef.current) clearInterval(pollingIntervalRef.current);
+          setIsProcessing(false); 
+          setUploadInitiationTime(null); 
+        } else {
+          // This is an old 'ready' deploy, the new one is still building or hasn't started
+          setProgressMessage(`Waiting for new deployment (last live deploy was older). Current API status: ${statusData.status}. Checking again in 10s...`);
+          setProgress(prev => Math.min(prev, 95)); // Keep progress high but not 100%
+        }
+      } else if (statusData.status === 'building') {
+        setProgressMessage(`Netlify build in progress (status: ${statusData.status}). Checking again in 10s...`);
         setProgress(prev => Math.min(prev + 5, 95)); 
       } else if (statusData.status === 'error' || statusData.status === 'failed') {
         setProgressMessage(`Deployment failed: ${statusData.status}`);
@@ -261,8 +265,9 @@ export default function UploadForm() {
         if (pollingIntervalRef.current) clearInterval(pollingIntervalRef.current);
         setIsProcessing(false);
         setUploadInitiationTime(null); 
-      } else {
-         setProgressMessage(`Deployment status: ${statusData.status || 'pending'}. This could be an older deployment. Checking again in 10s...`);
+      } else { // e.g., 'enqueued', 'new', 'preparing'
+         setProgressMessage(`Deployment status: ${statusData.status || 'pending'}. Checking again in 10s...`);
+         setProgress(prev => Math.min(prev + 2, 90)); // Slow progress for other states
       }
     } catch (error) {
       console.error("Error polling deploy status:", error);
@@ -288,7 +293,8 @@ export default function UploadForm() {
     setProgress(10); 
     setProgressMessage('Reading file...');
     
-    setUploadInitiationTime(Date.now()); // Set state here
+    const currentUploadStartTime = Date.now(); // Capture time for THIS specific upload
+    setUploadInitiationTime(currentUploadStartTime); 
 
     const reader = new FileReader();
     reader.readAsDataURL(selectedFile);
@@ -318,16 +324,11 @@ export default function UploadForm() {
           setMessage({ type: 'success', text: uploadResult.message || 'File processing initiated successfully!' });
           
           if (pollingIntervalRef.current) clearInterval(pollingIntervalRef.current); 
-          // MODIFIED: setInterval calls checkDeployStatus without arguments
+          // Pass the specific start time of this upload to the interval's first call
+          // and subsequent calls will use the state which should be set by now.
+          // For robustness, the checkDeployStatus itself relies on the state.
           pollingIntervalRef.current = setInterval(checkDeployStatus, 10000); 
-          // MODIFIED: Initial call also uses state (ensure state update has propagated)
-          // A useEffect hook might be more robust for the first call after state set,
-          // but for now, a direct call after setting state.
-          // We need to ensure uploadInitiationTime is set before this first call.
-          // The state update might not be immediate.
-          // Let's call it after a very short timeout to give state a chance to update,
-          // or rely on the interval for the first real check.
-          setTimeout(() => checkDeployStatus(), 100); // Small delay for state to propagate
+          setTimeout(() => checkDeployStatus(), 100); // Initial check after state has a chance to set
 
         } else {
           setMessage({ type: 'error', text: uploadResult.message || `Upload to function failed (Status: ${uploadResponse.status}).` });
