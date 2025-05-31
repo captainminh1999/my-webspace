@@ -2,8 +2,9 @@
 import React from 'react';
 import Link from 'next/link';
 // Import icons from lucide-react that are used directly in this page's JSX
-import { Link as LinkIcon } from 'lucide-react'; 
-// Note: Github, Linkedin, Twitter etc. are now imported in formatters.ts for parseWebsiteString
+// Ensuring ExternalLink is imported as it's used. ArrowLeft is not used here.
+import { Link as LinkIcon, ExternalLink } from 'lucide-react'; 
+// Note: Github, Linkedin, Twitter etc. are imported in formatters.ts for parseWebsiteString
 
 // Import shared types
 import type {
@@ -82,7 +83,7 @@ export default function HomePage() {
               <div className="mt-4 flex flex-wrap justify-center items-center gap-3">
                 <span className="text-sm font-medium text-gray-700 dark:text-gray-300">My Links:</span>
                 {websiteEntries.map((site, index) => {
-                  const IconComponent = site.icon || LinkIcon; // LinkIcon is imported at the top of this file
+                  const IconComponent = site.icon || LinkIcon; 
                   return (<a key={index} href={site.url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-3 py-1.5 bg-indigo-500 text-white text-xs font-semibold rounded-md shadow-sm hover:bg-indigo-600 transition duration-150 transform hover:scale-105" title={site.url}><IconComponent size={14} />{site.label}</a>);
                 })}
               </div>
@@ -128,7 +129,6 @@ export default function HomePage() {
           </Section>
         )}
 
-        {/* ... (Rest of the sections: Education, Licenses, etc. using imported formatters and types) ... */}
         {/* 4. Education Section (Top 3 + Show All Button) */}
         {educationData && educationData.length > 0 && (
           <Section title="Education">

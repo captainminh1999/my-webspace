@@ -2,7 +2,8 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { ArrowLeft, ExternalLink } from 'lucide-react'; // Import necessary icons
+// ExternalLink removed as it's not used in this file
+import { ArrowLeft } from 'lucide-react'; 
 import type { Metadata } from 'next';
 
 // Import shared types
@@ -21,7 +22,7 @@ import experienceDataFromFile from '@/data/experience.json';
 
 // --- Metadata for this specific page ---
 export const metadata: Metadata = {
-  title: 'All Work Experience - My Space', // Replace [Your Name] or make dynamic later
+  title: 'All Work Experience - My Space', 
   description: 'A detailed overview of all work experience.',
 };
 
