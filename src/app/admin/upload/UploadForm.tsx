@@ -48,9 +48,8 @@ const EXPECTED_HEADERS: { [key: string]: string[] } = {
     "Company Name", "Role", "Started On", "Finished On", "Cause", "Description"
   ],
   skills: [ 
-    "Skill Name"
+    "Name" 
   ],
-  // MODIFIED: Updated headers for Recommendations Received
   recommendationsReceived: [
     "First Name", "Last Name", "Company", "Job Title", "Text", "Creation Date", "Status"
   ],
@@ -71,6 +70,7 @@ interface UploadFunctionResponse {
   error?: string; 
 }
 
+// Re-added DeployStatusResponse for polling
 interface DeployStatusResponse {
   deployId?: string;
   status?: string;
@@ -91,11 +91,13 @@ export default function UploadForm() {
   const [message, setMessage] = useState<{ type: 'success' | 'error' | 'info'; text: string | React.ReactNode } | null>(null);
   const [secretKey, setSecretKey] = useState('');
   
+  // Re-added state for polling
   const [uploadInitiationTime, setUploadInitiationTime] = useState<number | null>(null);
   const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null); 
 
   useEffect(() => {
+    // Cleanup polling interval on component unmount
     return () => {
       if (pollingIntervalRef.current) {
         clearInterval(pollingIntervalRef.current);
@@ -103,14 +105,18 @@ export default function UploadForm() {
     };
   }, []);
 
-  const resetFormState = (clearFileInputValue: boolean = true) => {
+  const resetFormOnNewSelection = (clearFileInput: boolean = true) => {
     setProgress(0);
     setProgressMessage('');
     setMessage(null);
     setSelectedFile(null);
     setIsFileValid(false);
-    setUploadInitiationTime(null); // Ensure this is reset
-    if (clearFileInputValue && fileInputRef.current) {
+    setUploadInitiationTime(null); // Reset initiation time
+    if (pollingIntervalRef.current) { // Clear any active polling
+        clearInterval(pollingIntervalRef.current);
+        pollingIntervalRef.current = null;
+    }
+    if (clearFileInput && fileInputRef.current) {
       fileInputRef.current.value = ""; 
     }
   };
@@ -121,7 +127,10 @@ export default function UploadForm() {
     setSelectedFile(null); 
     setProgress(0);
     setProgressMessage('');
-    // Do not call resetFormState() here as it clears uploadInitiationTime too soon.
+    if (pollingIntervalRef.current) { 
+        clearInterval(pollingIntervalRef.current);
+        setIsProcessing(false); 
+    }
 
     const file = event.target.files?.[0];
 
@@ -142,15 +151,22 @@ export default function UploadForm() {
           const actualHeaders = results.meta.fields || [];
           const expected = EXPECTED_HEADERS[selectedSection];
 
-          if (!expected) {
+          if (!expected && selectedSection !== "about") {
             setMessage({ type: 'info', text: `No specific header validation for section: ${selectedSection}. Please ensure format is correct.` });
             setSelectedFile(csvFile); 
             setIsFileValid(true);
             setProgress(5);
-            setProgressMessage('File selected. No specific header validation for this section.');
+            setProgressMessage('File selected. Assuming correct format.');
             return;
           }
           
+          if (selectedSection === "about" && !EXPECTED_HEADERS["about"]) {
+             setMessage({ type: 'info', text: `The 'About' section is typically populated from the Profile summary. Direct CSV upload for 'About' is not configured.` });
+             setIsFileValid(false); 
+             if (fileInputRef.current) fileInputRef.current.value = "";
+             return;
+          }
+
           const missingHeaders = expected.filter(h => !actualHeaders.includes(h));
           const extraHeaders = actualHeaders.filter(h => !expected.includes(h)); 
 
@@ -188,25 +204,24 @@ export default function UploadForm() {
         }
       });
     } else {
-        resetFormState(); // Call full reset if no file is selected (e.g., user cancels)
+        resetFormOnNewSelection(true); 
     }
   };
 
   const handleSectionChange = (event: ChangeEvent<HTMLSelectElement>) => {
     setSelectedSection(event.target.value);
-    resetFormState(); 
+    resetFormOnNewSelection(true); 
   };
 
   const handleSecretKeyChange = (event: ChangeEvent<HTMLInputElement>) => {
     setSecretKey(event.target.value);
   };
 
-  // MODIFIED: checkDeployStatus now accepts an optional initiationTime for the first call
-  const checkDeployStatus = async (initialCallTime?: number) => {
-    const timeToCompare = initialCallTime || uploadInitiationTime; // Use passed time for first call, state for subsequent
-
-    if (!timeToCompare) { 
-        setProgressMessage("Waiting for upload process to fully start..."); // Changed message
+  const checkDeployStatus = async (currentUploadStartTime: number) => {
+    if (!currentUploadStartTime) { 
+        setProgressMessage("Error: Upload initiation time not available for polling.");
+        if (pollingIntervalRef.current) clearInterval(pollingIntervalRef.current);
+        setIsProcessing(false);
         return;
     }
     try {
@@ -214,26 +229,25 @@ export default function UploadForm() {
       const statusData = await statusResponse.json() as DeployStatusResponse; 
 
       if (!statusResponse.ok) {
-        setProgressMessage(`Error checking deploy status: ${statusData.message || statusResponse.statusText || statusResponse.status}. Function may not be deployed.`);
-        setMessage({ type: 'error', text: `Failed to get deployment status. Please check Netlify function logs for 'get-deploy-status'.` });
+        setProgressMessage(`Error checking deploy status: ${statusData.message || statusResponse.statusText || statusResponse.status}.`);
+        setMessage({ type: 'error', text: `Failed to get deployment status. Function 'get-deploy-status' might not be deployed or API key is invalid.` });
         if (pollingIntervalRef.current) clearInterval(pollingIntervalRef.current);
         setIsProcessing(false); 
+        setUploadInitiationTime(null); 
         return;
       }
       
       const deployCreatedAt = statusData.createdAt ? new Date(statusData.createdAt).getTime() : 0;
 
-      setProgressMessage(`Current deploy status: ${statusData.status || 'unknown'}. Checking again in 10s...`);
-      
-      if ((statusData.status === 'ready' || statusData.status === 'current') && deployCreatedAt >= timeToCompare) {
+      if ((statusData.status === 'ready' || statusData.status === 'current') && deployCreatedAt >= currentUploadStartTime) {
         setProgress(100);
         setProgressMessage('Site successfully updated!');
-        setMessage({ type: 'success', text: 'Deployment complete and site is live with new data.' });
+        setMessage({ type: 'success', text: 'Deployment complete and site is live with new data. You may need to refresh the main CV page.' });
         if (pollingIntervalRef.current) clearInterval(pollingIntervalRef.current);
-        setIsProcessing(false);
+        setIsProcessing(false); 
         setUploadInitiationTime(null); 
-      } else if (statusData.status === 'building' || ((statusData.status === 'ready' || statusData.status === 'current') && deployCreatedAt < timeToCompare) ) {
-        setProgressMessage(`Netlify build in progress (status: ${statusData.status}). Checking again in 10s...`);
+      } else if (statusData.status === 'building' || ((statusData.status === 'ready' || statusData.status === 'current') && deployCreatedAt < currentUploadStartTime) ) {
+        setProgressMessage(`Netlify build in progress (status: ${statusData.status}). This might be the new build or an older one. Checking again in 10s...`);
         setProgress(prev => Math.min(prev + 5, 95)); 
       } else if (statusData.status === 'error' || statusData.status === 'failed') {
         setProgressMessage(`Deployment failed: ${statusData.status}`);
@@ -242,7 +256,7 @@ export default function UploadForm() {
         setIsProcessing(false);
         setUploadInitiationTime(null); 
       } else {
-         setProgressMessage(`Deployment status: ${statusData.status || 'pending'}. Checking again in 10s...`);
+         setProgressMessage(`Deployment status: ${statusData.status || 'pending'}. This could be an older deployment. Checking again in 10s...`);
       }
     } catch (error) {
       console.error("Error polling deploy status:", error);
@@ -262,12 +276,15 @@ export default function UploadForm() {
     }
 
     setIsProcessing(true);
-    if (message?.type === 'error') setMessage(null); 
+    // Clear previous error messages, but keep info/success from validation
+    if (message?.type === 'error') {
+        setMessage(null); 
+    }
     setProgress(10); 
     setProgressMessage('Reading file...');
     
-    const initiationTime = Date.now(); // MODIFIED: Get current time
-    setUploadInitiationTime(initiationTime); // MODIFIED: Set state
+    const currentUploadStartTime = Date.now(); 
+    setUploadInitiationTime(currentUploadStartTime); 
 
     const reader = new FileReader();
     reader.readAsDataURL(selectedFile);
@@ -294,26 +311,23 @@ export default function UploadForm() {
         if (uploadResponse.ok) {
           setProgress(30); 
           setProgressMessage('Data submitted to GitHub. Build triggered. Monitoring deployment...');
-          if (message?.type !== 'error') {
-            setMessage({ type: 'success', text: uploadResult.message || 'File processing initiated successfully!' });
-          } else {
-             setMessage({ type: 'success', text: uploadResult.message || 'File processing initiated successfully!' });
-          }
+          // Set a new success message based on the upload result, overwriting previous info/success.
+          setMessage({ type: 'success', text: uploadResult.message || 'File processing initiated successfully!' });
           
           if (pollingIntervalRef.current) clearInterval(pollingIntervalRef.current); 
-          pollingIntervalRef.current = setInterval(() => checkDeployStatus(), 10000); // Subsequent calls use state
-          await checkDeployStatus(initiationTime); // MODIFIED: Pass initiationTime to the first call
+          pollingIntervalRef.current = setInterval(() => checkDeployStatus(currentUploadStartTime), 10000); 
+          await checkDeployStatus(currentUploadStartTime); 
 
         } else {
           setMessage({ type: 'error', text: uploadResult.message || `Upload to function failed (Status: ${uploadResponse.status}).` });
-          setIsProcessing(false);
+          setIsProcessing(false); 
           setProgress(0);
           setUploadInitiationTime(null); 
         }
       } catch (error) {
         console.error('Upload error:', error);
         setMessage({ type: 'error', text: 'An unexpected error occurred during upload processing.' });
-        setIsProcessing(false);
+        setIsProcessing(false); 
         setProgress(0);
         setUploadInitiationTime(null); 
       }
@@ -321,7 +335,7 @@ export default function UploadForm() {
     reader.onerror = (error) => {
       console.error('File reading error:', error);
       setMessage({ type: 'error', text: 'Error reading file.' });
-      setIsProcessing(false);
+      setIsProcessing(false); 
       setProgress(0);
       setUploadInitiationTime(null);
     };
@@ -394,17 +408,19 @@ export default function UploadForm() {
           )}
 
           {isProcessing && (
-            <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5 mt-4">
-              <div
-                className="bg-indigo-600 h-2.5 rounded-full transition-all duration-300 ease-out"
-                style={{ width: `${progress}%` }}
-              ></div>
-            </div>
-          )}
-          {isProcessing && progressMessage && (
-            <p className="text-center text-sm text-gray-600 dark:text-gray-400 mt-2">
-              {progressMessage}
-            </p>
+            <>
+              <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5 mt-4">
+                <div
+                  className="bg-indigo-600 h-2.5 rounded-full transition-all duration-300 ease-out"
+                  style={{ width: `${progress}%` }}
+                ></div>
+              </div>
+              {progressMessage && (
+                <p className="text-center text-sm text-gray-600 dark:text-gray-400 mt-2">
+                  {progressMessage}
+                </p>
+              )}
+            </>
           )}
 
 
