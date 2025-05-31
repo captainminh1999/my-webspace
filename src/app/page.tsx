@@ -2,7 +2,7 @@
 import React from 'react';
 import Link from 'next/link';
 // Import icons from lucide-react that are used directly in this page's JSX
-import { Link as LinkIcon, ExternalLink, ArrowLeft } from 'lucide-react'; 
+import { Link as LinkIcon } from 'lucide-react'; 
 // Note: Github, Linkedin, Twitter etc. are now imported in formatters.ts for parseWebsiteString
 
 // Import shared types
