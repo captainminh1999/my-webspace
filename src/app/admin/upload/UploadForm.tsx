@@ -70,7 +70,6 @@ interface UploadFunctionResponse {
   error?: string; 
 }
 
-// Re-added DeployStatusResponse for polling
 interface DeployStatusResponse {
   deployId?: string;
   status?: string;
@@ -91,13 +90,11 @@ export default function UploadForm() {
   const [message, setMessage] = useState<{ type: 'success' | 'error' | 'info'; text: string | React.ReactNode } | null>(null);
   const [secretKey, setSecretKey] = useState('');
   
-  // Re-added state for polling
   const [uploadInitiationTime, setUploadInitiationTime] = useState<number | null>(null);
   const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null); 
 
   useEffect(() => {
-    // Cleanup polling interval on component unmount
     return () => {
       if (pollingIntervalRef.current) {
         clearInterval(pollingIntervalRef.current);
@@ -111,8 +108,8 @@ export default function UploadForm() {
     setMessage(null);
     setSelectedFile(null);
     setIsFileValid(false);
-    setUploadInitiationTime(null); // Reset initiation time
-    if (pollingIntervalRef.current) { // Clear any active polling
+    setUploadInitiationTime(null); 
+    if (pollingIntervalRef.current) { 
         clearInterval(pollingIntervalRef.current);
         pollingIntervalRef.current = null;
     }
@@ -217,11 +214,12 @@ export default function UploadForm() {
     setSecretKey(event.target.value);
   };
 
-  const checkDeployStatus = async (currentUploadStartTime: number) => {
-    if (!currentUploadStartTime) { 
+  // MODIFIED: checkDeployStatus now uses the uploadInitiationTime state variable
+  const checkDeployStatus = async () => {
+    if (!uploadInitiationTime) { // Now checks the state variable
         setProgressMessage("Error: Upload initiation time not available for polling.");
         if (pollingIntervalRef.current) clearInterval(pollingIntervalRef.current);
-        setIsProcessing(false);
+        setIsProcessing(false); // Ensure form is re-enabled if this state occurs
         return;
     }
     try {
@@ -239,14 +237,15 @@ export default function UploadForm() {
       
       const deployCreatedAt = statusData.createdAt ? new Date(statusData.createdAt).getTime() : 0;
 
-      if ((statusData.status === 'ready' || statusData.status === 'current') && deployCreatedAt >= currentUploadStartTime) {
+      // Compare with the state variable uploadInitiationTime
+      if ((statusData.status === 'ready' || statusData.status === 'current') && deployCreatedAt >= uploadInitiationTime) {
         setProgress(100);
         setProgressMessage('Site successfully updated!');
         setMessage({ type: 'success', text: 'Deployment complete and site is live with new data. You may need to refresh the main CV page.' });
         if (pollingIntervalRef.current) clearInterval(pollingIntervalRef.current);
         setIsProcessing(false); 
         setUploadInitiationTime(null); 
-      } else if (statusData.status === 'building' || ((statusData.status === 'ready' || statusData.status === 'current') && deployCreatedAt < currentUploadStartTime) ) {
+      } else if (statusData.status === 'building' || ((statusData.status === 'ready' || statusData.status === 'current') && deployCreatedAt < uploadInitiationTime) ) {
         setProgressMessage(`Netlify build in progress (status: ${statusData.status}). This might be the new build or an older one. Checking again in 10s...`);
         setProgress(prev => Math.min(prev + 5, 95)); 
       } else if (statusData.status === 'error' || statusData.status === 'failed') {
@@ -276,15 +275,13 @@ export default function UploadForm() {
     }
 
     setIsProcessing(true);
-    // Clear previous error messages, but keep info/success from validation
     if (message?.type === 'error') {
         setMessage(null); 
     }
     setProgress(10); 
     setProgressMessage('Reading file...');
     
-    const currentUploadStartTime = Date.now(); 
-    setUploadInitiationTime(currentUploadStartTime); 
+    setUploadInitiationTime(Date.now()); // Set state here
 
     const reader = new FileReader();
     reader.readAsDataURL(selectedFile);
@@ -311,12 +308,18 @@ export default function UploadForm() {
         if (uploadResponse.ok) {
           setProgress(30); 
           setProgressMessage('Data submitted to GitHub. Build triggered. Monitoring deployment...');
-          // Set a new success message based on the upload result, overwriting previous info/success.
           setMessage({ type: 'success', text: uploadResult.message || 'File processing initiated successfully!' });
           
           if (pollingIntervalRef.current) clearInterval(pollingIntervalRef.current); 
-          pollingIntervalRef.current = setInterval(() => checkDeployStatus(currentUploadStartTime), 10000); 
-          await checkDeployStatus(currentUploadStartTime); 
+          // MODIFIED: setInterval calls checkDeployStatus without arguments
+          pollingIntervalRef.current = setInterval(checkDeployStatus, 10000); 
+          // MODIFIED: Initial call also uses state (ensure state update has propagated)
+          // A slight delay or using useEffect to trigger first poll might be more robust
+          // For now, directly calling it relies on state update being quick enough.
+          // A more robust pattern for immediate call after state set:
+          // useEffect(() => { if (uploadInitiationTime && isProcessing && progress === 30) checkDeployStatus(); }, [uploadInitiationTime, isProcessing, progress]);
+          // For simplicity now, direct call:
+          await checkDeployStatus(); 
 
         } else {
           setMessage({ type: 'error', text: uploadResult.message || `Upload to function failed (Status: ${uploadResponse.status}).` });
