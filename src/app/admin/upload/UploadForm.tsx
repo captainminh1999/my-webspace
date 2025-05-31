@@ -90,7 +90,9 @@ export default function UploadForm() {
   const [message, setMessage] = useState<{ type: 'success' | 'error' | 'info'; text: string | React.ReactNode } | null>(null);
   const [secretKey, setSecretKey] = useState('');
   
-  const [uploadInitiationTime, setUploadInitiationTime] = useState<number | null>(null);
+  // This state is set but its direct usage in checkDeployStatus was causing issues with closures.
+  // We'll rely on passing the specific initiationTime to checkDeployStatus.
+  const [uploadInitiationTime, setUploadInitiationTime] = useState<number | null>(null); 
   const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null); 
 
@@ -108,7 +110,7 @@ export default function UploadForm() {
     setMessage(null);
     setSelectedFile(null);
     setIsFileValid(false);
-    setUploadInitiationTime(null); 
+    setUploadInitiationTime(null); // Reset this for clarity, though polling relies on passed param
     if (pollingIntervalRef.current) { 
         clearInterval(pollingIntervalRef.current);
         pollingIntervalRef.current = null;
@@ -116,6 +118,7 @@ export default function UploadForm() {
     if (clearFileInput && fileInputRef.current) {
       fileInputRef.current.value = ""; 
     }
+    // setIsProcessing(false); // Only set isProcessing to false when a process truly ends
   };
 
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -128,11 +131,13 @@ export default function UploadForm() {
     if (isProcessing && pollingIntervalRef.current) {
         clearInterval(pollingIntervalRef.current);
         pollingIntervalRef.current = null;
+        // setIsProcessing(false); // Let submit button re-enable if user changes file mid-poll
     }
-    if (!isProcessing && pollingIntervalRef.current) { 
+     if (!isProcessing && pollingIntervalRef.current) { // If somehow an interval is orphaned
         clearInterval(pollingIntervalRef.current);
         pollingIntervalRef.current = null;
     }
+
 
     const file = event.target.files?.[0];
 
@@ -219,9 +224,10 @@ export default function UploadForm() {
     setSecretKey(event.target.value);
   };
 
-  const checkDeployStatus = async () => {
-    if (uploadInitiationTime === null) { 
-        setProgressMessage("Error: Upload initiation time not available for polling.");
+  // MODIFIED: checkDeployStatus now takes the specific upload's start time as a parameter
+  const checkDeployStatus = async (currentUploadCycleStartTime: number) => {
+    if (!currentUploadCycleStartTime) {
+        setProgressMessage("Error: Cannot check deploy status without upload initiation time for this cycle.");
         if (pollingIntervalRef.current) clearInterval(pollingIntervalRef.current);
         setIsProcessing(false); 
         return;
@@ -235,39 +241,35 @@ export default function UploadForm() {
         setMessage({ type: 'error', text: `Failed to get deployment status. Function 'get-deploy-status' might not be deployed or API key is invalid.` });
         if (pollingIntervalRef.current) clearInterval(pollingIntervalRef.current);
         setIsProcessing(false); 
-        setUploadInitiationTime(null); 
+        // setUploadInitiationTime(null); // Keep current cycle's time until it resolves or errors fully
         return;
       }
       
       const deployCreatedAt = statusData.createdAt ? new Date(statusData.createdAt).getTime() : 0;
 
-      // MODIFIED: Refined logic for deploy status checking
-      if (statusData.status === 'ready' || statusData.status === 'current') {
-        if (deployCreatedAt >= uploadInitiationTime) {
-          // This is the new deploy we were waiting for
-          setProgress(100);
-          setProgressMessage('Site successfully updated!');
-          setMessage({ type: 'success', text: 'Deployment complete and site is live with new data. You may need to refresh the main CV page.' });
-          if (pollingIntervalRef.current) clearInterval(pollingIntervalRef.current);
-          setIsProcessing(false); 
-          setUploadInitiationTime(null); 
-        } else {
-          // This is an old 'ready' deploy, the new one is still building or hasn't started
-          setProgressMessage(`Waiting for new deployment (last live deploy was older). Current API status: ${statusData.status}. Checking again in 10s...`);
-          setProgress(prev => Math.min(prev, 95)); // Keep progress high but not 100%
-        }
+      if ((statusData.status === 'ready' || statusData.status === 'current') && deployCreatedAt >= currentUploadCycleStartTime) {
+        setProgress(100);
+        setProgressMessage('Site successfully updated!');
+        setMessage({ type: 'success', text: 'Deployment complete and site is live with new data. You may need to refresh the main CV page.' });
+        if (pollingIntervalRef.current) clearInterval(pollingIntervalRef.current);
+        setIsProcessing(false); 
+        setUploadInitiationTime(null); // Reset for next potential upload
       } else if (statusData.status === 'building') {
         setProgressMessage(`Netlify build in progress (status: ${statusData.status}). Checking again in 10s...`);
         setProgress(prev => Math.min(prev + 5, 95)); 
+      } else if ((statusData.status === 'ready' || statusData.status === 'current') && deployCreatedAt < currentUploadCycleStartTime) {
+        // This is an old 'ready' deploy, the new one is still building or hasn't started/shown up
+        setProgressMessage(`Waiting for new deployment (last live deploy was older). Current API status: ${statusData.status}. Checking again in 10s...`);
+        setProgress(prev => Math.min(prev, 95)); // Keep progress high but not 100%
       } else if (statusData.status === 'error' || statusData.status === 'failed') {
         setProgressMessage(`Deployment failed: ${statusData.status}`);
         setMessage({ type: 'error', text: `Netlify deployment failed. Check deploy logs on Netlify.` });
         if (pollingIntervalRef.current) clearInterval(pollingIntervalRef.current);
         setIsProcessing(false);
         setUploadInitiationTime(null); 
-      } else { // e.g., 'enqueued', 'new', 'preparing'
+      } else { 
          setProgressMessage(`Deployment status: ${statusData.status || 'pending'}. Checking again in 10s...`);
-         setProgress(prev => Math.min(prev + 2, 90)); // Slow progress for other states
+         setProgress(prev => Math.min(prev + 2, 90)); 
       }
     } catch (error) {
       console.error("Error polling deploy status:", error);
@@ -293,8 +295,8 @@ export default function UploadForm() {
     setProgress(10); 
     setProgressMessage('Reading file...');
     
-    const currentUploadStartTime = Date.now(); // Capture time for THIS specific upload
-    setUploadInitiationTime(currentUploadStartTime); 
+    const currentUploadStartTimeForThisSubmit = Date.now(); // Capture time for THIS specific upload
+    setUploadInitiationTime(currentUploadStartTimeForThisSubmit); // Set state, primarily for potential direct use if needed elsewhere
 
     const reader = new FileReader();
     reader.readAsDataURL(selectedFile);
@@ -324,11 +326,10 @@ export default function UploadForm() {
           setMessage({ type: 'success', text: uploadResult.message || 'File processing initiated successfully!' });
           
           if (pollingIntervalRef.current) clearInterval(pollingIntervalRef.current); 
-          // Pass the specific start time of this upload to the interval's first call
-          // and subsequent calls will use the state which should be set by now.
-          // For robustness, the checkDeployStatus itself relies on the state.
-          pollingIntervalRef.current = setInterval(checkDeployStatus, 10000); 
-          setTimeout(() => checkDeployStatus(), 100); // Initial check after state has a chance to set
+          // Pass currentUploadStartTimeForThisSubmit to the interval's closure
+          pollingIntervalRef.current = setInterval(() => checkDeployStatus(currentUploadStartTimeForThisSubmit), 10000); 
+          // Also pass to the initial immediate check
+          await checkDeployStatus(currentUploadStartTimeForThisSubmit); 
 
         } else {
           setMessage({ type: 'error', text: uploadResult.message || `Upload to function failed (Status: ${uploadResponse.status}).` });
