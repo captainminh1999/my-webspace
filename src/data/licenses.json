@@ -1,10 +1,122 @@
 [
   {
-    "name": "Google Data Analytics Professional Certificate",
-    "authority": "Google",
-    "startedOn": "2022-01",
-    "finishedOn": "2022-06",
-    "licenseNumber": "XYZ123ABC",
-    "url": "https://coursera.org/verify/professional-cert/XYZ123ABC"
+    "name": "IBM Data Science Specialization",
+    "url": "https://www.coursera.org/account/accomplishments/specialization/certificate/Y2DHZ7YAPFTU",
+    "authority": "Coursera Course Certificates",
+    "startedOn": "Jan 2021",
+    "finishedOn": null,
+    "licenseNumber": "Y2DHZ7YAPFTU"
+  },
+  {
+    "name": "AWS Cloud Practitioner Essentials",
+    "url": "https://www.aws.training/Transcript/CompletionCertificateHtml?transcriptid=1I0__ZS6EkGDpuGWeGQv3A2",
+    "authority": "Amazon Web Services (AWS)",
+    "startedOn": "Jan 2021",
+    "finishedOn": null,
+    "licenseNumber": "1I0__ZS6EkGDpuGWeGQv3A2"
+  },
+  {
+    "name": "Data Analytics Consulting Virtual Program",
+    "url": "https://insidesherpa.s3.amazonaws.com/completion-certificates/KPMG/m7W4GMqeT3bh9Nb2c_KPMG_ToYyPsm5mrT6cugBs_completion_certificate.pdf",
+    "authority": "KPMG",
+    "startedOn": "Jan 2021",
+    "finishedOn": null,
+    "licenseNumber": "pa9YM3qLSicPJ833D"
+  },
+  {
+    "name": "Technology Consulting Virtual Program",
+    "url": "https://insidesherpa.s3.amazonaws.com/completion-certificates/Deloitte/FqFtWwQzNxJ8Qsh5H_Deloitte_ToYyPsm5mrT6cugBs_completion_certificate.pdf",
+    "authority": "Deloitte",
+    "startedOn": "Jan 2021",
+    "finishedOn": null,
+    "licenseNumber": "pNuxBA6g8Xrc35q6i"
+  },
+  {
+    "name": "C++ Developer",
+    "url": "https://www.linkedin.com/learning/certificates/810cc3f9a0ac32097a4e019bdb50beb5e03197cc2f35748ea900d3562e939fce?trk=backfilled_certificate",
+    "authority": "LinkedIn",
+    "startedOn": "Aug 2021",
+    "finishedOn": null,
+    "licenseNumber": "AcFJ28P7--7cM39WxPGaB7qKkHYy"
+  },
+  {
+    "name": "SQL (Intermediate)",
+    "url": "https://www.hackerrank.com/certificates/8a532e2c8ef7",
+    "authority": "HackerRank",
+    "startedOn": "Mar 2022",
+    "finishedOn": null,
+    "licenseNumber": "8a532e2c8ef7"
+  },
+  {
+    "name": "Python (Basic)",
+    "url": "https://www.hackerrank.com/certificates/d881b36bedc4",
+    "authority": "HackerRank",
+    "startedOn": "Mar 2022",
+    "finishedOn": null,
+    "licenseNumber": "d881b36bedc4"
+  },
+  {
+    "name": "Learning Java",
+    "url": "https://www.linkedin.com/learning/certificates/230ad16795c2f7946d8721223c8fecfc85cc394efe63a28e0f4216ca6d862ec9",
+    "authority": "LinkedIn",
+    "startedOn": "Sep 2022",
+    "finishedOn": null,
+    "licenseNumber": null
+  },
+  {
+    "name": "HubSpot Marketing Hub Software",
+    "url": "https://app.hubspot.com/academy/achievements/32r704pq/en/1/minh-nguyen/hubspot-marketing-hub-software",
+    "authority": "HubSpot Academy",
+    "startedOn": "Aug 2024",
+    "finishedOn": "Sep 2025",
+    "licenseNumber": "0bef81660373460ca3a1bedbf1e5476a"
+  },
+  {
+    "name": "Digital Marketing ",
+    "url": "https://app.hubspot.com/academy/achievements/38fy6b78/en/1/minh-nguyen/digital-marketing",
+    "authority": "HubSpot Academy",
+    "startedOn": "May 2023",
+    "finishedOn": "Sep 2025",
+    "licenseNumber": "e9ab9cb46f894c8ba2c8f5d376312b59"
+  },
+  {
+    "name": "HubSpot Reporting",
+    "url": "https://app.hubspot.com/academy/achievements/h8s0p26r/en/1/minh-nguyen/hubspot-reporting",
+    "authority": "HubSpot Academy",
+    "startedOn": "Aug 2024",
+    "finishedOn": "Sep 2025",
+    "licenseNumber": "0498eb781ae343f98bd6a3588fee8e6d"
+  },
+  {
+    "name": "Social Media Marketing",
+    "url": "https://app.hubspot.com/academy/achievements/9fv5ymhv/en/1/minh-nguyen/social-media-marketing",
+    "authority": "HubSpot Academy",
+    "startedOn": "Mar 2025",
+    "finishedOn": "Apr 2027",
+    "licenseNumber": "e0b594ae05384031a525b9a58b0c0b58"
+  },
+  {
+    "name": "Social Media Marketing Certification II",
+    "url": "https://app.hubspot.com/academy/achievements/0v4g51jg/en/1/minh-nguyen/social-media-marketing-certification-ii",
+    "authority": "HubSpot Academy",
+    "startedOn": "Mar 2025",
+    "finishedOn": "Apr 2027",
+    "licenseNumber": "3394a953467f4ae0af9acf097078f0c2"
+  },
+  {
+    "name": "HubSpot Sales Hub Software ",
+    "url": "https://app.hubspot.com/academy/achievements/thyv129q/en/1/minh-nguyen/hubspot-sales-hub-software",
+    "authority": "HubSpot Academy",
+    "startedOn": "Mar 2025",
+    "finishedOn": "Apr 2026",
+    "licenseNumber": "726c94ce85a14d69a28ee9dd9cac9591"
+  },
+  {
+    "name": "Inbound Sales",
+    "url": "https://app.hubspot.com/academy/achievements/8dg6dqrw/en/1/minh-nguyen/inbound-sales",
+    "authority": "HubSpot Academy",
+    "startedOn": "May 2023",
+    "finishedOn": "Jun 2027",
+    "licenseNumber": "f1037d5562344f4cacc63647ee43434e"
   }
 ]
