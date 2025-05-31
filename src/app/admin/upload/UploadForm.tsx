@@ -80,6 +80,9 @@ interface DeployStatusResponse {
   message?: string; 
 }
 
+const POLLING_INTERVAL_BUILDING = 10000; // 10 seconds for 'building'
+const POLLING_INTERVAL_PENDING = 3000;  // 3 seconds for other pending states
+
 export default function UploadForm() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isFileValid, setIsFileValid] = useState(false); 
@@ -92,17 +95,20 @@ export default function UploadForm() {
   
   const [uploadInitiationTime, setUploadInitiationTime] = useState<number | null>(null); 
   const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const currentPollIntervalDurationRef = useRef<number>(POLLING_INTERVAL_PENDING); // Ref to store current interval for cleanup
   const fileInputRef = useRef<HTMLInputElement>(null); 
 
+  // useEffect for polling logic
   useEffect(() => {
     const pollStatus = async () => {
-      if (!uploadInitiationTime || !isProcessing) { 
+      if (!uploadInitiationTime || !isProcessing || progress >= 100) {
         if (pollingIntervalRef.current) clearInterval(pollingIntervalRef.current);
         return;
       }
+
       try {
         const statusResponse = await fetch('/.netlify/functions/get-deploy-status');
-        const statusData = await statusResponse.json() as DeployStatusResponse; 
+        const statusData = await statusResponse.json() as DeployStatusResponse;
 
         if (!statusResponse.ok) {
           setProgressMessage(`Error checking deploy status: ${statusData.message || statusResponse.statusText || statusResponse.status}.`);
@@ -114,8 +120,8 @@ export default function UploadForm() {
         }
         
         const deployCreatedAt = statusData.createdAt ? new Date(statusData.createdAt).getTime() : 0;
+        let nextPollInterval = POLLING_INTERVAL_PENDING; // Default to faster polling
 
-        // MODIFIED: Refined progress logic
         if ((statusData.status === 'ready' || statusData.status === 'current') && deployCreatedAt >= uploadInitiationTime) {
           setProgress(100);
           setProgressMessage('Site successfully updated!');
@@ -124,24 +130,30 @@ export default function UploadForm() {
           setIsProcessing(false); 
           setUploadInitiationTime(null); 
         } else if (statusData.status === 'building') {
-          setProgressMessage(`Netlify build in progress (status: ${statusData.status}). Checking again in 10s...`);
-          // Ensure progress doesn't go backward from a higher "pending" state if API fluctuates
-          setProgress(prev => Math.max(prev, Math.min(prev + 10, 95))); // Gradual increase, capped at 95
+          setProgressMessage(`Netlify build in progress (status: ${statusData.status}). Checking again in ${POLLING_INTERVAL_BUILDING/1000}s...`);
+          setProgress(prev => Math.min(prev + 5, 95)); 
+          nextPollInterval = POLLING_INTERVAL_BUILDING;
         } else if ((statusData.status === 'ready' || statusData.status === 'current') && deployCreatedAt < uploadInitiationTime) {
-          // This is an old 'ready' deploy, the new one is still building or hasn't started/shown up
-          setProgressMessage(`Waiting for new deployment. Current API status: ${statusData.status} (older deploy). Checking again in 10s...`);
-          setProgress(prev => Math.min(prev, 90)); // Keep progress indicating waiting, but not 100
+          setProgressMessage(`Waiting for new deployment. Current API status: ${statusData.status} (older deploy). Checking again in ${POLLING_INTERVAL_PENDING/1000}s...`);
+          setProgress(prev => Math.min(prev, 90)); 
         } else if (statusData.status === 'error' || statusData.status === 'failed') {
           setProgressMessage(`Deployment failed: ${statusData.status}`);
           setMessage({ type: 'error', text: `Netlify deployment failed. Check deploy logs on Netlify.` });
           if (pollingIntervalRef.current) clearInterval(pollingIntervalRef.current);
           setIsProcessing(false);
           setUploadInitiationTime(null); 
-        } else { // e.g., 'enqueued', 'new', 'preparing'
-           setProgressMessage(`Deployment status: ${statusData.status || 'pending'}. Checking again in 10s...`);
-           // Only advance progress if it's below a certain threshold for these intermediate states
-           setProgress(prev => prev < 80 ? Math.min(prev + 2, 80) : prev); 
+        } else { 
+           setProgressMessage(`Deployment status: ${statusData.status || 'pending'}. Checking again in ${POLLING_INTERVAL_PENDING/1000}s...`);
+           setProgress(prev => prev < 85 ? Math.min(prev + 2, 85) : prev); 
         }
+
+        // If still processing, set up the next poll with the determined interval
+        if (isProcessing && progress < 100 && uploadInitiationTime) { // Check uploadInitiationTime again for safety
+            if (pollingIntervalRef.current) clearInterval(pollingIntervalRef.current);
+            currentPollIntervalDurationRef.current = nextPollInterval;
+            pollingIntervalRef.current = setTimeout(pollStatus, currentPollIntervalDurationRef.current);
+        }
+
       } catch (error) {
         console.error("Error polling deploy status:", error);
         setProgressMessage('Could not retrieve deploy status. Network error or function issue.');
@@ -152,31 +164,24 @@ export default function UploadForm() {
       }
     };
 
+    // Start polling if conditions are met
     if (uploadInitiationTime && isProcessing && progress >= 30 && progress < 100) {
-      if (pollingIntervalRef.current) clearInterval(pollingIntervalRef.current); 
-      // Initial call to pollStatus is important
-      // If handleSubmit just set progress to 30, this effect might run before that state is fully "seen" by this effect's closure
-      // A small timeout for the very first poll after upload can help, or trigger it more directly.
-      // For now, we rely on the progress >= 30 condition.
-      const initialPollTimeout = setTimeout(() => {
-        if(isProcessing && progress >= 30 && progress < 100) { // Re-check conditions
-            pollStatus();
-        }
-      }, 100); // Small delay for initial poll after progress hits 30%
-      
-      pollingIntervalRef.current = setInterval(pollStatus, 10000); 
-      
-      return () => clearTimeout(initialPollTimeout); // Cleanup timeout as well
-    } else if (!isProcessing && pollingIntervalRef.current) {
-      clearInterval(pollingIntervalRef.current);
+      // Clear any existing interval before starting a new one or the first call
+      if (pollingIntervalRef.current) {
+        clearInterval(pollingIntervalRef.current);
+      }
+      // Initial call to pollStatus
+      const initialCallTimeout = setTimeout(pollStatus, 100); // Small delay for state to settle
+      return () => clearTimeout(initialCallTimeout);
     }
-
+    
+    // Cleanup function for the effect
     return () => {
       if (pollingIntervalRef.current) {
         clearInterval(pollingIntervalRef.current);
       }
     };
-  }, [uploadInitiationTime, isProcessing, progress]); 
+  }, [uploadInitiationTime, isProcessing, progress]); // Re-run effect if these change
 
 
   const resetFormOnNewSelection = (clearFileInput: boolean = true) => {
@@ -207,6 +212,7 @@ export default function UploadForm() {
         clearInterval(pollingIntervalRef.current);
         pollingIntervalRef.current = null;
     }
+    // If user selects a new file, ensure isProcessing is false to allow new validation/upload
     setIsProcessing(false); 
 
     const file = event.target.files?.[0];
@@ -308,7 +314,7 @@ export default function UploadForm() {
     setProgress(10); 
     setProgressMessage('Reading file...');
     
-    setUploadInitiationTime(Date.now()); 
+    setUploadInitiationTime(Date.now()); // This triggers the useEffect for polling after next step
 
     const reader = new FileReader();
     reader.readAsDataURL(selectedFile);
@@ -333,11 +339,10 @@ export default function UploadForm() {
         const uploadResult = await uploadResponse.json() as UploadFunctionResponse; 
 
         if (uploadResponse.ok) {
-          setProgress(30); 
+          setProgress(30); // Polling will start via useEffect due to this and isProcessing/uploadInitiationTime
           setProgressMessage('Data submitted to GitHub. Build triggered. Monitoring deployment...');
           setMessage({ type: 'success', text: uploadResult.message || 'File processing initiated successfully!' });
-          // The useEffect hook will now pick up the changes to isProcessing, uploadInitiationTime, and progress
-          // to start the polling. No direct call to pollStatus() or setInterval here.
+          // useEffect will handle starting the pollStatus calls
         } else {
           setMessage({ type: 'error', text: uploadResult.message || `Upload to function failed (Status: ${uploadResponse.status}).` });
           setIsProcessing(false); 
