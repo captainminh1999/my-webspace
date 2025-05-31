@@ -1,4 +1,10 @@
-@import "tailwindcss";
+/* src/app/globals.css */
+@import 'react-grid-layout/css/styles.css';
+@import 'react-resizable/css/styles.css';
+
+@import 'tailwindcss';
+
+/* THEN Tailwind directives */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
