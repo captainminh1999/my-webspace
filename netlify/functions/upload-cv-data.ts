@@ -9,6 +9,17 @@ const DATA_BASE_PATH = "src/data";          // Base path for data files in your 
 const COMMIT_MESSAGE_PREFIX = "Update CV data for section: ";
 const GITHUB_BRANCH = "main";
 
+// Helper function to convert header to camelCase
+const toCamelCase = (str: string): string => {
+  // Remove special characters, trim, handle spaces/underscores/hyphens
+  let s = str
+    .replace(/[^a-zA-Z0-9\s_-]/g, "") // Remove non-alphanumeric except space, underscore, hyphen
+    .trim()
+    .replace(/[\s_-]+(.)?/g, (_, c) => (c ? c.toUpperCase() : '')); // Convert to camelCase
+  // Ensure first character is lowercase
+  return s.charAt(0).toLowerCase() + s.slice(1);
+};
+
 // Define a mapping from section identifiers to filenames
 const sectionFileMap: { [key: string]: string } = {
   profile: "profile.json",
@@ -83,6 +94,7 @@ const handler: Handler = async (event: HandlerEvent, context: HandlerContext) =>
       header: true, // Assumes first row of CSV is header
       skipEmptyLines: true,
       dynamicTyping: true, // Automatically convert numbers, booleans
+      transformHeader: (header) => toCamelCase(header), // ADDED/MODIFIED THIS LINE
     });
 
     if (parseResult.errors.length > 0) {
