@@ -21,22 +21,19 @@ const cvSections = [
 ];
 
 // DEFINE EXPECTED CSV HEADERS FOR EACH SECTION
-// **IMPORTANT**: These must exactly match the headers in your CSV files!
 const EXPECTED_HEADERS: { [key: string]: string[] } = {
   profile: [
     "First Name", "Last Name", "Maiden Name", "Address", "Birth Date", 
-    "Headline", "Summary", // Summary will be used for about.json
+    "Headline", "Summary", 
     "Industry", "Zip Code", "Geo Location", "Twitter Handles", 
     "Websites", "Instant Messengers"
   ],
-  // "about" section is derived from profile's summary, so no direct CSV upload usually.
-  // If you have a separate about.csv, define its headers here.
-  about: ["Content"], // Example if you had a dedicated about.csv
-  experience: [ // This is complex due to nested structure. This assumes a flat CSV per role.
+  about: ["Content"], 
+  experience: [ 
     "Company Name", "Employment Type", "Company Location", "Company Total Duration",
     "Role Title", "Role Start Date", "Role End Date", "Role Duration", "Role Location",
-    "Responsibility 1", "Responsibility 2", "Responsibility 3", // Add more as needed or handle differently
-    "Skills" // e.g., "Skill1;Skill2;Skill3"
+    "Responsibility 1", "Responsibility 2", "Responsibility 3", 
+    "Skills" 
   ],
   education: [
     "School Name", "Start Date", "End Date", "Degree Name", "Notes", "Activities"
@@ -50,14 +47,14 @@ const EXPECTED_HEADERS: { [key: string]: string[] } = {
   volunteering: [
     "Company Name", "Role", "Started On", "Finished On", "Cause", "Description"
   ],
-  skills: [ // Assuming a CSV with one column header, e.g., "Skill Name"
+  skills: [ 
     "Skill Name"
   ],
   recommendationsReceived: [
     "Recommender First Name", "Recommender Last Name", "Recommender Job Title", 
     "Recommender Company", "Recommendation Text", "Date Received"
   ],
-  recommendationsGiven: [ // If you implement upload for this
+  recommendationsGiven: [ 
     "Recipient First Name", "Recipient Last Name", "Recipient Job Title",
     "Recipient Company", "Recommendation Text", "Date Given"
   ],
@@ -69,10 +66,27 @@ const EXPECTED_HEADERS: { [key: string]: string[] } = {
   ],
 };
 
+// Interface for the expected response from the upload-cv-data function
+interface UploadFunctionResponse {
+  message: string;
+  error?: string; // Optional error details
+}
+
+// Interface for the expected response from the get-deploy-status function
+interface DeployStatusResponse {
+  deployId?: string;
+  status?: string;
+  createdAt?: string;
+  publishedAt?: string;
+  commitRef?: string;
+  context?: string;
+  message?: string; // For error messages from the function itself
+}
+
 
 export default function UploadForm() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [isFileValid, setIsFileValid] = useState(false); // New state for validation
+  const [isFileValid, setIsFileValid] = useState(false); 
   const [selectedSection, setSelectedSection] = useState<string>(cvSections[0].id);
   const [isProcessing, setIsProcessing] = useState(false);
   const [progress, setProgress] = useState(0);
@@ -82,7 +96,7 @@ export default function UploadForm() {
   
   const [uploadInitiationTime, setUploadInitiationTime] = useState<number | null>(null);
   const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null); // Ref for file input
+  const fileInputRef = useRef<HTMLInputElement>(null); 
 
   useEffect(() => {
     return () => {
@@ -100,12 +114,12 @@ export default function UploadForm() {
     setIsFileValid(false);
     setUploadInitiationTime(null);
     if (fileInputRef.current) {
-      fileInputRef.current.value = ""; // Reset the file input visually
+      fileInputRef.current.value = ""; 
     }
   };
 
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
-    resetFormState(); // Reset previous states on new file selection
+    resetFormState(); 
     const file = event.target.files?.[0];
 
     if (file) {
@@ -114,25 +128,21 @@ export default function UploadForm() {
         return;
       }
 
-      // Client-side CSV header validation
       Papa.parse(file, {
-        preview: 1, // Only parse the first few lines to get headers quickly
-        header: true, // Automatically detect headers
+        preview: 1, 
+        header: true, 
         skipEmptyLines: true,
         complete: (results) => {
           const actualHeaders = results.meta.fields || [];
           const expected = EXPECTED_HEADERS[selectedSection];
 
           if (selectedSection === "about" && EXPECTED_HEADERS["about"]?.length > 0) {
-            // Handle 'about' section special case if it's directly uploaded
-             // For now, this example assumes 'about' is from profile summary,
-             // so a direct 'about.csv' upload might not be typical unless you change that flow.
+            // Handle 'about' section special case
           }
-
 
           if (!expected) {
             setMessage({ type: 'info', text: `No specific header validation for section: ${selectedSection}. Please ensure format is correct.` });
-            setSelectedFile(file); // Allow upload but with a warning/info
+            setSelectedFile(file); 
             setIsFileValid(true);
             setProgress(5);
             setProgressMessage('File selected. No specific header validation for this section.');
@@ -140,7 +150,7 @@ export default function UploadForm() {
           }
           
           const missingHeaders = expected.filter(h => !actualHeaders.includes(h));
-          const extraHeaders = actualHeaders.filter(h => !expected.includes(h)); // Good to be aware of
+          const extraHeaders = actualHeaders.filter(h => !expected.includes(h)); 
 
           if (missingHeaders.length > 0) {
             setMessage({ 
@@ -168,7 +178,7 @@ export default function UploadForm() {
             setProgressMessage('File selected and headers validated. Ready for upload.');
           }
         },
-        error: (error: any) => {
+        error: (error: any) => { // error from PapaParse is 'any' by default
           setMessage({ type: 'error', text: `Error parsing CSV for validation: ${error.message}` });
           setIsFileValid(false);
         }
@@ -178,7 +188,7 @@ export default function UploadForm() {
 
   const handleSectionChange = (event: ChangeEvent<HTMLSelectElement>) => {
     setSelectedSection(event.target.value);
-    resetFormState(); // Reset file and validation when section changes
+    resetFormState(); 
   };
 
   const handleSecretKeyChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -186,23 +196,26 @@ export default function UploadForm() {
   };
 
   const checkDeployStatus = async () => {
-    // ... (checkDeployStatus function remains the same as previous version with timestamp logic)
     if (!uploadInitiationTime) { 
         setProgressMessage("Waiting for upload to start...");
         return;
     }
     try {
       const statusResponse = await fetch('/.netlify/functions/get-deploy-status');
+      const statusData = await statusResponse.json() as DeployStatusResponse; // MODIFIED: Type assertion
+
       if (!statusResponse.ok) {
-        setProgressMessage(`Error checking deploy status: ${statusResponse.statusText || statusResponse.status}. Function may not be deployed.`);
+        setProgressMessage(`Error checking deploy status: ${statusData.message || statusResponse.statusText || statusResponse.status}. Function may not be deployed.`);
         setMessage({ type: 'error', text: `Failed to get deployment status. Please check Netlify function logs for 'get-deploy-status'.` });
         if (pollingIntervalRef.current) clearInterval(pollingIntervalRef.current);
         setIsProcessing(false); 
         return;
       }
-      const statusData = await statusResponse.json();
-      const deployCreatedAt = new Date(statusData.createdAt).getTime();
+      
+      const deployCreatedAt = statusData.createdAt ? new Date(statusData.createdAt).getTime() : 0;
 
+      setProgressMessage(`Current deploy status: ${statusData.status || 'unknown'}. Checking again in 10s...`);
+      
       if ((statusData.status === 'ready' || statusData.status === 'current') && deployCreatedAt >= uploadInitiationTime) {
         setProgress(100);
         setProgressMessage('Site successfully updated!');
@@ -220,7 +233,7 @@ export default function UploadForm() {
         setIsProcessing(false);
         setUploadInitiationTime(null); 
       } else {
-         setProgressMessage(`Deployment status: ${statusData.status}. Checking again in 10s...`);
+         setProgressMessage(`Deployment status: ${statusData.status || 'pending'}. Checking again in 10s...`);
       }
     } catch (error) {
       console.error("Error polling deploy status:", error);
@@ -234,13 +247,12 @@ export default function UploadForm() {
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (!selectedFile || !isFileValid || !selectedSection) { // Check isFileValid
+    if (!selectedFile || !isFileValid || !selectedSection) { 
       setMessage({ type: 'error', text: 'Please select a valid CSV file for the chosen section.' });
       return;
     }
 
     setIsProcessing(true);
-    // Keep existing success/error message from validation if it's an info/success type
     if (message?.type === 'error') setMessage(null); 
     setProgress(10); 
     setProgressMessage('Reading file...');
@@ -266,7 +278,10 @@ export default function UploadForm() {
           }),
         });
 
-        const uploadResult = await uploadResponse.json();
+        // MODIFIED: Type assertion for uploadResult
+        const uploadResult = await uploadResponse.json() as UploadFunctionResponse; 
+        // Line 171 would be around here if we count from the start of the file.
+        // The error is specifically about the result of .json() being 'any'.
 
         if (uploadResponse.ok) {
           setProgress(30); 
@@ -344,13 +359,13 @@ export default function UploadForm() {
             </label>
             <div className="mt-1">
               <input
-                ref={fileInputRef} // Added ref
+                ref={fileInputRef} 
                 id="cvFile" name="cvFile" type="file" accept=".csv" onChange={handleFileChange} required
                 className="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white bg-white dark:bg-gray-700 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
                 disabled={isProcessing}
               />
             </div>
-            {selectedFile && !isFileValid && message && message.type === 'error' && ( // Show selected file name even if validation failed initially
+            {selectedFile && !isFileValid && message && message.type === 'error' && ( 
                 <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">Selected: {selectedFile.name}</p>
             )}
              {selectedFile && isFileValid && (
@@ -358,7 +373,6 @@ export default function UploadForm() {
             )}
           </div>
           
-          {/* Validation Message / Progress Message / Main Message */}
           {message && (
             <div 
                 className={`p-3 rounded-md text-xs mt-4 ${
@@ -388,7 +402,7 @@ export default function UploadForm() {
           <div>
             <button
               type="submit"
-              disabled={isProcessing || !selectedFile || !isFileValid} // MODIFIED: Also disable if not isFileValid
+              disabled={isProcessing || !selectedFile || !isFileValid} 
               className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:bg-gray-400 dark:disabled:bg-gray-600 mt-6"
             >
               {isProcessing ? `Processing (${progress}%)` : 'Upload CSV for Section'}
