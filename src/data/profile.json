@@ -1,15 +1,15 @@
 {
-  "First Name": "Minh",
-  "Last Name": "Nguyen",
-  "Maiden Name": "Jose",
-  "Address": null,
-  "Birth Date": "Apr 26, 1999",
-  "Headline": "Data Management Specialist @ oSpace",
-  "Summary": "I utilize my skills and experiences in sales/marketing technologies and business management to effectively scale, automate and deliver data solutions for lead generation programs.  Understanding pain-points, exceeding targets and managing teams are my top:  - Foundry: I managed a global B2B database of 200M+ records and led a team of 10 research reps to support the delivery of 200 different projects monthly.  - Selling Simplified: I accelerated advertising campaigns' delivery by 70% by advanced operational methods and enhanced customer satisfaction and retention.   Check my certification section, which includes Hubspot, AWS and IBM Data Science Specialization. I seek new challenges and opportunities to contribute my skills to a dynamic and innovative organization.",
-  "Industry": "Advertising Services",
-  "Zip Code": 2000,
-  "Geo Location": "Sydney, New South Wales, Australia",
-  "Twitter Handles": null,
-  "Websites": "[PERSONAL:github.com/captainminh1999]",
-  "Instant Messengers": null
+  "firstName": "Minh",
+  "lastName": "Nguyen",
+  "maidenName": "Jose",
+  "address": "Sydney, New South Wales, Australia",
+  "birthDate": "1990-01-01",
+  "headline": "Data Management Specialist @ NEXTGEN oSpace",
+  "summary": "I utilize my skills and experiences...",
+  "industry": "Information Technology and Services",
+  "zipCode": "2000",
+  "geoLocation": "Sydney, New South Wales",
+  "twitterHandles": "",
+  "websites": ["https://www.linkedin.com/in/captainminh1999/"],
+  "instantMessengers": ""
 }
