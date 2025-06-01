@@ -183,20 +183,6 @@ export default function NewHomePage() {
           </div>
         ))}
       </ResponsiveGridLayout>
-
-      {/* Hint about CSS imports */}
-      <div className="mt-8 p-4 bg-yellow-100 dark:bg-yellow-900/50 border border-yellow-300 dark:border-yellow-700 rounded-md text-yellow-700 dark:text-yellow-200 text-sm">
-        <p>
-          <strong>Note:</strong> Ensure
-          <code className="mx-1">react-grid-layout/css/styles.css</code> and
-          <code className="mx-1">react-resizable/css/styles.css</code>
-          are imported globally (e.g., in <code>globals.css</code>).
-        </p>
-        <pre className="mt-2 text-xs bg-gray-200 dark:bg-gray-700 p-2 rounded overflow-x-auto">
-@import "react-grid-layout/css/styles.css";
-@import "react-resizable/css/styles.css";
-        </pre>
-      </div>
     </main>
   );
 }
