@@ -35,8 +35,6 @@ interface WidgetItem {
   content?: React.ReactNode;
 }
 
-type BreakpointKey = "lg" | "md" | "sm" | "xs" | "xxs";
-
 /*****************************************************************
  *                           Widgets                             *
  *****************************************************************/
