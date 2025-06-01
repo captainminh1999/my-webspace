@@ -1,50 +1,30 @@
 // src/app/page.tsx
 "use client";
 
-import React, { useState, useCallback } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Responsive, WidthProvider, Layout, Layouts } from "react-grid-layout";
+import { useRouter, useSearchParams } from "next/navigation";
+import { motion } from "framer-motion";
 import Link from "next/link";
 
-// Ensure these styles are imported once globally (e.g., in globals.css)
-// @import "react-grid-layout/css/styles.css";
-// @import "react-resizable/css/styles.css";
+// Project‑level helpers
+import {
+  widgets,
+  breakpointsConfig,
+  colsConfig,
+  ORIGINAL_LAYOUTS,
+} from "../lib/widgetRegistry";
+import WidgetModal from "../components/WidgetModal";
 
-/*****************************************************************
- *                             Setup                             *
- *****************************************************************/
+/**************************************************************
+ * Setup                                                      *
+ **************************************************************/
 const ResponsiveGridLayout = WidthProvider(Responsive);
+const clone = <T,>(v: T): T => JSON.parse(JSON.stringify(v));
 
-// Utility: deep‑clone a Layouts object so RGL mutations never touch the source
-const cloneLayouts = (ls: Layouts): Layouts =>
-  JSON.parse(JSON.stringify(ls)) as Layouts;
-
-/*****************************************************************
- *                             Types                             *
- *****************************************************************/
-interface WidgetItem {
-  id: string;
-  title: string;
-  defaultSize: {
-    w: number;
-    h: number;
-    minW?: number;
-    minH?: number;
-    maxW?: number;
-    maxH?: number;
-  };
-  content?: React.ReactNode;
-}
-
-/*****************************************************************
- *                           Widgets                             *
- *****************************************************************/
-const CVLinkWidget: React.FC = () => (
-  <Link href="/about-me" className="flex flex-col items-center justify-center h-full p-4 text-center hover:bg-indigo-50 dark:hover:bg-indigo-900 transition-colors duration-150">
-    <h3 className="text-lg font-semibold">Minh (Jose) Nguyen</h3>
-    <p className="text-sm text-gray-600 dark:text-gray-400">Data Management Specialist @ NEXTGEN oSpace</p>
-  </Link>
-);
-
+/**************************************************************
+ * Fallback widget body                                       *
+ **************************************************************/
 const GenericWidgetContent: React.FC<{ title: string }> = ({ title }) => (
   <div className="p-4 h-full flex flex-col items-center justify-center text-center">
     <h3 className="font-bold text-lg mb-2">{title}</h3>
@@ -54,176 +34,53 @@ const GenericWidgetContent: React.FC<{ title: string }> = ({ title }) => (
   </div>
 );
 
-/*****************************************************************
- *                      Widget Definitions                       *
- *****************************************************************/
-const widgets: WidgetItem[] = [
-  {
-    id: "coffee",
-    title: "Coffee Corner",
-    defaultSize: { w: 1, h: 1, minW: 1, minH: 1, maxW: 2, maxH: 2 },
-  },
-  {
-    id: "weather",
-    title: "Weather",
-    defaultSize: { w: 1, h: 1, minW: 1, minH: 1, maxW: 2, maxH: 1 },
-  },
-  {
-    id: "space",
-    title: "Space News",
-    defaultSize: { w: 1, h: 1, minW: 1, minH: 1, maxW: 2, maxH: 2 },
-  },
-  {
-    id: "tech",
-    title: "Tech Updates",
-    defaultSize: { w: 1, h: 2, minW: 1, minH: 1, maxW: 2, maxH: 2 },
-  },
-  {
-    id: "youtube",
-    title: "YouTube Recs",
-    defaultSize: { w: 1, h: 2, minW: 1, minH: 1, maxW: 2, maxH: 2 },
-  },
-  {
-    id: "drones",
-    title: "Drones",
-    defaultSize: { w: 1, h: 1, minW: 1, minH: 1, maxW: 2, maxH: 2 },
-  },
-  {
-    id: "camera",
-    title: "Photography",
-    defaultSize: { w: 1, h: 1, minW: 1, minH: 1, maxW: 2, maxH: 2 },
-  },
-  {
-    id: "games",
-    title: "Gaming",
-    defaultSize: { w: 1, h: 1, minW: 1, minH: 1, maxW: 2, maxH: 2 },
-  },
-  {
-    id: "visitorEmotion",
-    title: "How are you feeling?",
-    defaultSize: { w: 1, h: 1, minW: 1, minH: 1, maxW: 1, maxH: 1 },
-  },
-  {
-    id: "cvLink",
-    title: "My Profile",
-    defaultSize: { w: 1, h: 1, minW: 1, minH: 1, maxW: 1, maxH: 1 },
-    content: <CVLinkWidget />,
-  },
-];
+/**************************************************************
+ * Special Profile widget                                     *
+ **************************************************************/
+const ProfileWidget: React.FC = () => (
+  <Link
+    href="/about-me"
+    className="flex flex-col items-center justify-center h-full p-4 text-center hover:bg-indigo-50 dark:hover:bg-indigo-900 transition-colors duration-150"
+  >
+    <h3 className="text-lg font-semibold">Minh (Jose) Nguyen</h3>
+    <p className="text-sm text-gray-600 dark:text-gray-400">Data Management Specialist @ NEXTGEN oSpace</p>
+  </Link>
+);
 
-/*****************************************************************
- *                     Breakpoints & Columns                     *
- *****************************************************************/
-const breakpointsConfig = {
-  lg: 1200,
-  md: 996,
-  sm: 768,
-  xs: 480,
-  xxs: 0,
-} as const;
-
-const colsConfig = {
-  lg: 3,
-  md: 3,
-  sm: 2,
-  xs: 1,
-  xxs: 1,
-} as const;
-
-/*****************************************************************
- *                      Original Layouts                         *
- *****************************************************************/
-const getCfg = (id: string) => widgets.find((w) => w.id === id)!;
-
-const buildItem = (
-  id: string,
-  x: number,
-  y: number,
-  w = 1,
-  h?: number,
-): Layout => {
-  const cfg = getCfg(id);
-  return {
-    i: id,
-    x,
-    y,
-    w,
-    h: h ?? cfg.defaultSize.h,
-    minW: cfg.defaultSize.minW ?? 1,
-    minH: cfg.defaultSize.minH ?? 1,
-    maxW: cfg.defaultSize.maxW ?? colsConfig.lg,
-    maxH: cfg.defaultSize.maxH ?? 2,
-    isResizable: true,
-    isDraggable: true,
-  };
-};
-
-// --- 3‑column (md / lg) --------------------------------------
-const layoutMd: Layout[] = [
-  buildItem("weather", 0, 0),
-  buildItem("tech", 1, 0, 1, 2),
-  buildItem("coffee", 2, 0),
-  buildItem("space", 0, 1),
-  buildItem("youtube", 2, 1, 1, 2),
-  buildItem("games", 0, 2),
-  buildItem("drones", 1, 2),
-  buildItem("visitorEmotion", 0, 3),
-  buildItem("camera", 1, 3),
-  buildItem("cvLink", 2, 3),
-];
-
-// --- 2‑column (sm) ------------------------------------------
-const layoutSm: Layout[] = [
-  buildItem("weather", 0, 0),
-  buildItem("coffee", 1, 0),
-  buildItem("space", 0, 1),
-  buildItem("tech", 1, 1, 1, 2),
-  buildItem("youtube", 0, 2, 1, 2),
-  buildItem("drones", 1, 3),
-  buildItem("games", 0, 4),
-  buildItem("camera", 1, 4),
-  buildItem("visitorEmotion", 0, 5),
-  buildItem("cvLink", 1, 5),
-];
-
-// --- 1‑column (xs / xxs) -------------------------------------
-const singleColumnOrder = [
-  "coffee",
-  "weather",
-  "space",
-  "tech",
-  "youtube",
-  "drones",
-  "camera",
-  "games",
-  "visitorEmotion",
-  "cvLink",
-];
-
-const makeSingleColumn = (): Layout[] =>
-  singleColumnOrder.map((id, idx) => buildItem(id, 0, idx));
-
-const ORIGINAL_LAYOUTS: Layouts = {
-  md: layoutMd,
-  lg: cloneLayouts({ md: layoutMd }).md, // copy of md
-  sm: layoutSm,
-  xs: makeSingleColumn(),
-  xxs: makeSingleColumn(),
-};
-
-/*****************************************************************
- *                         Component                             *
- *****************************************************************/
+/**************************************************************
+ * Page component                                             *
+ **************************************************************/
 export default function NewHomePage() {
-  // Always start with a fresh clone of the original layout
-  const [layouts, setLayouts] = useState<Layouts>(() => cloneLayouts(ORIGINAL_LAYOUTS));
+  const router = useRouter();
+  const params = useSearchParams();
+  const openId = params.get("w");
+  const modalWidget = widgets.find((w) => w.id === openId);
 
-  // Track user moves only for this session
-  const onLayoutChange = useCallback((_: Layout[], all: Layouts) => {
-    setLayouts(cloneLayouts(all));
-  }, []);
+  // Grid layout state – no persistence so refresh resets to canonical
+  const [layouts, setLayouts] = useState<Layouts>(() => clone(ORIGINAL_LAYOUTS));
 
-  const reset = () => setLayouts(cloneLayouts(ORIGINAL_LAYOUTS));
+  // Disable drag/resize when a modal is open
+  const gridEnabled = !modalWidget;
+
+  // Detect click vs drag to avoid opening modal on drop
+  const isDragging = useRef(false);
+
+  const onLayoutChange = useCallback((_: Layout[], all: Layouts) => setLayouts(clone(all)), []);
+  const resetLayout = () => setLayouts(clone(ORIGINAL_LAYOUTS));
+
+  // Close modal helpers
+  const closeModal = () => router.back();
+  useEffect(() => {
+    const esc = (e: KeyboardEvent) => e.key === "Escape" && modalWidget && closeModal();
+    window.addEventListener("keydown", esc);
+    return () => window.removeEventListener("keydown", esc);
+  }, [modalWidget]);
+
+  // lock body scroll while modal
+  useEffect(() => {
+    if (modalWidget) document.body.classList.add("overflow-hidden");
+    else document.body.classList.remove("overflow-hidden");
+  }, [modalWidget]);
 
   return (
     <main className="p-4 bg-gray-100 dark:bg-gray-900 min-h-screen">
@@ -231,7 +88,7 @@ export default function NewHomePage() {
       <div className="mb-4 flex justify-between items-center">
         <h1 className="text-2xl font-bold text-gray-800 dark:text-white">My Dashboard</h1>
         <button
-          onClick={reset}
+          onClick={resetLayout}
           className="px-4 py-2 bg-red-500 text-white text-xs font-semibold rounded-md shadow-sm hover:bg-red-600 transition duration-150"
         >
           Reset Layout
@@ -245,27 +102,54 @@ export default function NewHomePage() {
         cols={colsConfig}
         rowHeight={150}
         draggableHandle=".widget-drag-handle"
+        onDragStart={() => (isDragging.current = true)}
+        onDragStop={() => setTimeout(() => (isDragging.current = false), 0)}
         onLayoutChange={onLayoutChange}
+        isDraggable={gridEnabled}
+        isResizable={gridEnabled}
         compactType="vertical"
         preventCollision={false}
       >
         {widgets.map((w) => (
-          <div
+          <motion.div
             key={w.id}
             className="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden border border-gray-200 dark:border-gray-700 flex flex-col"
           >
             {/* drag handle */}
             <div className="p-2 bg-gray-50 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600 cursor-move widget-drag-handle">
-              <h3 className="text-xs font-semibold text-gray-700 dark:text-gray-200 truncate">
-                {w.title}
-              </h3>
+              <h3 className="text-xs font-semibold text-gray-700 dark:text-gray-200 truncate">{w.title}</h3>
             </div>
-            <div className="widget-content flex-grow p-2">
-              {w.content || <GenericWidgetContent title={w.title} />}
-            </div>
-          </div>
+
+            {/* content area (clickable if modal allowed) */}
+            {w.disableModal ? (
+              <div className="widget-content flex-grow p-2">
+                {w.id === "cvLink" ? <ProfileWidget /> : <GenericWidgetContent title={w.title} />}
+              </div>
+            ) : (
+              <button
+                type="button"
+                className="widget-content flex-grow p-2 text-left w-full"
+                onClick={() => {
+                  if (!isDragging.current) router.push(`?w=${w.id}`, { scroll: false });
+                }}
+              >
+                {w.modalContent ? (
+                  <GenericWidgetContent title={w.title} />
+                ) : (
+                  <GenericWidgetContent title={w.title} />
+                )}
+              </button>
+            )}
+          </motion.div>
         ))}
       </ResponsiveGridLayout>
+
+      {/* Modal overlay */}
+      {modalWidget && (
+        <WidgetModal id={modalWidget.id} title={modalWidget.title} onClose={closeModal}>
+          {modalWidget.modalContent || <GenericWidgetContent title={modalWidget.title} />}
+        </WidgetModal>
+      )}
     </main>
   );
 }
