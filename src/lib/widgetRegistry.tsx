@@ -1,6 +1,8 @@
 // src/lib/widgetRegistry.ts
 
 import { Layout, Layouts } from "react-grid-layout";
+import { SpaceCard, SpaceModalBody } from "@/components/widgets/SpaceWidget";
+
 
 /**************************************************************
  * Public exports                                             *
@@ -48,7 +50,8 @@ export const widgets: WidgetItem[] = [
     id: "space",
     title: "Space News",
     defaultSize: { w: 1, h: 1 },
-    modalContent: <p className="p-4">🚀 Latest launches here…</p>,
+    modalContent: <SpaceModalBody />,
+    content: <SpaceCard />,
   },
   {
     id: "tech",
@@ -113,8 +116,6 @@ export const colsConfig = {
   xs: 1,
   xxs: 1,
 } as const;
-
-type BK = keyof typeof breakpointsConfig;
 
 /**************************************************************
  * 3 · Canonical starting layouts                             *
