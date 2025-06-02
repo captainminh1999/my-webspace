@@ -17,7 +17,7 @@ jobs:
       # ── 1. Fetch OpenWeather One Call 3.0 JSON ──────────────────────────────
       - name: Fetch current weather
         env:
-          KEY: ${{ secrets.OWM_KEY }}   # add this secret in repo Settings → Actions → Secrets
+          KEY: ${{ secrets.WEATHER_KEY }}   # add this secret in repo Settings → Actions → Secrets
         run: |
           mkdir -p data
           curl -s \
