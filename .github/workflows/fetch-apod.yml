@@ -1,24 +1,40 @@
 name: Fetch NASA APOD
 
+# Grant write permission so the workflow can push to the repo
+permissions:
+  contents: write
+
 on:
   schedule:
-    - cron:  '0 10 * * *'          # every day at 10:00 UTC
+    # Runs every day at 10:00 UTC
+    - cron: '0 10 * * *'
   workflow_dispatch:
 
 jobs:
   update-apod:
     runs-on: ubuntu-latest
+
     steps:
-    - uses: actions/checkout@v4
-    - name: Fetch APOD
-      run: |
-        curl --silent \
-          "https://api.nasa.gov/planetary/apod?api_key=${{ secrets.NASA_KEY }}&thumbs=true" \
-          > data/space.json
-    - name: Commit & push
-      run: |
-        git config user.name "gh-action"
-        git config user.email "action@github"
-        git add data/space.json
-        git diff --cached --quiet || git commit -m "chore: update APOD"
-        git push
+      # ══ 1. Checkout repo with write creds ══════════════════════════════════════
+      - name: Checkout repo (with credentials)
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+
+      # ══ 2. Fetch APOD JSON ════════════════════════════════════════════════════
+      - name: Fetch APOD
+        run: |
+          mkdir -p data
+          curl --silent \
+            "https://api.nasa.gov/planetary/apod?api_key=${{ secrets.NASA_KEY }}&thumbs=true" \
+            > data/space.json
+
+      # ══ 3. Commit & push if file changed ═════════════════════════════════════
+      - name: Commit & push updated space.json
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/space.json
+          git diff --cached --quiet && exit 0
+          git commit -m "chore: update APOD"
+          git push
