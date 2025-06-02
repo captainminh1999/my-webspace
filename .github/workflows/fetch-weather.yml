@@ -32,31 +32,36 @@ jobs:
 
           const src = JSON.parse(fs.readFileSync('raw_weather.json', 'utf8'));
 
-          if (!src.current || !src.hourly || !src.daily) {
-            console.error('⚠️  OpenWeather response missing expected data:', src);
-            process.exit(0);   // don’t fail the job; just skip commit
+          try {
+            if (!src.current || !src.hourly || !src.daily) {
+              throw new Error('API payload missing expected properties');
+            }
+
+            const out = {
+              updated: Math.floor(Date.now() / 1000),
+              current: {
+                temp: src.current.temp,
+                icon: src.current.weather[0].icon,
+              },
+              hourly: src.hourly.slice(0, 12).map(h => ({
+                dt: h.dt,
+                temp: h.temp,
+                icon: h.weather[0].icon,
+              })),
+              daily: src.daily.slice(0, 7).map(d => ({
+                dt: d.dt,
+                min: d.temp.min,
+                max: d.temp.max,
+                icon: d.weather[0].icon,
+              })),
+            };
+
+            fs.writeFileSync('data/weather.json', JSON.stringify(out, null, 2));
+            console.log('✅ weather.json updated');
+          } catch (err) {
+            console.error('⚠️  Weather fetch skipped:', err.message);
+            // keep the existing weather.json; exit 0 so job does not fail
           }
-
-          const out = {
-            updated: Math.floor(Date.now() / 1000),
-            current: {
-              temp: src.current.temp,
-              icon: src.current.weather[0].icon,
-            },
-            hourly: src.hourly.slice(0, 12).map(h => ({
-              dt: h.dt,
-              temp: h.temp,
-              icon: h.weather[0].icon,
-            })),
-            daily: src.daily.slice(0, 7).map(d => ({
-              dt: d.dt,
-              min: d.temp.min,
-              max: d.temp.max,
-              icon: d.weather[0].icon,
-            })),
-          };
-
-          fs.writeFileSync('data/weather.json', JSON.stringify(out, null, 2));
           NODE
 
       # ── 3. Commit & push if the file changed ───────────────────────────────
