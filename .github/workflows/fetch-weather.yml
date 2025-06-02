@@ -1,5 +1,9 @@
 name: Fetch Weather (hourly)
 
+# Make sure the workflow has write permission to repo contents
+permissions:
+  contents: write
+
 on:
   schedule:
     # Runs at 10 minutes past every hour (UTC)
@@ -11,23 +15,27 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repo
+      - name: Checkout repo (with credentials)
         uses: actions/checkout@v4
+        with:
+          # Persist the GITHUB_TOKEN so we can push later
+          persist-credentials: true
 
-      # ── 1. Fetch OpenWeather One Call 3.0 JSON ──────────────────────────────
+      # ── 1. Fetch OpenWeather One Call 2.5 JSON (use 2.5 if 3.0 not yet enabled) ──
       - name: Fetch current weather
         env:
-          KEY: ${{ secrets.WEATHER_KEY }}   # add this secret in repo Settings → Actions → Secrets
+          KEY: ${{ secrets.WEATHER_KEY }}   # make sure this secret exists
         run: |
           mkdir -p data
           curl -s \
             "https://api.openweathermap.org/data/2.5/onecall?lat=-33.87&lon=151.21&units=metric&exclude=minutely,alerts&appid=$KEY" \
             > raw_weather.json
 
-      - name: Show first 200 bytes
+      # ── 2. (Optional) Show the first 200 bytes for debugging ──────────────────
+      - name: Show first 200 bytes of raw payload
         run: head -c 200 raw_weather.json || true
 
-      # ── 2. Trim payload to a small JSON shape ──────────────────────────────
+      # ── 3. Trim payload to a small JSON shape ──────────────────────────────
       - name: Trim hourly & daily data
         run: |
           node <<'NODE'
@@ -37,9 +45,17 @@ jobs:
           try { src = JSON.parse(raw); } catch { src = null; }
 
           // Bail if JSON invalid or missing expected props
-          if (!src || !src.current || !Array.isArray(src.hourly) || !Array.isArray(src.daily)) {
-            console.error('⚠️ Weather JSON invalid or missing fields. Payload:', raw.slice(0, 250));
-            process.exit(0);       // exit 0 so workflow succeeds
+          if (
+            !src ||
+            !src.current ||
+            !Array.isArray(src.hourly) ||
+            !Array.isArray(src.daily)
+          ) {
+            console.error(
+              '⚠️ Weather JSON invalid or missing fields. Payload:',
+              raw.slice(0, 250)
+            );
+            process.exit(0); // exit 0 so job doesn’t fail
           }
 
           const out = {
@@ -48,12 +64,12 @@ jobs:
               temp: src.current.temp,
               icon: src.current.weather[0].icon,
             },
-            hourly: src.hourly.slice(0, 12).map(h => ({
+            hourly: src.hourly.slice(0, 12).map((h) => ({
               dt: h.dt,
               temp: h.temp,
               icon: h.weather[0].icon,
             })),
-            daily: src.daily.slice(0, 7).map(d => ({
+            daily: src.daily.slice(0, 7).map((d) => ({
               dt: d.dt,
               min: d.temp.min,
               max: d.temp.max,
@@ -65,11 +81,12 @@ jobs:
           console.log('✅ weather.json written');
           NODE
 
-      # ── 3. Commit & push if the file changed ───────────────────────────────
+      # ── 4. Commit & push if the file changed ───────────────────────────────
       - name: Commit updated weather.json
         run: |
-          git config user.name "gh-action"
-          git config user.email "action@github"
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
           git add data/weather.json
-          git diff --cached --quiet || git commit -m "chore: update weather"
+          git diff --cached --quiet && exit 0
+          git commit -m "chore: update weather"
           git push
