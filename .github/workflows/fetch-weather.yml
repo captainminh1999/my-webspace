@@ -29,7 +29,13 @@ jobs:
         run: |
           node <<'NODE'
           const fs = require('fs');
+
           const src = JSON.parse(fs.readFileSync('raw_weather.json', 'utf8'));
+
+          if (!src.current || !src.hourly || !src.daily) {
+            console.error('⚠️  OpenWeather response missing expected data:', src);
+            process.exit(0);   // don’t fail the job; just skip commit
+          }
 
           const out = {
             updated: Math.floor(Date.now() / 1000),
