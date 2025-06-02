@@ -69,11 +69,13 @@ export default function NewHomePage() {
   const resetLayout = () => setLayouts(clone(ORIGINAL_LAYOUTS));
 
   // Close modal helpers
-  const closeModal = () => router.back();
+  const closeModal = React.useCallback(() => router.back(), [router]);
   useEffect(() => {
-    const esc = (e: KeyboardEvent) => e.key === "Escape" && modalWidget && closeModal();
-    window.addEventListener("keydown", esc);
-    return () => window.removeEventListener("keydown", esc);
+    function onEsc(e: KeyboardEvent) {
+      if (e.key === "Escape" && modalWidget) closeModal();
+    }
+    window.addEventListener("keydown", onEsc);
+    return () => window.removeEventListener("keydown", onEsc);
   }, [modalWidget, closeModal]);
 
   // Patch snippet for page.tsx – keep header+grid fixed but restore browser scrollbar

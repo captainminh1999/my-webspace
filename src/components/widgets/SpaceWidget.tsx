@@ -1,11 +1,21 @@
 // src/components/widgets/SpaceWidget.tsx
 import React from "react";
 import Image from "next/image";
-import space from "@/data/space.json";
+
+interface Apod {
+  url: string;
+  title: string;
+  date: string;
+  explanation: string;
+  thumbnail_url?: string;
+  hdurl?: string;
+}
+
+import raw from "@/data/space.json";
+const space = raw as Apod;
 
 /* Fallback to `url` if thumbnail is missing (image APODs). */
-const thumb = (space as any).thumbnail_url ?? (space as any).url;
-
+const thumb = space.thumbnail_url ?? space.url;
 /**
  * Small preview for the dashboard grid – shows thumbnail with cover fit.
  */
@@ -29,7 +39,7 @@ export const SpaceModalBody: React.FC = () => (
   <article className="p-4 space-y-4">
     <h3 className="text-lg font-semibold">{space.title}</h3>
     <Image
-      src={(space as any).url}
+      src={(space).url}
       alt={space.title}
       width={800}
       height={450}
@@ -38,10 +48,10 @@ export const SpaceModalBody: React.FC = () => (
     <p className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-line">
       {space.explanation}
     </p>
-    {(space as any).hdurl && (
+    {(space).hdurl && (
       <a
         className="underline text-indigo-600"
-        href={(space as any).hdurl}
+        href={(space).hdurl}
         target="_blank"
         rel="noopener noreferrer"
       >
