@@ -27,14 +27,14 @@ jobs:
           mkdir -p data
           curl --silent \
             "https://api.nasa.gov/planetary/apod?api_key=${{ secrets.NASA_KEY }}&thumbs=true" \
-            > data/space.json
+            > src/data/space.json
 
       # ══ 3. Commit & push if file changed ═════════════════════════════════════
       - name: Commit & push updated space.json
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add data/space.json
+          git add src/data/space.json
           git diff --cached --quiet && exit 0
           git commit -m "chore: update APOD"
           git push
