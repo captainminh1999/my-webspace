@@ -63,14 +63,14 @@ jobs:
             })),
           };
 
-          fs.writeFileSync('data/weather.json', JSON.stringify(out, null, 2));
+          fs.writeFileSync('src/data/weather.json', JSON.stringify(out, null, 2));
           NODE
 
       - name: Commit & push updated weather.json
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add data/weather.json
+          git add src/data/weather.json
           git diff --cached --quiet && exit 0
           git commit -m "chore: update weather"
           git push
