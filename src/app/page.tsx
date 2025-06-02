@@ -74,7 +74,7 @@ export default function NewHomePage() {
     const esc = (e: KeyboardEvent) => e.key === "Escape" && modalWidget && closeModal();
     window.addEventListener("keydown", esc);
     return () => window.removeEventListener("keydown", esc);
-  }, [modalWidget]);
+  }, [modalWidget, closeModal]);
 
   // Patch snippet for page.tsx – keep header+grid fixed but restore browser scrollbar
   // Place this helper effect **below** the existing one that sets wrapper position
