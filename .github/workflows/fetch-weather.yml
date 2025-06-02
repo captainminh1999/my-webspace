@@ -21,7 +21,7 @@ jobs:
         run: |
           mkdir -p data
           curl -s \
-            "https://api.openweathermap.org/data/3.0/onecall?lat=-33.87&lon=151.21&units=metric&exclude=minutely,alerts&appid=$KEY" \
+            "https://api.openweathermap.org/data/2.5/onecall?lat=-33.87&lon=151.21&units=metric&exclude=minutely,alerts&appid=$KEY" \
             > raw_weather.json
 
       # ── 2. Trim payload to a small JSON shape ──────────────────────────────
