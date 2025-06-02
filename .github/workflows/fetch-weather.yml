@@ -1,0 +1,63 @@
+name: Fetch Weather (hourly)
+
+on:
+  schedule:
+    # Runs at 10 minutes past every hour (UTC)
+    - cron: '10 * * * *'
+  workflow_dispatch:
+
+jobs:
+  update-weather:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      # ── 1. Fetch OpenWeather One Call 3.0 JSON ──────────────────────────────
+      - name: Fetch current weather
+        env:
+          KEY: ${{ secrets.OWM_KEY }}   # add this secret in repo Settings → Actions → Secrets
+        run: |
+          mkdir -p data
+          curl -s \
+            "https://api.openweathermap.org/data/3.0/onecall?lat=-33.87&lon=151.21&units=metric&exclude=minutely,alerts&appid=$KEY" \
+            > raw_weather.json
+
+      # ── 2. Trim payload to a small JSON shape ──────────────────────────────
+      - name: Trim hourly & daily data
+        run: |
+          node <<'NODE'
+          const fs = require('fs');
+          const src = JSON.parse(fs.readFileSync('raw_weather.json', 'utf8'));
+
+          const out = {
+            updated: Math.floor(Date.now() / 1000),
+            current: {
+              temp: src.current.temp,
+              icon: src.current.weather[0].icon,
+            },
+            hourly: src.hourly.slice(0, 12).map(h => ({
+              dt: h.dt,
+              temp: h.temp,
+              icon: h.weather[0].icon,
+            })),
+            daily: src.daily.slice(0, 7).map(d => ({
+              dt: d.dt,
+              min: d.temp.min,
+              max: d.temp.max,
+              icon: d.weather[0].icon,
+            })),
+          };
+
+          fs.writeFileSync('data/weather.json', JSON.stringify(out, null, 2));
+          NODE
+
+      # ── 3. Commit & push if the file changed ───────────────────────────────
+      - name: Commit updated weather.json
+        run: |
+          git config user.name "gh-action"
+          git config user.email "action@github"
+          git add data/weather.json
+          git diff --cached --quiet || git commit -m "chore: update weather"
+          git push

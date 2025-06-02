@@ -2,6 +2,7 @@
 
 import { Layout, Layouts } from "react-grid-layout";
 import { SpaceCard, SpaceModalBody } from "@/components/widgets/SpaceWidget";
+import { WeatherCard, WeatherModalBody } from "@/components/widgets/WeatherWidget";
 
 
 /**************************************************************
@@ -44,7 +45,8 @@ export const widgets: WidgetItem[] = [
     id: "weather",
     title: "Weather",
     defaultSize: { w: 1, h: 1 },
-    modalContent: <p className="p-4">7 day forecast placeholder…</p>,
+    content: <WeatherCard />,
+    modalContent: <WeatherModalBody />,
   },
   {
     id: "space",

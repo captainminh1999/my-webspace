@@ -8,11 +8,8 @@ const nextConfig: NextConfig = {
   images: {
     // Allow NASA APOD (and any other remote image hosts you need)
     remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: 'apod.nasa.gov',
-        pathname: '/**',      // match everything under that host
-      },
+      { protocol: 'https', hostname: 'apod.nasa.gov', pathname: '/**'},      // match everything under that host
+      { protocol: "https", hostname: "openweathermap.org", pathname: "/img/wn/**" },
       // add more hosts as needed:
       // {
       //   protocol: 'https',
