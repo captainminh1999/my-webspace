@@ -1,27 +1,27 @@
 [
   {
+    "id": 44167592,
+    "title": "Quarkdown: A modern Markdown-based typesetting system",
+    "url": "https://github.com/iamgio/quarkdown"
+  },
+  {
+    "id": 44166155,
+    "title": "The Metamorphosis of Prime Intellect (1994)",
+    "url": "https://localroger.com/prime-intellect/mopiall.html"
+  },
+  {
+    "id": 44166102,
+    "title": "AI makes the humanities more important, but also weirder",
+    "url": "https://resobscura.substack.com/p/ai-makes-the-humanities-more-important"
+  },
+  {
+    "id": 44166908,
+    "title": "Poison Pill: Is the killer behind 1982 Tylenol poisonings still on the loose?",
+    "url": "https://www.trulyadventure.us/poison-pill"
+  },
+  {
     "id": 44163063,
     "title": "My AI skeptic friends are all nuts",
     "url": "https://fly.io/blog/youre-all-nuts/"
-  },
-  {
-    "id": 44165346,
-    "title": "GenAI Is Our Polyester",
-    "url": "https://culture.ghost.io/genai-is-our-polyester/"
-  },
-  {
-    "id": 44159528,
-    "title": "Ask HN: Who is hiring? (June 2025)",
-    "url": null
-  },
-  {
-    "id": 44166033,
-    "title": "IT workers struggling in New Zealand's tight job market",
-    "url": "https://www.rnz.co.nz/news/chinese/562914/it-workers-struggling-in-new-zealand-s-tight-job-market"
-  },
-  {
-    "id": 44159166,
-    "title": "Cloudlflare builds OAuth with Claude and publishes all the prompts",
-    "url": "https://github.com/cloudflare/workers-oauth-provider/"
   }
 ]

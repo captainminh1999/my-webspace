@@ -12,14 +12,12 @@ interface Apod {
 }
 
 import raw from "@/data/space.json";
-import newsRaw from "@/data/nasaNews.json";
 import marsRaw from "@/data/marsPhoto.json";
 import epicRaw from "@/data/epic.json";
 import weatherRaw from "@/data/marsWeather.json";
-import type { NasaNewsItem, MarsPhotoData, EpicData, MarsWeatherData } from "@/types/spaceExtra";
+import type { MarsPhotoData, EpicData, MarsWeatherData } from "@/types/spaceExtra";
 
 const space = raw as Apod;
-const news = newsRaw as NasaNewsItem[];
 const mars = marsRaw as MarsPhotoData;
 const epic = epicRaw as EpicData;
 const marsWeather = weatherRaw as MarsWeatherData;
@@ -77,20 +75,6 @@ export const SpaceModalBody: React.FC = () => {
         <p className="text-xs text-right italic text-gray-500 mt-2">
           Updated {space.date}
         </p>
-      </div>
-
-      {/* NASA Breaking News */}
-      <div className="space-y-1 p-4 rounded-lg bg-gray-50 dark:bg-gray-700">
-        <h4 className="font-semibold">NASA Breaking News</h4>
-        <ul className="list-disc pl-5 text-sm space-y-1">
-          {news.slice(0, 5).map((n) => (
-            <li key={n.link}>
-              <a href={n.link} target="_blank" rel="noopener noreferrer" className="underline">
-                {n.title}
-              </a>
-            </li>
-          ))}
-        </ul>
       </div>
 
       {/* Mars Rover Photo */}
