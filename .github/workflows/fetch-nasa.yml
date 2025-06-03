@@ -29,8 +29,11 @@ jobs:
         env:
           NASA_KEY: ${{ secrets.NASA_KEY }}
         run: |
-          TODAY=$(date -u +%Y-%m-%d)
-          curl -s "https://api.nasa.gov/mars-photos/api/v1/rovers/curiosity/photos?earth_date=$TODAY&api_key=$NASA_KEY" \
+          get_yesterday() {
+            date -u -d "yesterday" +%Y-%m-%d
+          }
+          YESTERDAY=$(get_yesterday)
+          curl -s "https://api.nasa.gov/mars-photos/api/v1/rovers/curiosity/photos?earth_date=$YESTERDAY&api_key=$NASA_KEY" \
             | jq '{photos: .photos[0:1] | map({id: .id, img_src: .img_src, camera: .camera.full_name, rover: .rover.name})}' > src/data/marsPhoto.json
 
       - name: Fetch EPIC Earth image
