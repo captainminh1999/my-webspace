@@ -56,10 +56,8 @@ const ModalFrame: React.FC<ModalFrameProps> = ({ isOpen, title, children, onClos
                 </button>
 
                 {/* content body */}
-                <div className="mt-4 rounded-xl bg-gray-50 dark:bg-gray-700 p-6 prose prose-lg dark:prose-invert">
-                  <h2>{title}</h2>
-                  {children}
-                </div>
+                <h2>{title}</h2>
+                {children}
               </div>
             </motion.article>
             </div>
