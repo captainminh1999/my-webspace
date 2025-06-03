@@ -37,12 +37,12 @@ import languagesDataFromFile from '@/data/languages.json';
 
 // Predefined styles for the skill cloud for variety
 const skillCloudStyles = [
-  "text-base font-medium text-indigo-700 dark:text-indigo-300 bg-indigo-100 dark:bg-indigo-900/60 px-4 py-2 rounded-lg shadow-sm hover:shadow-md transform hover:scale-105 transition-all duration-200 cursor-default",
+  "text-base font-medium text-indigo-700 dark:text-indigo-300 bg-indigo-100 dark:bg-indigo-900/60 px-4 py-2 rounded-2xl shadow-sm hover:shadow-md transform hover:scale-105 transition-all duration-200 cursor-default",
   "text-sm font-medium text-purple-700 dark:text-purple-300 bg-purple-100 dark:bg-purple-900/60 px-3 py-1.5 rounded-md shadow-sm hover:shadow-md transform hover:scale-105 transition-all duration-200 cursor-default",
   "text-xs font-normal text-sky-700 dark:text-sky-300 bg-sky-100 dark:bg-sky-900/60 px-3 py-1 rounded-md shadow-sm hover:shadow transform hover:scale-105 transition-all duration-200 cursor-default",
-  "text-sm font-semibold text-emerald-700 dark:text-emerald-300 bg-emerald-100 dark:bg-emerald-900/60 px-3.5 py-1.5 rounded-lg shadow-sm hover:shadow-md transform hover:scale-105 transition-all duration-200 cursor-default",
+  "text-sm font-semibold text-emerald-700 dark:text-emerald-300 bg-emerald-100 dark:bg-emerald-900/60 px-3.5 py-1.5 rounded-2xl shadow-sm hover:shadow-md transform hover:scale-105 transition-all duration-200 cursor-default",
   "text-base font-medium text-rose-700 dark:text-rose-300 bg-rose-100 dark:bg-rose-900/60 px-4 py-1.5 rounded-md shadow-sm hover:shadow-md transform hover:scale-105 transition-all duration-200 cursor-default",
-  "text-xs font-semibold text-amber-700 dark:text-amber-300 bg-amber-100 dark:bg-amber-900/60 px-2.5 py-1 rounded-lg shadow-sm hover:shadow transform hover:scale-105 transition-all duration-200 cursor-default",
+  "text-xs font-semibold text-amber-700 dark:text-amber-300 bg-amber-100 dark:bg-amber-900/60 px-2.5 py-1 rounded-2xl shadow-sm hover:shadow transform hover:scale-105 transition-all duration-200 cursor-default",
 ];
 
 
@@ -92,7 +92,7 @@ export default function AboutMePage() { // Renamed component for clarity
           </Link>
         </div>
         {/* 1. Profile Section (Fully displayed) */}
-        <header className="text-center py-8 bg-white dark:bg-gray-800 rounded-lg shadow-lg">
+        <header className="text-center py-8 bg-white dark:bg-gray-800 rounded-2xl shadow-lg">
           <h1 className="text-4xl sm:text-5xl font-bold text-gray-800 dark:text-white mb-2">{fullName}</h1>
           {profileData.headline && <p className="text-xl sm:text-2xl text-indigo-600 dark:text-indigo-400 mb-4">{profileData.headline}</p>}
           <div className="text-sm text-gray-600 dark:text-gray-400 space-y-1 px-4">
@@ -294,7 +294,7 @@ export default function AboutMePage() { // Renamed component for clarity
 interface SectionProps { title: string; children: React.ReactNode; }
 const Section: React.FC<SectionProps> = ({ title, children }) => {
   return (
-    <section className="bg-white dark:bg-gray-800 p-6 sm:p-8 rounded-lg shadow-lg">
+    <section className="bg-white dark:bg-gray-800 p-6 sm:p-8 rounded-2xl shadow-lg">
       <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 dark:text-white mb-6 pb-2 border-b-2 border-indigo-500">{title}</h2>
       {children}
     </section>
