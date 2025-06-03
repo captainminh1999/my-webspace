@@ -1,0 +1,10 @@
+{
+  "photos": [
+    {
+      "id": 102697,
+      "img_src": "https://mars.nasa.gov/msl-raw-images/image/102697.jpg",
+      "camera": "Mast Camera",
+      "rover": "Curiosity"
+    }
+  ]
+}

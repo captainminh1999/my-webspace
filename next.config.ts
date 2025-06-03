@@ -10,6 +10,8 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       { protocol: 'https', hostname: 'apod.nasa.gov', pathname: '/**'},      // match everything under that host
       { protocol: "https", hostname: "openweathermap.org", pathname: "/img/wn/**" },
+      { protocol: 'https', hostname: 'mars.nasa.gov', pathname: '/**' },
+      { protocol: 'https', hostname: 'api.nasa.gov', pathname: '/**' },
       // add more hosts as needed:
       // {
       //   protocol: 'https',
