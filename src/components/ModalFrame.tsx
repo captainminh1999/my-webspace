@@ -46,17 +46,19 @@ const ModalFrame: React.FC<ModalFrameProps> = ({ isOpen, title, children, onClos
               transition={{ duration: 0.2 }}
             >
               <div className="relative p-6">
-                {/* Close button — follows the card up for 20 px, then scrolls with page */}
-                <button
-                  onClick={onClose}
-                  className="sticky top-5 ml-auto mr-4 h-5 w-5 flex items-center justify-center rounded-full bg-indigo-600 text-white shadow hover:bg-indigo-700 transition"
-                  aria-label="Close modal"
-                >
-                  <X size={14} />
-                </button>
+                {/* header with title and close button */}
+                <div className="flex items-start">
+                  <h1 className="text-2xl font-bold flex-1">{title}</h1>
+                  <button
+                    onClick={onClose}
+                    className="sticky top-5 ml-auto h-5 w-5 flex items-center justify-center rounded-full bg-indigo-600 text-white shadow hover:bg-indigo-700 transition"
+                    aria-label="Close modal"
+                  >
+                    <X size={14} />
+                  </button>
+                </div>
 
                 {/* content body */}
-                <h2>{title}</h2>
                 {children}
               </div>
             </motion.article>

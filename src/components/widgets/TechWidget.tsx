@@ -1,6 +1,7 @@
 // src/components/widgets/TechWidget.tsx
 import raw from "@/data/tech.json" assert { type: "json" };
 import type { TechStory } from "@/types/tech";
+import WidgetSection from "@/components/WidgetSection";
 
 const stories = (raw as TechStory[]).slice(0, 3);
 
@@ -23,12 +24,12 @@ export function TechModalBody() {
   return (
     <article className="p-4 space-y-2">
       {all.map((s) => (
-        <div key={s.id} className="space-y-1">
+        <WidgetSection key={s.id} className="space-y-1 p-0">
           <a href={s.url} target="_blank" rel="noopener noreferrer" className="text-sm font-medium hover:underline">
             {s.title}
           </a>
           <hr className="border-gray-200 dark:border-gray-700" />
-        </div>
+        </WidgetSection>
       ))}
     </article>
   );
