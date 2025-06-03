@@ -1,6 +1,7 @@
 // src/components/widgets/SpaceWidget.tsx
 import React from "react";
 import Image from "next/image";
+import WidgetSection from "@/components/WidgetSection";
 
 interface Apod {
   url: string;
@@ -50,7 +51,7 @@ export const SpaceModalBody: React.FC = () => {
   return (
     <article className="p-4 space-y-[50px]">
       {/* Astronomy Picture of the Day */}
-      <div className="space-y-2 p-4 rounded-lg bg-gray-50 dark:bg-gray-700">
+      <WidgetSection className="space-y-2">
         <h3 className="text-lg font-semibold">{space.title}</h3>
         <Image
           src={space.url}
@@ -75,12 +76,12 @@ export const SpaceModalBody: React.FC = () => {
         <p className="text-xs text-right italic text-gray-500 mt-2">
           Updated {space.date}
         </p>
-      </div>
+      </WidgetSection>
 
 
       {/* Mars Rover Photo */}
       {mars.photos.length > 0 && (
-        <div className="space-y-2 p-4 rounded-lg bg-gray-50 dark:bg-gray-700">
+        <WidgetSection className="space-y-2">
           <h4 className="font-semibold">Mars Rover Photo</h4>
           {mars.photos.map((p) => (
             <div key={p.id} className="space-y-1">
@@ -90,24 +91,24 @@ export const SpaceModalBody: React.FC = () => {
               </p>
             </div>
           ))}
-        </div>
+        </WidgetSection>
       )}
 
       {/* EPIC Earth image */}
-      <div className="space-y-2 p-4 rounded-lg bg-gray-50 dark:bg-gray-700">
+      <WidgetSection className="space-y-2">
         <h4 className="font-semibold">Earth from EPIC</h4>
         <Image src={epicUrl} alt="EPIC Earth" width={512} height={512} className="w-full rounded" />
         <p className="text-sm text-gray-700 dark:text-gray-300">{epic.caption}</p>
         <p className="text-xs text-right italic text-gray-500">{epic.date.split(" ")[0]}</p>
-      </div>
+      </WidgetSection>
 
       {/* InSight Mars Weather */}
-      <div className="space-y-1 p-4 rounded-lg bg-gray-50 dark:bg-gray-700">
+      <WidgetSection className="space-y-1">
         <h4 className="font-semibold">Mars Weather</h4>
         <p className="text-sm text-gray-700 dark:text-gray-300">
           Sol {marsWeather.latest.sol}: {marsWeather.latest.AT}°C, wind {marsWeather.latest.HWS} m/s, pressure {marsWeather.latest.PRE} Pa
         </p>
-      </div>
+      </WidgetSection>
     </article>
   );
 };

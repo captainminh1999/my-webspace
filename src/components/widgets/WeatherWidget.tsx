@@ -1,6 +1,7 @@
 // src/components/widgets/WeatherWidget.tsx
 "use client";
 import React, { useEffect, useState } from "react";
+import WidgetSection from "@/components/WidgetSection";
 import type { WeatherData } from "@/types/weather";
 import dataRaw from "@/data/weather.json" assert { type: "json" };
 import { format } from "date-fns";
@@ -52,7 +53,7 @@ export const WeatherCard: React.FC = () => {
 export const WeatherModalBody: React.FC = () => (
   <article className="space-y-6 p-4">
     {/* 12‑hour forecast */}
-    <div className="grid grid-cols-4 gap-6 overflow-x-auto pb-4">
+    <WidgetSection className="grid grid-cols-4 gap-6 overflow-x-auto pb-4">
       {data.hourly.slice(0, 12).map((h) => (
         <div key={h.dt} className="flex flex-col items-center">
           <p className="text-xs mb-1">
@@ -66,15 +67,16 @@ export const WeatherModalBody: React.FC = () => (
           </p>
         </div>
       ))}
-    </div>
+    </WidgetSection>
 
     {/* 7‑day min/max table */}
-    <table className="w-full text-sm">
-      <tbody>
-        {data.daily.slice(0, 7).map((d) => (
-          <tr key={d.dt} className="border-t border-gray-300 dark:border-gray-700">
-            <td className="py-1 pr-2 whitespace-nowrap">
-              {format(new Date(d.dt * 1000), "EEE d")}
+    <WidgetSection className="p-0">
+      <table className="w-full text-sm">
+        <tbody>
+          {data.daily.slice(0, 7).map((d) => (
+            <tr key={d.dt} className="border-t border-gray-300 dark:border-gray-700">
+              <td className="py-1 pr-2 whitespace-nowrap">
+                {format(new Date(d.dt * 1000), "EEE d")}
             </td>
             <td className="py-1">
               <Image src={`https://openweathermap.org/img/wn/${d.icon}.png`}
@@ -88,9 +90,10 @@ export const WeatherModalBody: React.FC = () => (
               {Math.round(d.min)}°
             </td>
           </tr>
-        ))}
-      </tbody>
-    </table>
+          ))}
+        </tbody>
+      </table>
+    </WidgetSection>
   </article>
 );
 
