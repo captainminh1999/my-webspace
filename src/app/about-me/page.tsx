@@ -2,7 +2,7 @@
 import React from 'react';
 import Link from 'next/link';
 // Import icons from lucide-react that are used directly in this page's JSX
-import { Link as LinkIcon, ExternalLink } from 'lucide-react'; 
+import { Link as LinkIcon, ExternalLink, ArrowLeft } from 'lucide-react';
 // Note: Github, Linkedin, Twitter etc. are now imported in formatters.ts for parseWebsiteString
 
 // Import shared types
@@ -81,6 +81,16 @@ export default function AboutMePage() { // Renamed component for clarity
   return (
     <main className="flex min-h-screen flex-col items-center justify-start bg-gray-100 dark:bg-gray-900 p-4 sm:p-8">
       <div className="w-full max-w-4xl space-y-12">
+        {/* Back to Daily Dash Link */}
+        <div className="mb-8">
+          <Link
+            href="/"
+            className="inline-flex items-center text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-200 transition-colors duration-150 group"
+          >
+            <ArrowLeft size={20} className="mr-2 transition-transform duration-150 group-hover:-translate-x-1" />
+            Back to Daily Dash
+          </Link>
+        </div>
         {/* 1. Profile Section (Fully displayed) */}
         <header className="text-center py-8 bg-white dark:bg-gray-800 rounded-lg shadow-lg">
           <h1 className="text-4xl sm:text-5xl font-bold text-gray-800 dark:text-white mb-2">{fullName}</h1>
