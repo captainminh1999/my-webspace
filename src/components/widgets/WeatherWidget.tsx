@@ -1,5 +1,6 @@
 // src/components/widgets/WeatherWidget.tsx
-import React from "react";
+"use client";
+import React, { useEffect, useState } from "react";
 import type { WeatherData } from "@/types/weather";
 import dataRaw from "@/data/weather.json" assert { type: "json" };
 import { format } from "date-fns";
@@ -13,6 +14,21 @@ const data = dataRaw as WeatherData;
 export const WeatherCard: React.FC = () => {
   const iconUrl = `https://openweathermap.org/img/wn/${data.current.icon}.png`;
 
+  const [now, setNow] = useState<Date>(() => new Date());
+
+  useEffect(() => {
+    const id = setInterval(() => setNow(new Date()), 1000);
+    return () => clearInterval(id);
+  }, []);
+
+  const timeString = now.toLocaleTimeString('en-AU', {
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: false,
+    timeZone: 'Australia/Sydney',
+  });
+
   return (
   <div className="flex items-center justify-center gap-6 py-2 mx-auto">
     <div className="flex items-center space-x-1">
@@ -20,7 +36,7 @@ export const WeatherCard: React.FC = () => {
       <div className="flex flex-col leading-tight">
         <span className="text-lg font-semibold">{Math.round(data.current.temp)}°C</span>
         <span className="text-[10px] text-gray-500 dark:text-gray-400">
-          {new Date(data.updated * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+          {timeString}
         </span>
       </div>
     </div>
