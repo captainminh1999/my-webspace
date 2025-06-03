@@ -49,12 +49,12 @@ export default function StaticDashboard() {
             <div
               key={item.i}
               style={{ gridColumn: `span ${item.w}` }}
-              className="pointer-events-none select-none bg-white dark:bg-gray-800 rounded-lg shadow border border-gray-200 dark:border-gray-700 flex flex-col"
+              className="pointer-events-none select-none bg-white dark:bg-gray-800 rounded-2xl shadow border border-gray-200 dark:border-gray-700 flex flex-col"
             >
               <div className="p-2 bg-gray-50 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600">
-                <h3 className="text-xs font-semibold text-gray-700 dark:text-gray-200 truncate">
+                <h2 className="text-xs font-semibold text-gray-700 dark:text-gray-200 truncate">
                   {widget.title}
-                </h3>
+                </h2>
               </div>
               <div className="flex-grow p-2">
                 {staticContent[widget.id] || (

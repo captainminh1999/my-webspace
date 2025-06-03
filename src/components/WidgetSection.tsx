@@ -10,7 +10,7 @@ interface WidgetSectionProps {
  * spacing, padding and background styling across widgets.
  */
 const WidgetSection: React.FC<WidgetSectionProps> = ({ children, className = "" }) => (
-  <div className={`p-4 rounded-lg bg-gray-50 dark:bg-gray-700 ${className}`.trim()}>
+  <div className={`p-4 rounded-2xl bg-gray-50 dark:bg-gray-700 ${className}`.trim()}>
     {children}
   </div>
 );
