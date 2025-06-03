@@ -40,7 +40,7 @@ export default function StaticDashboard() {
 
       {/* Simple CSS Grid to approximate positions without JS */}
       <div
-        className="grid gap-4"
+        className="grid gap-4 mx-auto max-w-[1200px]"
         style={{ gridTemplateColumns: "repeat(3, minmax(0, 1fr))" }}
       >
         {layout.map((item) => {

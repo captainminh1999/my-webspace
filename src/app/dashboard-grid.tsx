@@ -80,7 +80,7 @@ export default function DynamicGrid() {
           {widgets.map((w) => (
             <motion.div
               key={w.id}
-              className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden border border-gray-200 dark:border-gray-700 flex flex-col transition-transform duration-200 ease-out hover:shadow-xl hover:scale-[1.02]"
+              className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden border border-gray-200 dark:border-gray-700 flex flex-col duration-600 ease-in-out hover:scale-101"
             >
               {/* drag handle */}
               <div className="p-2 bg-gray-50 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600 cursor-move widget-drag-handle">

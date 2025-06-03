@@ -48,7 +48,7 @@ export const SpaceModalBody: React.FC = () => {
   const epicUrl = epic.url;
 
   return (
-    <article className="p-4 space-y-[50px]">
+    <article className="p-4 space-y-[10px]">
       {/* Astronomy Picture of the Day */}
       <WidgetSection className="space-y-2">
         <h3 className="text-lg font-semibold">{space.title}</h3>
