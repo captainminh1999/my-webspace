@@ -13,6 +13,7 @@ export interface EpicData {
   date: string;
   image: string;
   caption: string;
+  url: string;
 }
 
 export interface MarsWeatherData {
