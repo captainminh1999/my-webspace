@@ -1,0 +1,7 @@
+[
+  { "id": 1, "title": "Rust 1.70 Released", "url": "https://blog.rust-lang.org/" },
+  { "id": 2, "title": "New AI Model X Posts Impressive Results", "url": "https://news.example.com/ai-model-x" },
+  { "id": 3, "title": "Firefox 120 Brings Performance Boost", "url": "https://mozilla.org/firefox" },
+  { "id": 4, "title": "JavaScript Gains New Features in ES2025", "url": "https://tc39.es" },
+  { "id": 5, "title": "Cloudflare Announces Workers 2.0", "url": "https://blog.cloudflare.com/workers" }
+]

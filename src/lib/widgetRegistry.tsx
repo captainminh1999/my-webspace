@@ -3,6 +3,7 @@
 import { Layout, Layouts } from "react-grid-layout";
 import { SpaceCard, SpaceModalBody } from "@/components/widgets/SpaceWidget";
 import { WeatherCard, WeatherModalBody } from "@/components/widgets/WeatherWidget";
+import { TechCard, TechModalBody } from "@/components/widgets/TechWidget";
 
 
 /**************************************************************
@@ -59,7 +60,8 @@ export const widgets: WidgetItem[] = [
     id: "tech",
     title: "Tech Updates",
     defaultSize: { w: 1, h: 2 },
-    modalContent: <p className="p-4">🔖 RSS headlines TBD.</p>,
+    content: <TechCard />,
+    modalContent: <TechModalBody />,
   },
   {
     id: "youtube",
