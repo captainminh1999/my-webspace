@@ -9,7 +9,7 @@ import React from 'react';
 import profileDataFromFile from '@/data/profile.json';
 
 // Import the client component that contains the form
-import UploadForm from './UploadForm'; // We will create this component next
+import UploadPortal from './UploadPortal.client';
 
 // Define a simple interface for the part of profileData we need
 interface ProfileTitleData {
@@ -43,5 +43,5 @@ export async function generateMetadata(): Promise<Metadata> {
 // This is the main component for the /admin/upload route
 export default function AdminUploadPage() {
   // This Server Component now renders the Client Component for the form
-  return <UploadForm />;
+  return <UploadPortal />;
 }
