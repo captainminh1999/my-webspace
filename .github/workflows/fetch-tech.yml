@@ -20,7 +20,7 @@ jobs:
 
       - name: Fetch top Hacker News stories
         run: |
-          TOP_IDS=$(curl -s https://hacker-news.firebaseio.com/v0/topstories.json | jq '.[0:5]')
+          TOP_IDS=$(curl -s https://hacker-news.firebaseio.com/v0/topstories.json | jq '.[0:10]')
           STORIES=$(echo "$TOP_IDS" | jq -r '.[]' | while read ID; do
             curl -s "https://hacker-news.firebaseio.com/v0/item/${ID}.json" \
               | jq '{ id: .id, title: .title, url: .url }'
