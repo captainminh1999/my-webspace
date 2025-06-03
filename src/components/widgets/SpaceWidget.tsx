@@ -50,7 +50,7 @@ export const SpaceModalBody: React.FC = () => {
   const epicUrl = `https://api.nasa.gov/EPIC/archive/natural/${year}/${month}/${day}/png/${epic.image}.png?api_key=${process.env.NASA_KEY ?? ''}`;
 
   return (
-    <article className="p-4 space-y-4">
+    <article className="p-4 space-y-[50px]">
       {/* Astronomy Picture of the Day */}
       <div className="space-y-2 p-4 rounded-lg bg-gray-50 dark:bg-gray-700">
         <h3 className="text-lg font-semibold">{space.title}</h3>
