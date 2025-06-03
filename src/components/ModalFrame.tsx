@@ -39,7 +39,7 @@ const ModalFrame: React.FC<ModalFrameProps> = ({ isOpen, title, children, onClos
           >
             <motion.article
               onClick={(e) => e.stopPropagation()}
-              className="relative bg-white dark:bg-gray-800 w-full max-w-xl mx-auto rounded-2xl shadow-lg pointer-events-auto"
+              className="relative bg-white dark:bg-gray-800 w-full max-w-6xl mx-auto rounded-2xl shadow-lg pointer-events-auto"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
