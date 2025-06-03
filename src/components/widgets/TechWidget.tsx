@@ -3,7 +3,7 @@ import raw from "@/data/tech.json" assert { type: "json" };
 import type { TechStory } from "@/types/tech";
 import WidgetSection from "@/components/WidgetSection";
 
-const stories = (raw as TechStory[]).slice(0, 3);
+const stories = (raw as TechStory[]).slice(0, 5);
 
 export function TechCard() {
   return (
