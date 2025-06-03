@@ -12,7 +12,17 @@ interface Apod {
 }
 
 import raw from "@/data/space.json";
+import newsRaw from "@/data/nasaNews.json";
+import marsRaw from "@/data/marsPhoto.json";
+import epicRaw from "@/data/epic.json";
+import weatherRaw from "@/data/marsWeather.json";
+import type { NasaNewsItem, MarsPhotoData, EpicData, MarsWeatherData } from "@/types/spaceExtra";
+
 const space = raw as Apod;
+const news = newsRaw as NasaNewsItem[];
+const mars = marsRaw as MarsPhotoData;
+const epic = epicRaw as EpicData;
+const marsWeather = weatherRaw as MarsWeatherData;
 
 /* Fallback to `url` if thumbnail is missing (image APODs). */
 const thumb = space.thumbnail_url ?? space.url;
@@ -35,31 +45,90 @@ export const SpaceCard: React.FC = () => (
 /**
  * Detailed content inside the modal.
  */
-export const SpaceModalBody: React.FC = () => (
-  <article className="p-4 space-y-4">
-    <h3 className="text-lg font-semibold">{space.title}</h3>
-    <Image
-      src={(space).url}
-      alt={space.title}
-      width={800}
-      height={450}
-      className="w-full rounded"
-    />
-    <p className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-line">
-      {space.explanation}
-    </p>
-    {(space).hdurl && (
-      <a
-        className="underline text-indigo-600"
-        href={(space).hdurl}
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        View HD image
-      </a>
-    )}
-    <p className="text-xs text-right italic text-gray-500 mt-4">
-      Updated {space.date}
-    </p>
-  </article>
-);
+export const SpaceModalBody: React.FC = () => {
+  const [year, month, day] = epic.date.split(" ")[0].split("-");
+  const epicUrl = `https://api.nasa.gov/EPIC/archive/natural/${year}/${month}/${day}/png/${epic.image}.png?api_key=${process.env.NASA_KEY ?? ''}`;
+
+  return (
+    <article className="p-4 space-y-6">
+      {/* Astronomy Picture of the Day */}
+      <section className="space-y-2">
+        <h3 className="text-lg font-semibold">{space.title}</h3>
+        <Image
+          src={space.url}
+          alt={space.title}
+          width={800}
+          height={450}
+          className="w-full rounded"
+        />
+        <p className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-line">
+          {space.explanation}
+        </p>
+        {space.hdurl && (
+          <a
+            className="underline text-indigo-600"
+            href={space.hdurl}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            View HD image
+          </a>
+        )}
+        <p className="text-xs text-right italic text-gray-500 mt-2">
+          Updated {space.date}
+        </p>
+      </section>
+
+      {/* NASA Breaking News */}
+      <hr className="border-gray-300 dark:border-gray-700" />
+      <section className="space-y-1">
+        <h4 className="font-semibold">NASA Breaking News</h4>
+        <ul className="list-disc pl-5 text-sm space-y-1">
+          {news.slice(0, 5).map((n) => (
+            <li key={n.link}>
+              <a href={n.link} target="_blank" rel="noopener noreferrer" className="underline">
+                {n.title}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      {/* Mars Rover Photo */}
+      {mars.photos.length > 0 && (
+        <>
+          <hr className="border-gray-300 dark:border-gray-700" />
+          <section className="space-y-2">
+            <h4 className="font-semibold">Mars Rover Photo</h4>
+            {mars.photos.map((p) => (
+              <div key={p.id} className="space-y-1">
+                <Image src={p.img_src} alt={p.camera} width={800} height={450} className="w-full rounded" />
+                <p className="text-sm text-gray-700 dark:text-gray-300">
+                  {p.rover} – {p.camera}
+                </p>
+              </div>
+            ))}
+          </section>
+        </>
+      )}
+
+      {/* EPIC Earth image */}
+      <hr className="border-gray-300 dark:border-gray-700" />
+      <section className="space-y-2">
+        <h4 className="font-semibold">Earth from EPIC</h4>
+        <Image src={epicUrl} alt="EPIC Earth" width={512} height={512} className="w-full rounded" />
+        <p className="text-sm text-gray-700 dark:text-gray-300">{epic.caption}</p>
+        <p className="text-xs text-right italic text-gray-500">{epic.date.split(" ")[0]}</p>
+      </section>
+
+      {/* InSight Mars Weather */}
+      <hr className="border-gray-300 dark:border-gray-700" />
+      <section className="space-y-1">
+        <h4 className="font-semibold">Mars Weather</h4>
+        <p className="text-sm text-gray-700 dark:text-gray-300">
+          Sol {marsWeather.latest.sol}: {marsWeather.latest.AT}°C, wind {marsWeather.latest.HWS} m/s, pressure {marsWeather.latest.PRE} Pa
+        </p>
+      </section>
+    </article>
+  );
+};
