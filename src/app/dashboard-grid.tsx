@@ -42,10 +42,10 @@ export default function DashboardGrid() {
             <div
               key={item.i}
               style={{ gridColumn: `span ${item.w}`, gridRow: `span ${item.h}` }}
-              className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden border border-gray-200 dark:border-gray-700 flex flex-col"
+              className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden border border-gray-200 dark:border-gray-700 flex flex-col transform transition-transform duration-[300ms] ease-in-out hover:scale-[1.02]"
             >
-              <div className="p-2 bg-gray-50 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600">
-                <h2 className="text-xs font-semibold text-gray-700 dark:text-gray-200 truncate">
+              <div className="p-2.5 bg-gray-50 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600">
+                <h2 className="text-md font-semibold text-gray-700 dark:text-gray-200 truncate pl-2">
                   {widget.title}
                 </h2>
               </div>
