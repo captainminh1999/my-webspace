@@ -1,10 +1,3 @@
-export interface NasaNewsItem {
-  title: string;
-  pubDate: string;
-  link: string;
-  summary: string;
-}
-
 export interface MarsPhoto {
   id: number;
   img_src: string;
