@@ -5,14 +5,24 @@
     "url": "https://github.com/iamgio/quarkdown"
   },
   {
-    "id": 44168256,
-    "title": "There should be no Computer Art (1971)",
-    "url": "https://dam.org/museum/essays_ui/essays/there-should-be-no-computer-art/"
-  },
-  {
     "id": 44169132,
     "title": "Show HN: I wrote a Java decompiler in pure C language",
     "url": "https://github.com/neocanable/garlic"
+  },
+  {
+    "id": 44168835,
+    "title": "Claude has learned how to jailbreak Cursor",
+    "url": "https://forum.cursor.com/t/important-claude-has-learned-how-to-jailbreak-cursor/96702"
+  },
+  {
+    "id": 44169314,
+    "title": "Covert Web-to-App Tracking via Localhost on Android",
+    "url": "https://localmess.github.io/"
+  },
+  {
+    "id": 44168256,
+    "title": "There should be no Computer Art (1971)",
+    "url": "https://dam.org/museum/essays_ui/essays/there-should-be-no-computer-art/"
   },
   {
     "id": 44168265,
@@ -20,14 +30,9 @@
     "url": "https://www.belfercenter.org/publication/plutonium-mountain-inside-17-year-mission-secure-legacy-soviet-nuclear-testing"
   },
   {
-    "id": 44168134,
-    "title": "EU Commission refuses to disclose authors behind its mass surveillance proposal",
-    "url": "https://old.reddit.com/r/europe/comments/1l2655n/the_eu_commission_refuses_to_disclose_the/"
-  },
-  {
-    "id": 44166102,
-    "title": "AI makes the humanities more important, but also weirder",
-    "url": "https://resobscura.substack.com/p/ai-makes-the-humanities-more-important"
+    "id": 44169115,
+    "title": "Meta and Yandex are de-anonymizing Android users' web browsing identifiers",
+    "url": "https://arstechnica.com/security/2025/06/headline-to-come/"
   },
   {
     "id": 44169039,
@@ -35,18 +40,13 @@
     "url": "https://www.ycombinator.com/companies/spark/jobs/kDeJlPK-software-engineer-full-stack"
   },
   {
-    "id": 44169115,
-    "title": "Meta and Yandex are de-anonymizing Android users' web browsing identifiers",
-    "url": "https://arstechnica.com/security/2025/06/headline-to-come/"
+    "id": 44169050,
+    "title": "NYC Drivers Who Run Red Lights Get Tickets. E-Bike Riders Get Court Dates",
+    "url": "https://www.nytimes.com/2025/05/24/nyregion/ebikes-scooters-cyclists-nyc.html"
   },
   {
-    "id": 44163063,
-    "title": "My AI skeptic friends are all nuts",
-    "url": "https://fly.io/blog/youre-all-nuts/"
-  },
-  {
-    "id": 44143045,
-    "title": "GUIs are built at least 2.5 times",
-    "url": "https://patricia.no/2025/05/30/why_lean_software_dev_is_wrong.html"
+    "id": 44166102,
+    "title": "AI makes the humanities more important, but also weirder",
+    "url": "https://resobscura.substack.com/p/ai-makes-the-humanities-more-important"
   }
 ]
