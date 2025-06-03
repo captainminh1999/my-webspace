@@ -4,7 +4,7 @@ import { Layout, Layouts } from "react-grid-layout";
 import { SpaceCard, SpaceModalBody } from "@/components/widgets/SpaceWidget";
 import { WeatherCard, WeatherModalBody } from "@/components/widgets/WeatherWidget";
 import { TechCard, TechModalBody } from "@/components/widgets/TechWidget";
-import YouTubeRecsCard, { YouTubeRecsModalBody } from "@/components/widgets/YouTubeRecsWidget";
+import {YouTubeRecsCard, YouTubeRecsModalBody } from "@/components/widgets/YouTubeRecsWidget";
 
 
 /**************************************************************
