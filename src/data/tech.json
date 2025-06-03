@@ -1,5 +1,10 @@
 [
   {
+    "id": 44170968,
+    "title": "The Small World of English",
+    "url": "https://www.inotherwords.app/linguabase/"
+  },
+  {
     "id": 44167592,
     "title": "Quarkdown: A modern Markdown-based typesetting system",
     "url": "https://github.com/iamgio/quarkdown"
@@ -10,9 +15,9 @@
     "url": "https://github.com/neocanable/garlic"
   },
   {
-    "id": 44168835,
-    "title": "Claude has learned how to jailbreak Cursor",
-    "url": "https://forum.cursor.com/t/important-claude-has-learned-how-to-jailbreak-cursor/96702"
+    "id": 44170694,
+    "title": "Show HN: Controlling 3D models with voice and hand gestures",
+    "url": "https://github.com/collidingScopes/3d-model-playground"
   },
   {
     "id": 44169314,
@@ -20,33 +25,28 @@
     "url": "https://localmess.github.io/"
   },
   {
-    "id": 44168256,
-    "title": "There should be no Computer Art (1971)",
-    "url": "https://dam.org/museum/essays_ui/essays/there-should-be-no-computer-art/"
+    "id": 44170657,
+    "title": "Show HN: PinSend – Share text between devices using a PIN(P2P, no login)",
+    "url": "https://pinsend.app"
   },
   {
-    "id": 44168265,
-    "title": "Plutonium Mountain: The 17-year mission to guard remains of Soviet nuclear tests",
-    "url": "https://www.belfercenter.org/publication/plutonium-mountain-inside-17-year-mission-secure-legacy-soviet-nuclear-testing"
+    "id": 44163063,
+    "title": "My AI skeptic friends are all nuts",
+    "url": "https://fly.io/blog/youre-all-nuts/"
   },
   {
-    "id": 44169115,
-    "title": "Meta and Yandex are de-anonymizing Android users' web browsing identifiers",
-    "url": "https://arstechnica.com/security/2025/06/headline-to-come/"
-  },
-  {
-    "id": 44169039,
-    "title": "Spark AI (YC W24) Is Hiring a Full Stack Engineer in San Francisco",
-    "url": "https://www.ycombinator.com/companies/spark/jobs/kDeJlPK-software-engineer-full-stack"
-  },
-  {
-    "id": 44169050,
-    "title": "NYC Drivers Who Run Red Lights Get Tickets. E-Bike Riders Get Court Dates",
-    "url": "https://www.nytimes.com/2025/05/24/nyregion/ebikes-scooters-cyclists-nyc.html"
+    "id": 44143045,
+    "title": "GUIs are built at least 2.5 times",
+    "url": "https://patricia.no/2025/05/30/why_lean_software_dev_is_wrong.html"
   },
   {
     "id": 44166102,
     "title": "AI makes the humanities more important, but also weirder",
     "url": "https://resobscura.substack.com/p/ai-makes-the-humanities-more-important"
+  },
+  {
+    "id": 44168994,
+    "title": "Updates to Windows for the Digital Markets Act",
+    "url": "https://blogs.windows.com/windows-insider/2025/06/02/updates-to-windows-for-the-digital-markets-act/"
   }
 ]
