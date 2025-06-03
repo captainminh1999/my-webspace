@@ -5,9 +5,24 @@
     "url": "https://github.com/iamgio/quarkdown"
   },
   {
-    "id": 44166155,
-    "title": "The Metamorphosis of Prime Intellect (1994)",
-    "url": "https://localroger.com/prime-intellect/mopiall.html"
+    "id": 44168256,
+    "title": "There should be no Computer Art (1971)",
+    "url": "https://dam.org/museum/essays_ui/essays/there-should-be-no-computer-art/"
+  },
+  {
+    "id": 44169132,
+    "title": "Show HN: I wrote a Java decompiler in pure C language",
+    "url": "https://github.com/neocanable/garlic"
+  },
+  {
+    "id": 44168265,
+    "title": "Plutonium Mountain: The 17-year mission to guard remains of Soviet nuclear tests",
+    "url": "https://www.belfercenter.org/publication/plutonium-mountain-inside-17-year-mission-secure-legacy-soviet-nuclear-testing"
+  },
+  {
+    "id": 44168134,
+    "title": "EU Commission refuses to disclose authors behind its mass surveillance proposal",
+    "url": "https://old.reddit.com/r/europe/comments/1l2655n/the_eu_commission_refuses_to_disclose_the/"
   },
   {
     "id": 44166102,
@@ -15,13 +30,23 @@
     "url": "https://resobscura.substack.com/p/ai-makes-the-humanities-more-important"
   },
   {
-    "id": 44166908,
-    "title": "Poison Pill: Is the killer behind 1982 Tylenol poisonings still on the loose?",
-    "url": "https://www.trulyadventure.us/poison-pill"
+    "id": 44169039,
+    "title": "Spark AI (YC W24) Is Hiring a Full Stack Engineer in San Francisco",
+    "url": "https://www.ycombinator.com/companies/spark/jobs/kDeJlPK-software-engineer-full-stack"
+  },
+  {
+    "id": 44169115,
+    "title": "Meta and Yandex are de-anonymizing Android users' web browsing identifiers",
+    "url": "https://arstechnica.com/security/2025/06/headline-to-come/"
   },
   {
     "id": 44163063,
     "title": "My AI skeptic friends are all nuts",
     "url": "https://fly.io/blog/youre-all-nuts/"
+  },
+  {
+    "id": 44143045,
+    "title": "GUIs are built at least 2.5 times",
+    "url": "https://patricia.no/2025/05/30/why_lean_software_dev_is_wrong.html"
   }
 ]
