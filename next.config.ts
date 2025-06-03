@@ -12,6 +12,7 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname: "openweathermap.org", pathname: "/img/wn/**" },
       { protocol: 'https', hostname: 'mars.nasa.gov', pathname: '/**' },
       { protocol: 'https', hostname: 'api.nasa.gov', pathname: '/**' },
+      { protocol: 'https', hostname: 'i.ytimg.com', pathname: '/vi/**' },
       // add more hosts as needed:
       // {
       //   protocol: 'https',

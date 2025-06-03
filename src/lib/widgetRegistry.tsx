@@ -4,6 +4,7 @@ import { Layout, Layouts } from "react-grid-layout";
 import { SpaceCard, SpaceModalBody } from "@/components/widgets/SpaceWidget";
 import { WeatherCard, WeatherModalBody } from "@/components/widgets/WeatherWidget";
 import { TechCard, TechModalBody } from "@/components/widgets/TechWidget";
+import YouTubeRecsCard, { YouTubeRecsModalBody } from "@/components/widgets/YouTubeRecsWidget";
 
 
 /**************************************************************
@@ -67,7 +68,8 @@ export const widgets: WidgetItem[] = [
     id: "youtube",
     title: "YouTube Recs",
     defaultSize: { w: 1, h: 2 },
-    modalContent: <p className="p-4">🎬 Video list placeholder.</p>,
+    content: <YouTubeRecsCard />,
+    modalContent: <YouTubeRecsModalBody />,
   },
   {
     id: "drones",

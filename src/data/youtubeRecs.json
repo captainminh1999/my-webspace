@@ -1,0 +1,28 @@
+{
+  "items": [
+    {
+      "channelId": "CH1",
+      "videoId": "vid1",
+      "title": "Sample Video 1",
+      "thumbnail": "https://i.ytimg.com/vi/vid1/mqdefault.jpg",
+      "channelTitle": "Channel One",
+      "publishedAt": "2024-01-01T00:00:00Z"
+    },
+    {
+      "channelId": "CH2",
+      "videoId": "vid2",
+      "title": "Sample Video 2",
+      "thumbnail": "https://i.ytimg.com/vi/vid2/mqdefault.jpg",
+      "channelTitle": "Channel Two",
+      "publishedAt": "2024-01-02T00:00:00Z"
+    },
+    {
+      "channelId": "CH3",
+      "videoId": "vid3",
+      "title": "Sample Video 3",
+      "thumbnail": "https://i.ytimg.com/vi/vid3/mqdefault.jpg",
+      "channelTitle": "Channel Three",
+      "publishedAt": "2024-01-03T00:00:00Z"
+    }
+  ]
+}
