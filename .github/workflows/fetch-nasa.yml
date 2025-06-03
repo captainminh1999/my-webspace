@@ -28,19 +28,19 @@ jobs:
         run: |
           curl -s https://www.nasa.gov/rss/dyn/breaking_news.rss > news.xml
           python3 - <<'PY'
-import json, xml.etree.ElementTree as ET
-root = ET.parse('news.xml').getroot()
-items = []
-for item in root.findall('./channel/item')[:10]:
-    items.append({
-        'title': item.findtext('title'),
-        'pubDate': item.findtext('pubDate'),
-        'link': item.findtext('link'),
-        'summary': item.findtext('description')
-    })
-with open('src/data/nasaNews.json', 'w') as f:
-    json.dump(items, f, indent=2)
-PY
+          import json, xml.etree.ElementTree as ET
+          root = ET.parse('news.xml').getroot()
+          items = []
+          for item in root.findall('./channel/item')[:10]:
+              items.append({
+                  'title': item.findtext('title'),
+                  'pubDate': item.findtext('pubDate'),
+                  'link': item.findtext('link'),
+                  'summary': item.findtext('description')
+              })
+          with open('src/data/nasaNews.json', 'w') as f:
+              json.dump(items, f, indent=2)
+          PY
 
       - name: Fetch Mars Rover Photo
         env:
