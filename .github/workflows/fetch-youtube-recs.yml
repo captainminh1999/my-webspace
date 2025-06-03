@@ -1,0 +1,80 @@
+name: Fetch YouTube Latest (daily)
+
+permissions:
+  contents: write
+
+on:
+  schedule:
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+
+jobs:
+  update-youtube:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+
+      - name: Fetch latest videos for channels
+        env:
+          KEY: ${{ secrets.YOUTUBE_KEY }}
+        run: |
+          mkdir -p data
+
+          CHANNEL_IDS=(
+            "UCHnyfMqiRRG1u-2MsSQLbXA"
+            "UCsXVk37bltHxD1rDPwtNM8Q"
+            "UCcyq283he07B7_KUX07mmtA"
+            "UCMb0O2CdPBNi-QqPk5T3gsQ"
+            "UCXuqSBlHAE6Xw-yeJA0Tunw"
+            "UCo4K5kzinPI9AHRDp_V4T0w"
+            "UCKy1dAqELo0zrOtPkf0eTMw"
+            "UC1D3yD4wlPMico0dss264XA"
+            "UCftwRNsjfRo08xYE31tkiyw"
+          )
+
+          echo "{" > temp_videos.json
+          echo '  "items": [' >> temp_videos.json
+
+          first=true
+          for CID in "${CHANNEL_IDS[@]}"; do
+            if [ "$first" = true ]; then
+              first=false
+            else
+              echo "    ," >> temp_videos.json
+            fi
+
+            resp=$(curl -s "https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=${CID}&maxResults=1&order=date&type=video&key=$KEY")
+
+            vidId=$(echo "$resp" | jq -r '.items[0].id.videoId')
+            title=$(echo "$resp" | jq -r '.items[0].snippet.title | @json')
+            thumb=$(echo "$resp" | jq -r '.items[0].snippet.thumbnails.medium.url | @json')
+            channelTitle=$(echo "$resp" | jq -r '.items[0].snippet.channelTitle | @json')
+            publishedAt=$(echo "$resp" | jq -r '.items[0].snippet.publishedAt | @json')
+
+            echo "    {" >> temp_videos.json
+            echo "      \"channelId\": \"${CID}\"," >> temp_videos.json
+            echo "      \"videoId\": \"${vidId}\"," >> temp_videos.json
+            echo "      \"title\": ${title}," >> temp_videos.json
+            echo "      \"thumbnail\": ${thumb}," >> temp_videos.json
+            echo "      \"channelTitle\": ${channelTitle}," >> temp_videos.json
+            echo "      \"publishedAt\": ${publishedAt}" >> temp_videos.json
+            echo "    }" >> temp_videos.json
+          done
+
+          echo "  ]" >> temp_videos.json
+          echo "}" >> temp_videos.json
+
+          mv temp_videos.json src/data/youtubeRecs.json
+
+      - name: Commit updated JSON
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add src/data/youtubeRecs.json
+          git diff --cached --quiet && exit 0
+          git commit -m "chore: update YouTube Recs"
+          git push
