@@ -34,11 +34,11 @@ export default function AllEducationPage() {
     <main className="min-h-screen bg-gray-50 dark:bg-gray-950 py-10 px-4 sm:px-6 lg:px-8">
       <div className="max-w-3xl mx-auto">
         
-        {/* Back to Home Link */}
+        {/* Back to Main CV Link */}
         <div className="mb-8">
-          <Link href="/" className="inline-flex items-center text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-200 transition-colors duration-150 group">
+          <Link href="/about-me" className="inline-flex items-center text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-200 transition-colors duration-150 group">
             <ArrowLeft size={20} className="mr-2 transition-transform duration-150 group-hover:-translate-x-1" />
-            Back to Home
+            Back to Main CV
           </Link>
         </div>
 
