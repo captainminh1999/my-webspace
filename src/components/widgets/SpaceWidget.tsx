@@ -45,8 +45,7 @@ export const SpaceCard: React.FC = () => (
  * Detailed content inside the modal.
  */
 export const SpaceModalBody: React.FC = () => {
-  const [year, month, day] = epic.date.split(" ")[0].split("-");
-  const epicUrl = `https://api.nasa.gov/EPIC/archive/natural/${year}/${month}/${day}/png/${epic.image}.png?api_key=${process.env.NASA_KEY ?? ''}`;
+  const epicUrl = epic.url;
 
   return (
     <article className="p-4 space-y-[50px]">
