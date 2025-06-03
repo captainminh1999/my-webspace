@@ -1,0 +1,36 @@
+name: Fetch Tech Headlines
+
+permissions:
+  contents: write
+
+on:
+  schedule:
+    - cron: '0 * * * *'
+  workflow_dispatch:
+
+jobs:
+  update-tech:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo (with credentials)
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+
+      - name: Fetch top Hacker News stories
+        run: |
+          TOP_IDS=$(curl -s https://hacker-news.firebaseio.com/v0/topstories.json | jq '.[0:5]')
+          STORIES=$(echo "$TOP_IDS" | jq -r '.[]' | while read ID; do
+            curl -s "https://hacker-news.firebaseio.com/v0/item/${ID}.json" \
+              | jq '{ id: .id, title: .title, url: .url }'
+          done | jq -s '.')
+          echo "$STORIES" > src/data/tech.json
+
+      - name: Commit & push updated tech.json
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add src/data/tech.json
+          git diff --cached --quiet && exit 0
+          git commit -m "chore: update tech headlines"
+          git push
