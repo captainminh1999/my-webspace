@@ -1,20 +1,49 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
   widgets,
-  layoutMd,
+  ORIGINAL_LAYOUTS,
+  breakpointsConfig,
+  colsConfig,
+  BreakpointKey,
 } from "@/lib/widgetRegistry";
 import ModalFrame from "@/components/ModalFrame";
 import GenericWidgetContent from "@/components/widgets/GenericWidgetContent";
 import ProfileWidget from "@/components/widgets/ProfileWidget";
+
+function useResponsiveLayout() {
+  const [layoutKey, setLayoutKey] = useState<BreakpointKey>("md");
+  const updateLayout = () => {
+    const w = window.innerWidth;
+    let key: BreakpointKey = "xxs";
+    if (w >= breakpointsConfig.lg) key = "lg";
+    else if (w >= breakpointsConfig.md) key = "md";
+    else if (w >= breakpointsConfig.sm) key = "sm";
+    else if (w >= breakpointsConfig.xs) key = "xs";
+    setLayoutKey(key);
+  };
+
+  useEffect(() => {
+    updateLayout();
+    window.addEventListener("resize", updateLayout);
+    return () => window.removeEventListener("resize", updateLayout);
+  }, []);
+
+  return {
+    layout: ORIGINAL_LAYOUTS[layoutKey],
+    cols: colsConfig[layoutKey],
+  };
+}
 
 export default function DashboardGrid() {
   const router = useRouter();
   const params = useSearchParams();
   const openId = params.get("w");
   const modalWidget = widgets.find((w) => w.id === openId);
+
+  const { layout, cols } = useResponsiveLayout();
 
   const closeModal = React.useCallback(() => router.back(), [router]);
 
@@ -34,9 +63,9 @@ export default function DashboardGrid() {
     <>
       <div
         className="mx-auto max-w-[1200px] grid gap-4"
-        style={{ gridTemplateColumns: "repeat(3, minmax(0, 1fr))" }}
+        style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))` }}
       >
-        {layoutMd.map((item) => {
+        {layout.map((item) => {
           const widget = widgets.find((w) => w.id === item.i)!;
           return (
             <div
