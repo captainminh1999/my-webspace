@@ -3,6 +3,7 @@
 import React from "react";
 import type { YouTubeRecData, YouTubeRecItem } from "@/types/youtubeRecs";
 import raw from "@/data/youtubeRecs.json" assert { type: "json" };
+import WidgetSection from "@/components/WidgetSection";
 import Link from "next/link";
 import Image from "next/image";
 import { format } from "date-fns";
@@ -47,7 +48,7 @@ export const YouTubeRecsCard: React.FC = () => {
 export const YouTubeRecsModalBody: React.FC = () => (
   <article className="space-y-4 p-4">
     {data.items.map((item) => (
-      <div key={item.videoId} className="flex items-start space-x-4">
+      <WidgetSection key={item.videoId} className="flex items-start space-x-4">
         <Link
           href={`https://youtu.be/${item.videoId}`}
           target="_blank"
@@ -76,7 +77,7 @@ export const YouTubeRecsModalBody: React.FC = () => (
             {item.channelTitle} • {format(new Date(item.publishedAt), "MMM d, yyyy")}
           </p>
         </div>
-      </div>
+      </WidgetSection>
     ))}
   </article>
 );

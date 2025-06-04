@@ -18,13 +18,13 @@ jobs:
         with:
           persist-credentials: true
 
-      - name: Fetch latest RAWG games
+      - name: Fetch RAWG new & trending games
         env:
           RAWG_KEY: ${{ secrets.RAWG_KEY }}
         run: |
           mkdir -p data
           curl -s \
-            "https://api.rawg.io/api/games?key=$RAWG_KEY&ordering=-released&page_size=5" \
+            "https://api.rawg.io/api/games?key=$RAWG_KEY&ordering=-added&page_size=10" \
             > raw_games.json
 
       - name: Trim RAWG payload
