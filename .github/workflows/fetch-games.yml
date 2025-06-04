@@ -1,0 +1,59 @@
+name: Fetch Games Updates (daily)
+
+permissions:
+  contents: write
+
+on:
+  schedule:
+    - cron: '0 4 * * *'
+  workflow_dispatch:
+
+jobs:
+  update-games:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+
+      - name: Fetch latest RAWG games
+        env:
+          RAWG_KEY: ${{ secrets.RAWG_KEY }}
+        run: |
+          mkdir -p data
+          curl -s \
+            "https://api.rawg.io/api/games?key=$RAWG_KEY&ordering=-released&page_size=5" \
+            > raw_games.json
+
+      - name: Trim RAWG payload
+        run: |
+          node <<'NODE'
+          const fs = require('fs');
+          const src = JSON.parse(fs.readFileSync('raw_games.json', 'utf8'));
+
+          if (!Array.isArray(src.results)) {
+            console.error('Unexpected RAWG payload', JSON.stringify(src).slice(0,200));
+            process.exit(0);
+          }
+
+          // Keep only id, name, background_image, released
+          const out = src.results.map(g => ({
+            id: g.id,
+            name: g.name,
+            thumbnail: g.background_image,
+            released: g.released
+          }));
+
+          fs.writeFileSync('src/data/games.json', JSON.stringify(out, null, 2));
+          NODE
+
+      - name: Commit & push updated games.json
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add src/data/games.json
+          git diff --cached --quiet && exit 0
+          git commit -m "chore: update games"
+          git push
