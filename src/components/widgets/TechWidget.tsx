@@ -24,12 +24,12 @@ export function TechModalBody() {
   return (
     <article className="p-4 space-y-2">
       {all.map((s) => (
-        <WidgetSection key={s.id} className="space-y-1 p-0">
-          <a href={s.url} target="_blank" rel="noopener noreferrer" className="text-sm font-medium hover:underline">
-            {s.title}
-          </a>
-          <hr className="border-gray-200 dark:border-gray-700" />
-        </WidgetSection>
+        <a key={s.id} href={s.url} target="_blank" rel="noopener noreferrer" className="block">
+          <WidgetSection className="space-y-1 p-0 hover:bg-gray-100 dark:hover:bg-gray-700">
+            <p className="text-sm font-medium text-indigo-600">{s.title}</p>
+            <hr className="border-gray-200 dark:border-gray-700" />
+          </WidgetSection>
+        </a>
       ))}
     </article>
   );
