@@ -5,9 +5,10 @@ import { SpaceCard, SpaceModalBody } from "@/components/widgets/SpaceWidget";
 import { WeatherCard, WeatherModalBody } from "@/components/widgets/WeatherWidget";
 import CoffeeCard, { CoffeeModalBody } from "@/components/widgets/CoffeeWidget";
 import { TechCard, TechModalBody } from "@/components/widgets/TechWidget";
-import {YouTubeRecsCard, YouTubeRecsModalBody } from "@/components/widgets/YouTubeRecsWidget";
+import { YouTubeRecsCard, YouTubeRecsModalBody } from "@/components/widgets/YouTubeRecsWidget";
 import GamesCard, { GamesModalBody } from "@/components/widgets/GamesWidget";
 import DroneNewsCard, { DroneNewsModalBody } from "@/components/widgets/DroneNewsWidget";
+import PhotographyCard, { PhotographyModalBody } from "@/components/widgets/PhotographyWidget";
 
 
 /**************************************************************
@@ -85,8 +86,9 @@ export const widgets: WidgetItem[] = [
   {
     id: "camera",
     title: "Photography",
-    defaultSize: { w: 1, h: 2 },
-    modalContent: <p className="p-4">📸 Gallery coming soon.</p>,
+    defaultSize: { w: 1, h: 1, minW: 1, minH: 1, maxW: 2, maxH: 2 },
+    content: <PhotographyCard />,
+    modalContent: <PhotographyModalBody />,
   },
   {
     id: "games",

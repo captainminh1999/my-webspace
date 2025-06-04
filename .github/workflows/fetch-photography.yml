@@ -1,0 +1,75 @@
+name: Fetch Photography Widget (daily)
+
+permissions:
+  contents: write   # so we can push changes back to the repo
+
+on:
+  schedule:
+    # Runs every day at 08:00 UTC (adjust as desired)
+    - cron: '0 8 * * *'
+  workflow_dispatch:
+
+jobs:
+  update-photography:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1) Check out the repo so we can commit data/photography.json
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+
+      # 2) Fetch a single random Unsplash photo (using a "topic" if desired)
+      - name: Fetch daily photo from Unsplash
+        env:
+          KEY: ${{ secrets.UNSPLASH_KEY }}
+        run: |
+          mkdir -p data
+          # You can narrow by topic, e.g. &topics=editorial in the URL. Here we fetch truly random:
+          curl -s \
+            "https://api.unsplash.com/photos/random?orientation=landscape&client_id=$KEY" \
+            > raw_photo.json
+
+      # 3) Trim to only the fields we need: id, urls.small (thumbnail), urls.full, user.name, alt_description
+      - name: Trim Unsplash response
+        run: |
+          node <<'NODE'
+          const fs = require('fs');
+
+          let src;
+          try {
+            src = JSON.parse(fs.readFileSync('raw_photo.json', 'utf8'));
+          } catch (err) {
+            console.error('⚠️ Invalid JSON from Unsplash:', err.message);
+            process.exit(0); // skip if invalid
+          }
+
+          // If Unsplash returned an error (e.g. rate-limit), bail out:
+          if (src.errors || src.status === 403 || !src.id) {
+            console.error('⚠️ Unsplash returned an error:', JSON.stringify(src).slice(0, 200));
+            process.exit(0);
+          }
+
+          const out = {
+            id: src.id,
+            thumbnail: src.urls.small,   // ~400px-wide thumbnail
+            full: src.urls.full,         // full-resolution URL
+            photographer: src.user.name, // name to credit
+            profile: src.user.links.html, // link to photographer’s Unsplash profile
+            alt: src.alt_description || '', // alt text (may be null)
+            createdAt: src.created_at,      // e.g. "2023-10-07T12:34:56Z"
+          };
+
+          fs.writeFileSync('data/photography.json', JSON.stringify(out, null, 2));
+          NODE
+
+      # 4) Commit & push if data changed
+      - name: Commit & push updated photography.json
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/photography.json
+          git diff --cached --quiet && exit 0
+          git commit -m "chore: update Photography widget"
+          git push
