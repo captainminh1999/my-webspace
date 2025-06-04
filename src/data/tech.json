@@ -1,52 +1,52 @@
 [
   {
+    "id": 44182186,
+    "title": "FFmpeg merges WebRTC support",
+    "url": "https://git.ffmpeg.org/gitweb/ffmpeg.git/commit/167e343bbe75515a80db8ee72ffa0c607c944a00"
+  },
+  {
+    "id": 44183591,
+    "title": "The iPhone 15 Pro's Depth Maps",
+    "url": "https://tech.marksblogg.com/apple-iphone-15-pro-depth-map-heic.html"
+  },
+  {
     "id": 44179257,
-    "title": "Why I Wrote the BEAM Book",
+    "title": "Why I wrote the BEAM book",
     "url": "https://happihacking.com/blog/posts/2025/why_I_wrote_theBEAMBook/"
   },
   {
-    "id": 44178468,
-    "title": "Cloud Run GPUs, now GA, makes running AI workloads easier for everyone",
-    "url": "https://cloud.google.com/blog/products/serverless/cloud-run-gpus-are-now-generally-available"
+    "id": 44183515,
+    "title": "Mistral Code",
+    "url": "https://mistral.ai/products/mistral-code"
   },
   {
-    "id": 44181421,
-    "title": "The Right to Repair Is Law in Washington State",
-    "url": "https://www.eff.org/deeplinks/2025/06/right-repair-law-washington-state"
+    "id": 44183799,
+    "title": "A proposal to restrict sites from accessing a users' local network",
+    "url": "https://github.com/explainers-by-googlers/local-network-access"
   },
   {
-    "id": 44176737,
-    "title": "DiffX – Next-Generation Extensible Diff Format",
-    "url": "https://diffx.org/"
+    "id": 44184305,
+    "title": "Curtis Yarvin's Plot Against America",
+    "url": "https://www.newyorker.com/magazine/2025/06/09/curtis-yarvin-profile"
   },
   {
-    "id": 44181613,
-    "title": "AGI Is Not Multimodal",
-    "url": "https://thegradient.pub/agi-is-not-multimodal/"
+    "id": 44182356,
+    "title": "IRS Direct File on GitHub",
+    "url": "https://chrisgiven.com/2025/05/direct-file-on-github/"
   },
   {
-    "id": 44181305,
-    "title": "From Steam to Silicon: Patterns of Technological Revolutions",
-    "url": "https://ianreppel.org/from-steam-to-silicon/"
+    "id": 44182698,
+    "title": "When memory was measured in kilobytes: The art of efficient vision",
+    "url": "https://www.softwareheritage.org/2025/06/04/history_computer_vision/"
   },
   {
-    "id": 44176829,
-    "title": "Merlin Bird ID",
-    "url": "https://merlin.allaboutbirds.org/"
+    "id": 44182188,
+    "title": "The Prompt Engineering Playbook for Programmers",
+    "url": "https://addyo.substack.com/p/the-prompt-engineering-playbook-for"
   },
   {
-    "id": 44178902,
-    "title": "Cockatoos have learned to operate drinking fountains in Australia",
-    "url": "https://www.science.org/content/article/cockatoos-have-learned-operate-drinking-fountains-australia"
-  },
-  {
-    "id": 44161102,
-    "title": "Twain Dreams",
-    "url": "https://harpers.org/archive/2025/06/twain-dreams-samuel-clemens-john-jeremiah-sullivan/"
-  },
-  {
-    "id": 44176825,
-    "title": "Binary Wordle",
-    "url": "https://wordle.chengeric.com/"
+    "id": 44182206,
+    "title": "Show HN: GPT image editing, but for 3D models",
+    "url": "https://www.adamcad.com/"
   }
 ]
