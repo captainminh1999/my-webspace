@@ -1,6 +1,6 @@
 // src/lib/widgetRegistry.ts
 
-import { Layout, Layouts } from "react-grid-layout";
+import { Layout } from "react-grid-layout";
 import { SpaceCard, SpaceModalBody } from "@/components/widgets/SpaceWidget";
 import { WeatherCard, WeatherModalBody } from "@/components/widgets/WeatherWidget";
 import { TechCard, TechModalBody } from "@/components/widgets/TechWidget";
@@ -109,7 +109,9 @@ export const breakpointsConfig = {
   xxs: 0,
 } as const;
 
-export const colsConfig = {
+export type BreakpointKey = keyof typeof breakpointsConfig;
+
+export const colsConfig: Record<BreakpointKey, number> = {
   lg: 3,
   md: 3,
   sm: 2,
@@ -158,7 +160,7 @@ export const layoutMd: Layout[] = [
   { i: "cvLink", x: 2, y: 3, w: 1, h: 1 },
 ];
 
-export const ORIGINAL_LAYOUTS: Layouts = {
+export const ORIGINAL_LAYOUTS: Record<BreakpointKey, Layout[]> = {
   md: layoutMd,
   lg: clone(layoutMd),
   sm: layoutSm,

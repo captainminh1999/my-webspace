@@ -7,18 +7,17 @@ import {
   ORIGINAL_LAYOUTS,
   breakpointsConfig,
   colsConfig,
+  BreakpointKey,
 } from "@/lib/widgetRegistry";
 import ModalFrame from "@/components/ModalFrame";
 import GenericWidgetContent from "@/components/widgets/GenericWidgetContent";
 import ProfileWidget from "@/components/widgets/ProfileWidget";
 
 function useResponsiveLayout() {
-  const [layoutKey, setLayoutKey] = useState<keyof typeof ORIGINAL_LAYOUTS>(
-    "md"
-  );
+  const [layoutKey, setLayoutKey] = useState<BreakpointKey>("md");
   const updateLayout = () => {
     const w = window.innerWidth;
-    let key: keyof typeof ORIGINAL_LAYOUTS = "xxs";
+    let key: BreakpointKey = "xxs";
     if (w >= breakpointsConfig.lg) key = "lg";
     else if (w >= breakpointsConfig.md) key = "md";
     else if (w >= breakpointsConfig.sm) key = "sm";
