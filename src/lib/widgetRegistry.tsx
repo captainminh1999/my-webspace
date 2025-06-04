@@ -5,6 +5,7 @@ import { SpaceCard, SpaceModalBody } from "@/components/widgets/SpaceWidget";
 import { WeatherCard, WeatherModalBody } from "@/components/widgets/WeatherWidget";
 import { TechCard, TechModalBody } from "@/components/widgets/TechWidget";
 import {YouTubeRecsCard, YouTubeRecsModalBody } from "@/components/widgets/YouTubeRecsWidget";
+import GamesCard, { GamesModalBody } from "@/components/widgets/GamesWidget";
 
 
 /**************************************************************
@@ -87,7 +88,8 @@ export const widgets: WidgetItem[] = [
     id: "games",
     title: "Gaming",
     defaultSize: { w: 1, h: 1 },
-    modalContent: <p className="p-4">🎮 Steam deals etc.</p>,
+    content: <GamesCard />,
+    modalContent: <GamesModalBody />,
   },
   // Profile widget: links away, so modal disabled
   {

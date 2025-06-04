@@ -13,6 +13,7 @@ const nextConfig: NextConfig = {
       { protocol: 'https', hostname: 'mars.nasa.gov', pathname: '/**' },
       { protocol: 'https', hostname: 'api.nasa.gov', pathname: '/**' },
       { protocol: 'https', hostname: 'i.ytimg.com', pathname: '/vi/**' },
+      { protocol: "https", hostname: "media.rawg.io", pathname: "/media/**" },
       // add more hosts as needed:
       // {
       //   protocol: 'https',
