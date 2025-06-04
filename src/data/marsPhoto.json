@@ -1,3 +1,10 @@
 {
-  "photos": []
+  "photos": [
+    {
+      "id": 1322118,
+      "img_src": "https://mars.nasa.gov/msl-raw-images/proj/msl/redops/ods/surface/sol/04559/opgs/edr/ccam/CR0_802216799EDR_F1161890CCAM01559M_.JPG",
+      "camera": "CHEMCAM_RMI",
+      "rover": "Curiosity"
+    }
+  ]
 }
