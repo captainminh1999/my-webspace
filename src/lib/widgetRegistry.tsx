@@ -137,8 +137,15 @@ const order1Col = [
   "games",
   "cvLink",
 ];
-const make1Col = (): Layout[] =>
-  order1Col.map((id, y) => ({ i: id, x: 0, y, w: 1, h: widgets.find((w) => w.id === id)!.defaultSize.h }));
+const make1Col = (): Layout[] => {
+  let y = 0;
+  return order1Col.map((id) => {
+    const h = widgets.find((w) => w.id === id)!.defaultSize.h;
+    const item = { i: id, x: 0, y, w: 1, h } as Layout;
+    y += h;
+    return item;
+  });
+};
 
 export const layoutSm: Layout[] = [
   { i: "weather", x: 0, y: 0, w: 1, h: 1 },
