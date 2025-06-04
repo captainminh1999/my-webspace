@@ -20,14 +20,17 @@ jobs:
         with:
           persist-credentials: true
 
-      # 2. Fetch the latest “coffee” articles via NewsAPI
+      # 2. Fetch the latest coffee-related articles via NewsAPI (titles only)
       - name: Fetch Coffee Articles
         env:
           KEY: ${{ secrets.NEWSAPI_KEY }}
         run: |
           mkdir -p data
-          curl -s \
-            "https://newsapi.org/v2/everything?q=coffee&pageSize=5&sortBy=publishedAt&apiKey=$KEY" \
+          curl -sG "https://newsapi.org/v2/everything" \
+            --data-urlencode 'qInTitle=coffee OR robusta OR barista OR arabica OR liberica OR "latte," OR "flat white" OR espresso OR americano' \
+            --data-urlencode 'pageSize=5' \
+            --data-urlencode 'sortBy=publishedAt' \
+            --data-urlencode "apiKey=$KEY" \
             > raw_coffee.json
 
       # 3. Trim to just the fields we need (title, url, urlToImage, publishedAt)
