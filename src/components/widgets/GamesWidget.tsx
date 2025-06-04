@@ -2,6 +2,7 @@
 import React from "react";
 import raw from "@/data/games.json" assert { type: "json" };
 import type { GameData, GameItem } from "@/types/games";
+import WidgetSection from "@/components/WidgetSection";
 import Link from "next/link";
 import Image from "next/image";
 import { format } from "date-fns";
@@ -48,7 +49,7 @@ export const GamesCard: React.FC = () => {
 export const GamesModalBody: React.FC = () => (
   <article className="space-y-4 p-4">
     {data.map((game) => (
-      <div key={game.id} className="flex items-start space-x-4">
+      <WidgetSection key={game.id} className="flex items-start space-x-4">
         <Link
           href={`https://rawg.io/games/${game.id}`}
           target="_blank"
@@ -77,7 +78,7 @@ export const GamesModalBody: React.FC = () => (
             Released: {format(new Date(game.released), "MMM d, yyyy")}
           </p>
         </div>
-      </div>
+      </WidgetSection>
     ))}
   </article>
 );
