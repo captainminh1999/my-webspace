@@ -53,7 +53,7 @@ export const widgets: WidgetItem[] = [
   {
     id: "space",
     title: "Space News",
-    defaultSize: { w: 1, h: 1 },
+    defaultSize: { w: 1, h: 2 },
     modalContent: <SpaceModalBody />,
     content: <SpaceCard />,
   },
@@ -88,12 +88,6 @@ export const widgets: WidgetItem[] = [
     title: "Gaming",
     defaultSize: { w: 1, h: 1 },
     modalContent: <p className="p-4">🎮 Steam deals etc.</p>,
-  },
-  {
-    id: "visitorEmotion",
-    title: "How are you feeling?",
-    defaultSize: { w: 1, h: 1 },
-    modalContent: <p className="p-4">🙂 Mood tracker stub.</p>,
   },
   // Profile widget: links away, so modal disabled
   {
@@ -135,7 +129,6 @@ const order1Col = [
   "drones",
   "camera",
   "games",
-  "visitorEmotion",
   "cvLink",
 ];
 const make1Col = (): Layout[] =>
@@ -144,25 +137,23 @@ const make1Col = (): Layout[] =>
 export const layoutSm: Layout[] = [
   { i: "weather", x: 0, y: 0, w: 1, h: 1 },
   { i: "coffee", x: 1, y: 0, w: 1, h: 1 },
-  { i: "space", x: 0, y: 1, w: 1, h: 1 },
+  { i: "space", x: 0, y: 1, w: 1, h: 2 },
   { i: "tech", x: 1, y: 1, w: 1, h: 1 },
-  { i: "youtube", x: 0, y: 2, w: 1, h: 2 },
+  { i: "youtube", x: 0, y: 3, w: 1, h: 2 },
   { i: "drones", x: 1, y: 3, w: 1, h: 1 },
-  { i: "games", x: 0, y: 4, w: 1, h: 1 },
+  { i: "games", x: 0, y: 5, w: 1, h: 1 },
   { i: "camera", x: 1, y: 4, w: 1, h: 2 },
-  { i: "visitorEmotion", x: 0, y: 5, w: 1, h: 1 },
-  { i: "cvLink", x: 1, y: 5, w: 1, h: 1 },
+  { i: "cvLink", x: 1, y: 6, w: 1, h: 1 },
 ];
 
 export const layoutMd: Layout[] = [
   { i: "weather", x: 0, y: 0, w: 1, h: 1 },
   { i: "tech", x: 1, y: 0, w: 1, h: 1 },
   { i: "coffee", x: 2, y: 0, w: 1, h: 1 },
-  { i: "space", x: 0, y: 1, w: 1, h: 1 },
+  { i: "space", x: 0, y: 1, w: 1, h: 2 },
   { i: "youtube", x: 2, y: 1, w: 1, h: 2 },
-  { i: "games", x: 0, y: 2, w: 1, h: 1 },
   { i: "drones", x: 1, y: 2, w: 1, h: 1 },
-  { i: "visitorEmotion", x: 0, y: 3, w: 1, h: 1 },
+  { i: "games", x: 0, y: 3, w: 1, h: 1 },
   { i: "camera", x: 1, y: 3, w: 1, h: 2 },
   { i: "cvLink", x: 2, y: 3, w: 1, h: 1 },
 ];
