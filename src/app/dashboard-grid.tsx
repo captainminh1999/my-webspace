@@ -70,7 +70,10 @@ export default function DashboardGrid() {
           return (
             <div
               key={item.i}
-              style={{ gridColumn: `span ${item.w}`, gridRow: `span ${item.h}` }}
+              style={{
+                gridColumn: `${item.x + 1} / span ${item.w}`,
+                gridRow: `${item.y + 1} / span ${item.h}`,
+              }}
               className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden border border-gray-200 dark:border-gray-700 flex flex-col transform transition-transform duration-[300ms] ease-in-out hover:scale-[1.02]"
             >
               <div
