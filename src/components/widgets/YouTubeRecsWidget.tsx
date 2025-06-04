@@ -48,36 +48,32 @@ export const YouTubeRecsCard: React.FC = () => {
 export const YouTubeRecsModalBody: React.FC = () => (
   <article className="space-y-4 p-4">
     {data.items.map((item) => (
-      <WidgetSection key={item.videoId} className="flex items-start space-x-4">
-        <Link
-          href={`https://youtu.be/${item.videoId}`}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="shrink-0"
-        >
+      <Link
+        key={item.videoId}
+        href={`https://youtu.be/${item.videoId}`}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="block"
+      >
+        <WidgetSection className="flex items-start space-x-4 hover:bg-gray-100 dark:hover:bg-gray-700">
           <Image
             src={item.thumbnail}
             width={160}
             height={90}
             alt={item.title}
             unoptimized
-            className="rounded-md"
+            className="rounded-md shrink-0"
           />
-        </Link>
-        <div className="flex-1">
-          <Link
-            href={`https://youtu.be/${item.videoId}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-base font-semibold text-indigo-600 hover:underline"
-          >
-            {item.title}
-          </Link>
-          <p className="text-[11px] text-gray-500 dark:text-gray-400">
-            {item.channelTitle} • {format(new Date(item.publishedAt), "MMM d, yyyy")}
-          </p>
-        </div>
-      </WidgetSection>
+          <div className="flex-1">
+            <p className="text-base font-semibold text-indigo-600">
+              {item.title}
+            </p>
+            <p className="text-[11px] text-gray-500 dark:text-gray-400">
+              {item.channelTitle} • {format(new Date(item.publishedAt), "MMM d, yyyy")}
+            </p>
+          </div>
+        </WidgetSection>
+      </Link>
     ))}
   </article>
 );

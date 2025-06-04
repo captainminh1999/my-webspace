@@ -49,36 +49,32 @@ export const GamesCard: React.FC = () => {
 export const GamesModalBody: React.FC = () => (
   <article className="space-y-4 p-4">
     {data.map((game) => (
-      <WidgetSection key={game.id} className="flex items-start space-x-4">
-        <Link
-          href={`https://rawg.io/games/${game.id}`}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="shrink-0"
-        >
+      <Link
+        key={game.id}
+        href={`https://rawg.io/games/${game.id}`}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="block"
+      >
+        <WidgetSection className="flex items-start space-x-4 hover:bg-gray-100 dark:hover:bg-gray-700">
           <Image
             src={game.thumbnail}
             width={160}
             height={90}
             alt={game.name}
             unoptimized
-            className="rounded-md"
+            className="rounded-md shrink-0"
           />
-        </Link>
-        <div className="flex-1">
-          <Link
-            href={`https://rawg.io/games/${game.id}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-base font-semibold text-indigo-600 hover:underline"
-          >
-            {game.name}
-          </Link>
-          <p className="text-[11px] text-gray-500 dark:text-gray-400">
-            Released: {format(new Date(game.released), "MMM d, yyyy")}
-          </p>
-        </div>
-      </WidgetSection>
+          <div className="flex-1">
+            <p className="text-base font-semibold text-indigo-600">
+              {game.name}
+            </p>
+            <p className="text-[11px] text-gray-500 dark:text-gray-400">
+              Released: {format(new Date(game.released), "MMM d, yyyy")}
+            </p>
+          </div>
+        </WidgetSection>
+      </Link>
     ))}
   </article>
 );
