@@ -7,6 +7,7 @@ import CoffeeCard, { CoffeeModalBody } from "@/components/widgets/CoffeeWidget";
 import { TechCard, TechModalBody } from "@/components/widgets/TechWidget";
 import {YouTubeRecsCard, YouTubeRecsModalBody } from "@/components/widgets/YouTubeRecsWidget";
 import GamesCard, { GamesModalBody } from "@/components/widgets/GamesWidget";
+import DroneNewsCard, { DroneNewsModalBody } from "@/components/widgets/DroneNewsWidget";
 
 
 /**************************************************************
@@ -77,8 +78,9 @@ export const widgets: WidgetItem[] = [
   {
     id: "drones",
     title: "Drones",
-    defaultSize: { w: 1, h: 1 },
-    modalContent: <p className="p-4">Drone news feed…</p>,
+    defaultSize: { w: 1, h: 1, minW: 1, minH: 1, maxW: 2, maxH: 2 },
+    content: <DroneNewsCard />,
+    modalContent: <DroneNewsModalBody />,
   },
   {
     id: "camera",

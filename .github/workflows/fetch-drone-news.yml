@@ -1,0 +1,69 @@
+name: Fetch Drone News (daily)
+
+permissions:
+  contents: write   # so we can commit src/data/droneNews.json
+
+on:
+  schedule:
+    # Runs every day at 06:00 UTC (adjust as needed)
+    - cron: '0 6 * * *'
+  workflow_dispatch:
+
+jobs:
+  update-drone-news:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1) Check out the repo with credentials so we can push
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+
+      # 2) Fetch the latest “drone” articles via NewsAPI
+      - name: Fetch Drone Articles
+        env:
+          KEY: ${{ secrets.NEWSAPI_KEY }}
+        run: |
+          mkdir -p data
+          curl -s \
+            "https://newsapi.org/v2/everything?qInTitle=drone%20OR%20drones%20OR%20fpv%20OR%20%22dji%20avata%22%20OR%20%22dji%20mavic%22&pageSize=5&sortBy=publishedAt&apiKey=$KEY" \
+            > raw_drone.json
+
+      # 3) Trim to only the fields we need (title, url, urlToImage, publishedAt)
+      - name: Trim Drone JSON
+        run: |
+          node <<'NODE'
+          const fs = require('fs');
+          let src;
+          try {
+            src = JSON.parse(fs.readFileSync('raw_drone.json', 'utf8'));
+          } catch {
+            console.error('⚠️  Invalid JSON from NewsAPI');
+            process.exit(0);
+          }
+
+          if (!Array.isArray(src.articles)) {
+            console.error('⚠️  Unexpected NewsAPI response:', JSON.stringify(src).slice(0, 200));
+            process.exit(0);
+          }
+
+          const trimmed = src.articles.map((a) => ({
+            title: a.title || '',
+            url: a.url || '',
+            image: a.urlToImage || '',
+            publishedAt: a.publishedAt || '',
+          }));
+
+          fs.writeFileSync('src/data/droneNews.json', JSON.stringify(trimmed, null, 2));
+          NODE
+
+      # 4) Commit & push if src/data/droneNews.json changed
+      - name: Commit & push updated droneNews.json
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add src/data/droneNews.json
+          git diff --cached --quiet && exit 0
+          git commit -m "chore: update Drone News"
+          git push
