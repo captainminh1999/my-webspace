@@ -1,13 +1,38 @@
 [
   {
+    "id": 44176737,
+    "title": "DiffX – Next-Generation Extensible Diff Format",
+    "url": "https://diffx.org/"
+  },
+  {
+    "id": 44175773,
+    "title": "Precious Plastic is in trouble",
+    "url": "https://www.preciousplastic.com//news/problems-in-precious-plastic"
+  },
+  {
+    "id": 44176829,
+    "title": "Merlin Bird ID",
+    "url": "https://merlin.allaboutbirds.org/"
+  },
+  {
+    "id": 44176825,
+    "title": "Binary Wordle",
+    "url": "https://wordle.chengeric.com/"
+  },
+  {
+    "id": 44176514,
+    "title": "Ask HN: Has anybody built search on top of Anna's Archive?",
+    "url": null
+  },
+  {
     "id": 44174965,
     "title": "Deep learning gets the glory, deep fact checking gets ignored",
     "url": "https://rachel.fast.ai/posts/2025-06-04-enzyme-ml-fails/index.html"
   },
   {
-    "id": 44175773,
-    "title": "Precious Plastic Is in Trouble",
-    "url": "https://www.preciousplastic.com//news/problems-in-precious-plastic"
+    "id": 44175557,
+    "title": "Show HN: Ephe – A minimalist open-source Markdown paper for today",
+    "url": "https://github.com/unvalley/ephe"
   },
   {
     "id": 44174856,
@@ -15,38 +40,13 @@
     "url": "https://richardcsuwandi.github.io/blog/2025/dgm/"
   },
   {
-    "id": 44175557,
-    "title": "Show HN: Ephe – A Minimalist Open-Source Markdown Paper for Today",
-    "url": "https://github.com/unvalley/ephe"
-  },
-  {
-    "id": 44175048,
-    "title": "Human Brain Cells on Chip for Sale – First biocomputing platform hits the market",
-    "url": "https://spectrum.ieee.org/biological-computer-for-sale"
+    "id": 44169115,
+    "title": "Covert Web-to-App Tracking via Localhost on Android",
+    "url": "https://localmess.github.io/"
   },
   {
     "id": 44173853,
     "title": "Destination: Jupiter",
     "url": "https://clarkesworldmagazine.com/liptak_06_25/"
-  },
-  {
-    "id": 44176314,
-    "title": "Patched (YC S24) Is Hiring SWEs in Singapore",
-    "url": "https://www.ycombinator.com/companies/patched/jobs/hgDeMBr-software-engineer"
-  },
-  {
-    "id": 44175905,
-    "title": "Brain aging shows nonlinear transitions, suggesting a midlife \"critical window\"",
-    "url": "https://www.pnas.org/doi/10.1073/pnas.2416433122"
-  },
-  {
-    "id": 44170968,
-    "title": "The Small World of English",
-    "url": "https://www.inotherwords.app/linguabase/"
-  },
-  {
-    "id": 44174190,
-    "title": "Show HN: AirAP AirPlay server - AirPlay to an iOS Device",
-    "url": "https://github.com/neon443/AirAP"
   }
 ]
