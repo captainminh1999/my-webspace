@@ -5,11 +5,6 @@
     "url": "https://diffx.org/"
   },
   {
-    "id": 44175773,
-    "title": "Precious Plastic is in trouble",
-    "url": "https://www.preciousplastic.com//news/problems-in-precious-plastic"
-  },
-  {
     "id": 44176829,
     "title": "Merlin Bird ID",
     "url": "https://merlin.allaboutbirds.org/"
@@ -20,33 +15,38 @@
     "url": "https://wordle.chengeric.com/"
   },
   {
+    "id": 44175773,
+    "title": "Precious Plastic is in trouble",
+    "url": "https://www.preciousplastic.com//news/problems-in-precious-plastic"
+  },
+  {
+    "id": 44176919,
+    "title": "A critical look at NetBSD’s installer",
+    "url": "https://eerielinux.wordpress.com/2025/05/31/installing-bsd-in-2025-part-3-a-critical-look-at-netbsds-installer/"
+  },
+  {
     "id": 44176514,
     "title": "Ask HN: Has anybody built search on top of Anna's Archive?",
     "url": null
   },
   {
-    "id": 44174965,
-    "title": "Deep learning gets the glory, deep fact checking gets ignored",
-    "url": "https://rachel.fast.ai/posts/2025-06-04-enzyme-ml-fails/index.html"
+    "id": 44143199,
+    "title": "Consider Knitting",
+    "url": "https://journal.stuffwithstuff.com/2025/05/30/consider-knitting/"
   },
   {
-    "id": 44175557,
-    "title": "Show HN: Ephe – A minimalist open-source Markdown paper for today",
-    "url": "https://github.com/unvalley/ephe"
+    "id": 44178008,
+    "title": "X's new \"encrypted\" XChat feature doesn't seem to be any more secure",
+    "url": "https://www.theregister.com/2025/06/03/xs_new_encrypted_xchat_feature/"
   },
   {
-    "id": 44174856,
-    "title": "A deep dive into self-improving AI and the Darwin-Gödel Machine",
-    "url": "https://richardcsuwandi.github.io/blog/2025/dgm/"
+    "id": 44177901,
+    "title": "Depot (YC W23) is hiring an enterprise support engineer (UK/EU)",
+    "url": "https://www.ycombinator.com/companies/depot/jobs/NdCr76D-enterprise-support-engineer"
   },
   {
-    "id": 44169115,
-    "title": "Covert Web-to-App Tracking via Localhost on Android",
-    "url": "https://localmess.github.io/"
-  },
-  {
-    "id": 44173853,
-    "title": "Destination: Jupiter",
-    "url": "https://clarkesworldmagazine.com/liptak_06_25/"
+    "id": 44176909,
+    "title": "Show HN: Hacker News historic upvote and score data",
+    "url": "https://hn.dunkirk.sh/"
   }
 ]
