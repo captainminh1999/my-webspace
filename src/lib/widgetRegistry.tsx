@@ -3,6 +3,7 @@
 import { Layout } from "react-grid-layout";
 import { SpaceCard, SpaceModalBody } from "@/components/widgets/SpaceWidget";
 import { WeatherCard, WeatherModalBody } from "@/components/widgets/WeatherWidget";
+import CoffeeCard, { CoffeeModalBody } from "@/components/widgets/CoffeeWidget";
 import { TechCard, TechModalBody } from "@/components/widgets/TechWidget";
 import {YouTubeRecsCard, YouTubeRecsModalBody } from "@/components/widgets/YouTubeRecsWidget";
 import GamesCard, { GamesModalBody } from "@/components/widgets/GamesWidget";
@@ -42,7 +43,8 @@ export const widgets: WidgetItem[] = [
     id: "coffee",
     title: "Coffee Corner",
     defaultSize: { w: 1, h: 1 },
-    modalContent: <p className="p-4">☕ It is always coffee oh clock!</p>,
+    content: <CoffeeCard />,
+    modalContent: <CoffeeModalBody />,
   },
   {
     id: "weather",
