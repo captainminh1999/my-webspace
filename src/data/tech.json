@@ -1,18 +1,43 @@
 [
   {
+    "id": 44174965,
+    "title": "Deep learning gets the glory, deep fact checking gets ignored",
+    "url": "https://rachel.fast.ai/posts/2025-06-04-enzyme-ml-fails/index.html"
+  },
+  {
+    "id": 44175773,
+    "title": "Precious Plastic Is in Trouble",
+    "url": "https://www.preciousplastic.com//news/problems-in-precious-plastic"
+  },
+  {
+    "id": 44174856,
+    "title": "A deep dive into self-improving AI and the Darwin-Gödel Machine",
+    "url": "https://richardcsuwandi.github.io/blog/2025/dgm/"
+  },
+  {
+    "id": 44175557,
+    "title": "Show HN: Ephe – A Minimalist Open-Source Markdown Paper for Today",
+    "url": "https://github.com/unvalley/ephe"
+  },
+  {
+    "id": 44175048,
+    "title": "Human Brain Cells on Chip for Sale – First biocomputing platform hits the market",
+    "url": "https://spectrum.ieee.org/biological-computer-for-sale"
+  },
+  {
     "id": 44173853,
     "title": "Destination: Jupiter",
     "url": "https://clarkesworldmagazine.com/liptak_06_25/"
   },
   {
-    "id": 44174190,
-    "title": "Show HN: AirAP AirPlay server - AirPlay to an iOS Device",
-    "url": "https://github.com/neon443/AirAP"
+    "id": 44176314,
+    "title": "Patched (YC S24) Is Hiring SWEs in Singapore",
+    "url": "https://www.ycombinator.com/companies/patched/jobs/hgDeMBr-software-engineer"
   },
   {
-    "id": 44173291,
-    "title": "Don't just check errors, handle them gracefully (2016)",
-    "url": "https://dave.cheney.net/2016/04/27/dont-just-check-errors-handle-them-gracefully"
+    "id": 44175905,
+    "title": "Brain aging shows nonlinear transitions, suggesting a midlife \"critical window\"",
+    "url": "https://www.pnas.org/doi/10.1073/pnas.2416433122"
   },
   {
     "id": 44170968,
@@ -20,33 +45,8 @@
     "url": "https://www.inotherwords.app/linguabase/"
   },
   {
-    "id": 44167592,
-    "title": "Quarkdown: A modern Markdown-based typesetting system",
-    "url": "https://github.com/iamgio/quarkdown"
-  },
-  {
-    "id": 44171677,
-    "title": "(On | No) Syntactic Support for Error Handling",
-    "url": "https://go.dev/blog/error-syntax"
-  },
-  {
-    "id": 44173581,
-    "title": "Ask HN: Options for One-Handed Typing",
-    "url": null
-  },
-  {
-    "id": 44173667,
-    "title": "Show HN: An Alfred workflow to open GCP services and browse resources within",
-    "url": "https://github.com/dineshgowda24/alfred-gcp-workflow"
-  },
-  {
-    "id": 44170694,
-    "title": "Show HN: Controlling 3D models with voice and hand gestures",
-    "url": "https://github.com/collidingScopes/3d-model-playground"
-  },
-  {
-    "id": 44173193,
-    "title": "CVE-2024-47081: Netrc credential leak in PSF requests library",
-    "url": "https://seclists.org/fulldisclosure/2025/Jun/2"
+    "id": 44174190,
+    "title": "Show HN: AirAP AirPlay server - AirPlay to an iOS Device",
+    "url": "https://github.com/neon443/AirAP"
   }
 ]
