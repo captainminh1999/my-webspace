@@ -1,0 +1,63 @@
+name: Fetch Coffee News (daily)
+
+permissions:
+  contents: write   # so we can push data/coffee.json
+
+on:
+  schedule:
+    # Run once per day at 05:00 UTC (adjust as you like)
+    - cron: '0 5 * * *'
+  workflow_dispatch:
+
+jobs:
+  update-coffee-news:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Check out the repo (persist credentials so we can push)
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+
+      # 2. Fetch the latest “coffee” articles via NewsAPI
+      - name: Fetch Coffee Articles
+        env:
+          KEY: ${{ secrets.NEWSAPI_KEY }}
+        run: |
+          mkdir -p data
+          curl -s \
+            "https://newsapi.org/v2/everything?q=coffee&pageSize=5&sortBy=publishedAt&apiKey=$KEY" \
+            > raw_coffee.json
+
+      # 3. Trim to just the fields we need (title, url, urlToImage, publishedAt)
+      - name: Trim Coffee JSON
+        run: |
+          node <<'NODE'
+          const fs = require('fs');
+          const src = JSON.parse(fs.readFileSync('raw_coffee.json', 'utf8'));
+
+          if (!Array.isArray(src.articles)) {
+            console.error('Unexpected NewsAPI response:', JSON.stringify(src).slice(0, 200));
+            process.exit(0); // skip if invalid
+          }
+
+          const trimmed = src.articles.map((a) => ({
+            title: a.title,
+            url: a.url,
+            image: a.urlToImage || '',
+            publishedAt: a.publishedAt,
+          }));
+
+          fs.writeFileSync('data/coffee.json', JSON.stringify(trimmed, null, 2));
+          NODE
+
+      # 4. Commit & push if data changed
+      - name: Commit & push coffee.json
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/coffee.json
+          git diff --cached --quiet && exit 0
+          git commit -m "chore: update Coffee News"
+          git push
