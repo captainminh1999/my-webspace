@@ -10,7 +10,7 @@ import { format } from "date-fns";
 const data = raw as YouTubeRecData;
 
 export const YouTubeRecsCard: React.FC = () => {
-  const preview: YouTubeRecItem[] = data.items.slice(0, 3);
+  const preview: YouTubeRecItem[] = data.items.slice(0, 5);
 
   return (
     <div className="space-y-2 p-2">
