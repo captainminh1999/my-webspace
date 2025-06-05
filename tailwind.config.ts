@@ -13,9 +13,13 @@ const config: Config = {
       // You can extend your theme here
       // For example, custom colors, fonts, spacing, etc.
       colors: {
-        // Example:
-        // 'brand-primary': '#6A0DAD',
-        // 'brand-secondary': '#DA70D6',
+        background: 'var(--background)',
+        foreground: 'var(--foreground)',
+        primary: 'var(--primary)',
+        secondary: 'var(--secondary)',
+      },
+      fontSize: {
+        base: '1.125rem', // 18px
       },
       fontFamily: {
         // Example if you're using custom fonts loaded via Next/font

@@ -12,6 +12,9 @@
   --foreground-rgb: 0, 0, 0;
   --background-start-rgb: 214, 219, 220;
   --background-end-rgb: 255, 255, 255;
+  /* base color palette */
+  --primary: #3b82f6; /* blue-500 */
+  --secondary: #f97316; /* orange-500 */
 }
 
 @media (prefers-color-scheme: dark) {
@@ -19,6 +22,8 @@
     --foreground-rgb: 255, 255, 255;
     --background-start-rgb: 0, 0, 0;
     --background-end-rgb: 0, 0, 0;
+    --primary: #60a5fa; /* blue-400 */
+    --secondary: #fb923c; /* orange-400 */
   }
 }
 
@@ -48,6 +53,8 @@ body {
   :root {
     --background: #0a0a0a;
     --foreground: #ededed;
+    --primary: #60a5fa;
+    --secondary: #fb923c;
   }
 }
 
@@ -55,4 +62,5 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+  font-size: 18px;
 }
