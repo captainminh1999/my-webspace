@@ -1,8 +1,18 @@
 [
   {
+    "id": 44190498,
+    "title": "Sodern launches Astradia, a star tracker for GNSS-denied navigation",
+    "url": "https://sodern.com/fr/astradia-le-viseur-detoiles-diurne-pour-un-systeme-de-navigation-sur-et-robuste/"
+  },
+  {
     "id": 44182186,
     "title": "FFmpeg merges WebRTC support",
     "url": "https://git.ffmpeg.org/gitweb/ffmpeg.git/commit/167e343bbe75515a80db8ee72ffa0c607c944a00"
+  },
+  {
+    "id": 44189329,
+    "title": "Air Lab – A portable and open air quality measuring device",
+    "url": "https://networkedartifacts.com/airlab/simulator"
   },
   {
     "id": 44185256,
@@ -15,38 +25,28 @@
     "url": "https://github.com/explainers-by-googlers/local-network-access"
   },
   {
-    "id": 44187645,
-    "title": "Show HN: I made a 3D SVG Renderer that projects textures without rasterization",
-    "url": "https://seve.blog/p/i-made-a-3d-svg-renderer-that-projects"
-  },
-  {
     "id": 44179257,
     "title": "Why I wrote the BEAM book",
     "url": "https://happihacking.com/blog/posts/2025/why_I_wrote_theBEAMBook/"
   },
   {
-    "id": 44189329,
-    "title": "Air Lab – A portable and open air quality measuring device",
-    "url": "https://networkedartifacts.com/airlab/simulator"
+    "id": 44190758,
+    "title": "AtoB (YC S20) – Stripe for Transportation – is hiring engineers",
+    "url": "https://jobs.ashbyhq.com/atob"
   },
   {
-    "id": 44185913,
-    "title": "OpenAI slams court order to save all ChatGPT logs, including deleted chats",
-    "url": "https://arstechnica.com/tech-policy/2025/06/openai-says-court-forcing-it-to-save-all-chatgpt-logs-is-a-privacy-nightmare/"
+    "id": 44189741,
+    "title": "Phptop: Simple PHP ressource profiler, safe and useful for production sites",
+    "url": "https://github.com/bearstech/phptop"
   },
   {
-    "id": 44188068,
-    "title": "Differences in link hallucination and source comprehension across different LLM",
-    "url": "https://mikecaulfield.substack.com/p/differences-in-link-hallucination"
+    "id": 44187645,
+    "title": "Show HN: I made a 3D SVG Renderer that projects textures without rasterization",
+    "url": "https://seve.blog/p/i-made-a-3d-svg-renderer-that-projects"
   },
   {
     "id": 44184900,
     "title": "Autonomous drone defeats human champions in racing first",
     "url": "https://www.tudelft.nl/en/2025/lr/autonomous-drone-from-tu-delft-defeats-human-champions-in-historic-racing-first"
-  },
-  {
-    "id": 44186660,
-    "title": "A Spiral Structure in the Inner Oort Cloud",
-    "url": "https://iopscience.iop.org/article/10.3847/1538-4357/adbf9b"
   }
 ]
