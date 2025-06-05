@@ -1,33 +1,8 @@
 [
   {
-    "id": 44187645,
-    "title": "Show HN: I made a 3D SVG Renderer that projects textures without rasterization",
-    "url": "https://seve.blog/p/i-made-a-3d-svg-renderer-that-projects"
-  },
-  {
     "id": 44182186,
     "title": "FFmpeg merges WebRTC support",
     "url": "https://git.ffmpeg.org/gitweb/ffmpeg.git/commit/167e343bbe75515a80db8ee72ffa0c607c944a00"
-  },
-  {
-    "id": 44183799,
-    "title": "A proposal to restrict sites from accessing a users’ local network",
-    "url": "https://github.com/explainers-by-googlers/local-network-access"
-  },
-  {
-    "id": 44179257,
-    "title": "Why I wrote the BEAM book",
-    "url": "https://happihacking.com/blog/posts/2025/why_I_wrote_theBEAMBook/"
-  },
-  {
-    "id": 44185913,
-    "title": "After court order, OpenAI is now preserving all ChatGPT user logs",
-    "url": "https://mastodon.laurenweinstein.org/@lauren/114627064774788581"
-  },
-  {
-    "id": 44186660,
-    "title": "A Spiral Structure in the Inner Oort Cloud",
-    "url": "https://iopscience.iop.org/article/10.3847/1538-4357/adbf9b"
   },
   {
     "id": 44185256,
@@ -35,18 +10,43 @@
     "url": "https://www.cursor.com/en/changelog/1-0"
   },
   {
+    "id": 44183799,
+    "title": "A proposal to restrict sites from accessing a users’ local network",
+    "url": "https://github.com/explainers-by-googlers/local-network-access"
+  },
+  {
+    "id": 44187645,
+    "title": "Show HN: I made a 3D SVG Renderer that projects textures without rasterization",
+    "url": "https://seve.blog/p/i-made-a-3d-svg-renderer-that-projects"
+  },
+  {
+    "id": 44179257,
+    "title": "Why I wrote the BEAM book",
+    "url": "https://happihacking.com/blog/posts/2025/why_I_wrote_theBEAMBook/"
+  },
+  {
+    "id": 44189329,
+    "title": "Air Lab – A portable and open air quality measuring device",
+    "url": "https://networkedartifacts.com/airlab/simulator"
+  },
+  {
+    "id": 44185913,
+    "title": "OpenAI slams court order to save all ChatGPT logs, including deleted chats",
+    "url": "https://arstechnica.com/tech-policy/2025/06/openai-says-court-forcing-it-to-save-all-chatgpt-logs-is-a-privacy-nightmare/"
+  },
+  {
+    "id": 44188068,
+    "title": "Differences in link hallucination and source comprehension across different LLM",
+    "url": "https://mikecaulfield.substack.com/p/differences-in-link-hallucination"
+  },
+  {
     "id": 44184900,
     "title": "Autonomous drone defeats human champions in racing first",
     "url": "https://www.tudelft.nl/en/2025/lr/autonomous-drone-from-tu-delft-defeats-human-champions-in-historic-racing-first"
   },
   {
-    "id": 44188204,
-    "title": "Engineer Fixes and Re-Installs Old Payphones, Provides Free Calls to the Public",
-    "url": "https://www.core77.com/posts/137183/Engineer-Fixes-and-Re-Installs-Old-Payphones-Provides-Free-Calls-to-the-Public"
-  },
-  {
-    "id": 44183923,
-    "title": "Apple Notes Expected to Gain Markdown Support in iOS 26",
-    "url": "https://www.macrumors.com/2025/06/04/apple-notes-rumored-markdown-support-ios-26/"
+    "id": 44186660,
+    "title": "A Spiral Structure in the Inner Oort Cloud",
+    "url": "https://iopscience.iop.org/article/10.3847/1538-4357/adbf9b"
   }
 ]
