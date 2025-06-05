@@ -1,18 +1,13 @@
 [
   {
-    "id": 44186660,
-    "title": "A Spiral Structure in the Inner Oort Cloud",
-    "url": "https://iopscience.iop.org/article/10.3847/1538-4357/adbf9b"
+    "id": 44187645,
+    "title": "Show HN: I made a 3D SVG Renderer that projects textures without rasterization",
+    "url": "https://seve.blog/p/i-made-a-3d-svg-renderer-that-projects"
   },
   {
     "id": 44182186,
     "title": "FFmpeg merges WebRTC support",
     "url": "https://git.ffmpeg.org/gitweb/ffmpeg.git/commit/167e343bbe75515a80db8ee72ffa0c607c944a00"
-  },
-  {
-    "id": 44185913,
-    "title": "After court order, OpenAI is now preserving all ChatGPT user logs",
-    "url": "https://mastodon.laurenweinstein.org/@lauren/114627064774788581"
   },
   {
     "id": 44183799,
@@ -25,28 +20,33 @@
     "url": "https://happihacking.com/blog/posts/2025/why_I_wrote_theBEAMBook/"
   },
   {
-    "id": 44186780,
-    "title": "Tesla seeks to guard crash data from public disclosure",
-    "url": "https://www.reuters.com/legal/government/musks-tesla-seeks-guard-crash-data-public-disclosure-2025-06-04/"
+    "id": 44185913,
+    "title": "After court order, OpenAI is now preserving all ChatGPT user logs",
+    "url": "https://mastodon.laurenweinstein.org/@lauren/114627064774788581"
   },
   {
-    "id": 44183591,
-    "title": "The iPhone 15 Pro’s Depth Maps",
-    "url": "https://tech.marksblogg.com/apple-iphone-15-pro-depth-map-heic.html"
+    "id": 44186660,
+    "title": "A Spiral Structure in the Inner Oort Cloud",
+    "url": "https://iopscience.iop.org/article/10.3847/1538-4357/adbf9b"
   },
   {
-    "id": 44182188,
-    "title": "The Prompt Engineering Playbook for Programmers",
-    "url": "https://addyo.substack.com/p/the-prompt-engineering-playbook-for"
+    "id": 44185256,
+    "title": "Cursor 1.0",
+    "url": "https://www.cursor.com/en/changelog/1-0"
+  },
+  {
+    "id": 44184900,
+    "title": "Autonomous drone defeats human champions in racing first",
+    "url": "https://www.tudelft.nl/en/2025/lr/autonomous-drone-from-tu-delft-defeats-human-champions-in-historic-racing-first"
+  },
+  {
+    "id": 44188204,
+    "title": "Engineer Fixes and Re-Installs Old Payphones, Provides Free Calls to the Public",
+    "url": "https://www.core77.com/posts/137183/Engineer-Fixes-and-Re-Installs-Old-Payphones-Provides-Free-Calls-to-the-Public"
   },
   {
     "id": 44183923,
     "title": "Apple Notes Expected to Gain Markdown Support in iOS 26",
     "url": "https://www.macrumors.com/2025/06/04/apple-notes-rumored-markdown-support-ios-26/"
-  },
-  {
-    "id": 44178902,
-    "title": "Cockatoos have learned to operate drinking fountains in Australia",
-    "url": "https://www.science.org/content/article/cockatoos-have-learned-operate-drinking-fountains-australia"
   }
 ]
