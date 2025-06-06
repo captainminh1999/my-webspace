@@ -1,13 +1,33 @@
 [
   {
+    "id": 44199699,
+    "title": "Swift and Cute 2D Game Framework: Setting Up a Project with CMake",
+    "url": "https://layer22.com/swift-and-cute-framework-setting-up-a-project-with-cmake"
+  },
+  {
     "id": 44197932,
     "title": "Self-hosting your own media considered harmful according to YouTube",
     "url": "https://www.jeffgeerling.com/blog/2025/self-hosting-your-own-media-considered-harmful"
   },
   {
-    "id": 44197961,
-    "title": "How Much Energy Does It Take To Think?",
-    "url": "https://www.quantamagazine.org/how-much-energy-does-it-take-to-think-20250604/"
+    "id": 44199592,
+    "title": "Jepsen: TigerBeetle 0.16.11",
+    "url": "https://jepsen.io/analyses/tigerbeetle-0.16.11"
+  },
+  {
+    "id": 44199005,
+    "title": "Freight rail fueled a new luxury overnight train startup",
+    "url": "https://www.freightwaves.com/news/how-freight-rail-fueled-a-new-luxury-overnight-train-startup"
+  },
+  {
+    "id": 44199649,
+    "title": "What you need to know about EMP weapons",
+    "url": "https://www.aardvark.co.nz/daily/2025/0606.shtml"
+  },
+  {
+    "id": 44199967,
+    "title": "Deepnote (YC S19) is hiring engineers to build an AI-powered data notebook",
+    "url": "https://deepnote.com/join-us"
   },
   {
     "id": 44191620,
@@ -15,14 +35,9 @@
     "url": "https://crookedtimber.org/2025/06/05/occasional-paper-the-impossible-predicament-of-the-death-newts/"
   },
   {
-    "id": 44195961,
-    "title": "Tokasaurus: An LLM inference engine for high-throughput workloads",
-    "url": "https://scalingintelligence.stanford.edu/blogs/tokasaurus/"
-  },
-  {
-    "id": 44198583,
-    "title": "A maths proof that is only true in Japan",
-    "url": "https://www.newscientist.com/article/2482461-the-bizarre-story-of-a-maths-proof-that-is-only-true-in-japan/"
+    "id": 44199597,
+    "title": "Weaponizing Dependabot: Pwn Request at its finest",
+    "url": "https://boostsecurity.io/blog/weaponizing-dependabot-pwn-request-at-its-finest"
   },
   {
     "id": 44196945,
@@ -30,23 +45,8 @@
     "url": "https://github.com/wey-gu/py-pglite"
   },
   {
-    "id": 44196850,
-    "title": "How we’re responding to The NYT’s data demands in order to protect user privacy",
-    "url": "https://openai.com/index/response-to-nyt-data-demands/"
-  },
-  {
-    "id": 44196417,
-    "title": "Show HN: Claude Composer",
-    "url": "https://github.com/possibilities/claude-composer"
-  },
-  {
-    "id": 44196393,
-    "title": "What a developer needs to know about SCIM",
-    "url": "https://tesseral.com/blog/what-a-developer-needs-to-know-about-scim"
-  },
-  {
-    "id": 44195931,
-    "title": "APL Interpreter – An implementation of APL, written in Haskell (2024)",
-    "url": "https://scharenbroch.dev/projects/apl-interpreter/"
+    "id": 44195961,
+    "title": "Tokasaurus: An LLM inference engine for high-throughput workloads",
+    "url": "https://scalingintelligence.stanford.edu/blogs/tokasaurus/"
   }
 ]
