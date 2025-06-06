@@ -1,18 +1,18 @@
 [
   {
-    "id": 44201872,
-    "title": "Meta: Shut Down Your Invasive AI Discover Feed. Now",
-    "url": "https://www.mozillafoundation.org/en/campaigns/meta-shut-down-your-invasive-ai-discover-feed-now/"
-  },
-  {
     "id": 44201975,
-    "title": "Decreasing Gitlab repo backup times from 48 hours to 41 minutes",
+    "title": "How we decreased GitLab repo backup times from 48 hours to 41 minutes",
     "url": "https://about.gitlab.com/blog/2025/06/05/how-we-decreased-gitlab-repo-backup-times-from-48-hours-to-41-minutes/"
   },
   {
-    "id": 44201583,
-    "title": "An Interactive Guide to Rate Limiting",
-    "url": "https://blog.sagyamthapa.com.np/interactive-guide-to-rate-limiting"
+    "id": 44201901,
+    "title": "4-7-8 Breathing",
+    "url": "https://www.breathbelly.com/exercises/4-7-8-breathing"
+  },
+  {
+    "id": 44201812,
+    "title": "Sandia turns on brain-like storage-free supercomputer",
+    "url": "https://blocksandfiles.com/2025/06/06/sandia-turns-on-brain-like-storage-free-supercomputer/"
   },
   {
     "id": 44200866,
@@ -20,9 +20,9 @@
     "url": "https://odyc.dev"
   },
   {
-    "id": 44201812,
-    "title": "Sandia turns on brain-like storage-free supercomputer – Blocks and Files",
-    "url": "https://blocksandfiles.com/2025/06/06/sandia-turns-on-brain-like-storage-free-supercomputer/"
+    "id": 44180533,
+    "title": "The time bomb in the tax code that's fueling mass tech layoffs",
+    "url": "https://qz.com/tech-layoffs-tax-code-trump-section-174-microsoft-meta-1851783502"
   },
   {
     "id": 44200895,
@@ -30,23 +30,23 @@
     "url": "https://sebastiano.tronto.net/blog/2025-06-06-webdev/"
   },
   {
-    "id": 44201829,
-    "title": "Why Bell Labs Worked",
-    "url": "https://links.fabiomanganiello.com/share/683ee70d0409e6.66273547"
-  },
-  {
-    "id": 44201748,
-    "title": "Free Gaussian Primitives at Anytime Anywhere for Dynamic Scene Reconstruction",
-    "url": "https://zju3dv.github.io/freetimegs/"
-  },
-  {
-    "id": 44200870,
-    "title": "Curate Your Shell History",
-    "url": "https://esham.io/2025/05/shell-history"
+    "id": 44201872,
+    "title": "Meta: Shut down your invasive AI Discover feed",
+    "url": "https://www.mozillafoundation.org/en/campaigns/meta-shut-down-your-invasive-ai-discover-feed-now/"
   },
   {
     "id": 44201762,
     "title": "Too Many Open Files",
     "url": "https://mattrighetti.com/2025/06/04/too-many-files-open"
+  },
+  {
+    "id": 44204277,
+    "title": "United States Digital Service Origins",
+    "url": "https://usdigitalserviceorigins.org/"
+  },
+  {
+    "id": 44203486,
+    "title": "Great Question (YC W21) Is Hiring a Director of Customer Success",
+    "url": "https://www.ycombinator.com/companies/great-question/jobs/fYB5UKu-director-of-customer-success"
   }
 ]
