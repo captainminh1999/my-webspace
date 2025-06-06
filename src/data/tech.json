@@ -1,13 +1,13 @@
 [
   {
-    "id": 44196850,
-    "title": "How we’re responding to The NYT’s data demands in order to protect user privacy",
-    "url": "https://openai.com/index/response-to-nyt-data-demands/"
+    "id": 44197932,
+    "title": "Self-hosting your own media considered harmful according to YouTube",
+    "url": "https://www.jeffgeerling.com/blog/2025/self-hosting-your-own-media-considered-harmful"
   },
   {
-    "id": 44195961,
-    "title": "Tokasaurus: An LLM Inference Engine for High-Throughput Workloads",
-    "url": "https://scalingintelligence.stanford.edu/blogs/tokasaurus/"
+    "id": 44197961,
+    "title": "How Much Energy Does It Take To Think?",
+    "url": "https://www.quantamagazine.org/how-much-energy-does-it-take-to-think-20250604/"
   },
   {
     "id": 44191620,
@@ -15,14 +15,29 @@
     "url": "https://crookedtimber.org/2025/06/05/occasional-paper-the-impossible-predicament-of-the-death-newts/"
   },
   {
+    "id": 44195961,
+    "title": "Tokasaurus: An LLM inference engine for high-throughput workloads",
+    "url": "https://scalingintelligence.stanford.edu/blogs/tokasaurus/"
+  },
+  {
+    "id": 44198583,
+    "title": "A maths proof that is only true in Japan",
+    "url": "https://www.newscientist.com/article/2482461-the-bizarre-story-of-a-maths-proof-that-is-only-true-in-japan/"
+  },
+  {
+    "id": 44196945,
+    "title": "Test Postgres in Python Like SQLite",
+    "url": "https://github.com/wey-gu/py-pglite"
+  },
+  {
+    "id": 44196850,
+    "title": "How we’re responding to The NYT’s data demands in order to protect user privacy",
+    "url": "https://openai.com/index/response-to-nyt-data-demands/"
+  },
+  {
     "id": 44196417,
     "title": "Show HN: Claude Composer",
     "url": "https://github.com/possibilities/claude-composer"
-  },
-  {
-    "id": 44197347,
-    "title": "Building an AI Server on a Budget",
-    "url": "https://www.informationga.in/blog/building-an-ai-server-on-a-budget"
   },
   {
     "id": 44196393,
@@ -33,20 +48,5 @@
     "id": 44195931,
     "title": "APL Interpreter – An implementation of APL, written in Haskell (2024)",
     "url": "https://scharenbroch.dev/projects/apl-interpreter/"
-  },
-  {
-    "id": 44196945,
-    "title": "Test Postgres in Python Like SQLite",
-    "url": "https://github.com/wey-gu/py-pglite"
-  },
-  {
-    "id": 44195354,
-    "title": "Defending adverbs exuberantly if conditionally",
-    "url": "https://countercraft.substack.com/p/defending-adverbs-exuberantly-if"
-  },
-  {
-    "id": 44196433,
-    "title": "Show HN: Ask-human-mcp – zero-config human-in-loop hatch to stop hallucinations",
-    "url": "https://masonyarbrough.com/blog/ask-human"
   }
 ]
