@@ -1,13 +1,13 @@
 [
   {
+    "id": 44196850,
+    "title": "How we’re responding to The NYT’s data demands in order to protect user privacy",
+    "url": "https://openai.com/index/response-to-nyt-data-demands/"
+  },
+  {
     "id": 44195961,
     "title": "Tokasaurus: An LLM Inference Engine for High-Throughput Workloads",
     "url": "https://scalingintelligence.stanford.edu/blogs/tokasaurus/"
-  },
-  {
-    "id": 44196417,
-    "title": "Show HN: Claude Composer",
-    "url": "https://github.com/possibilities/claude-composer"
   },
   {
     "id": 44191620,
@@ -15,14 +15,14 @@
     "url": "https://crookedtimber.org/2025/06/05/occasional-paper-the-impossible-predicament-of-the-death-newts/"
   },
   {
-    "id": 44196576,
-    "title": "I Do Not Remember My Life and It's Fine",
-    "url": "https://aethermug.com/posts/i-do-not-remember-my-life-and-it-s-fine"
+    "id": 44196417,
+    "title": "Show HN: Claude Composer",
+    "url": "https://github.com/possibilities/claude-composer"
   },
   {
-    "id": 44195931,
-    "title": "APL Interpreter – An implementation of APL, written in Haskell (2024)",
-    "url": "https://scharenbroch.dev/projects/apl-interpreter/"
+    "id": 44197347,
+    "title": "Building an AI Server on a Budget",
+    "url": "https://www.informationga.in/blog/building-an-ai-server-on-a-budget"
   },
   {
     "id": 44196393,
@@ -30,23 +30,23 @@
     "url": "https://tesseral.com/blog/what-a-developer-needs-to-know-about-scim"
   },
   {
-    "id": 44196410,
-    "title": "Machine Learning: The Native Language of Biology",
-    "url": "https://decodingbiology.substack.com/p/machine-learning-the-native-language"
+    "id": 44195931,
+    "title": "APL Interpreter – An implementation of APL, written in Haskell (2024)",
+    "url": "https://scharenbroch.dev/projects/apl-interpreter/"
+  },
+  {
+    "id": 44196945,
+    "title": "Test Postgres in Python Like SQLite",
+    "url": "https://github.com/wey-gu/py-pglite"
+  },
+  {
+    "id": 44195354,
+    "title": "Defending adverbs exuberantly if conditionally",
+    "url": "https://countercraft.substack.com/p/defending-adverbs-exuberantly-if"
   },
   {
     "id": 44196433,
     "title": "Show HN: Ask-human-mcp – zero-config human-in-loop hatch to stop hallucinations",
     "url": "https://masonyarbrough.com/blog/ask-human"
-  },
-  {
-    "id": 44194859,
-    "title": "SkyRoof: New Ham Satellite Tracking and SDR Receiver Software",
-    "url": "https://www.rtl-sdr.com/skyroof-new-ham-satellite-tracking-and-sdr-receiver-software/"
-  },
-  {
-    "id": 44196807,
-    "title": "Anthropic co-founder on cutting access to Windsurf",
-    "url": "https://techcrunch.com/2025/06/05/anthropic-co-founder-on-cutting-access-to-windsurf-it-would-be-odd-for-us-to-sell-claude-to-openai/"
   }
 ]
