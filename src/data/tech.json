@@ -5,6 +5,11 @@
     "url": "https://japannews.yomiuri.co.jp/science-nature/technology/20250605-259501/"
   },
   {
+    "id": 44180533,
+    "title": "The time bomb in the tax code that's fueling mass tech layoffs",
+    "url": "https://qz.com/tech-layoffs-tax-code-trump-section-174-microsoft-meta-1851783502"
+  },
+  {
     "id": 44204224,
     "title": "A year of funded FreeBSD development",
     "url": "https://www.daemonology.net/blog/2025-06-06-A-year-of-funded-FreeBSD.html"
@@ -15,14 +20,24 @@
     "url": "https://about.gitlab.com/blog/2025/06/05/how-we-decreased-gitlab-repo-backup-times-from-48-hours-to-41-minutes/"
   },
   {
-    "id": 44180533,
-    "title": "The time bomb in the tax code that's fueling mass tech layoffs",
-    "url": "https://qz.com/tech-layoffs-tax-code-trump-section-174-microsoft-meta-1851783502"
+    "id": 44205590,
+    "title": "Falsehoods Programmers Believe About Aviation",
+    "url": "https://flightaware.engineering/falsehoods-programmers-believe-about-aviation/"
+  },
+  {
+    "id": 44201527,
+    "title": "Sharing everything I could understand about gradient noise",
+    "url": "https://blog.pkh.me/p/42-sharing-everything-i-could-understand-about-gradient-noise.html"
   },
   {
     "id": 44205599,
-    "title": "Medieval Africans Had a Unique Process for Purifying Gold with Glass (2019)",
+    "title": "Medieval Africans had a unique process for purifying gold with glass (2019)",
     "url": "https://www.atlasobscura.com/articles/medieval-african-gold"
+  },
+  {
+    "id": 44205697,
+    "title": "I Read All of Cloudflare's Claude-Generated Commits",
+    "url": "https://www.maxemitchell.com/writings/i-read-all-of-cloudflares-claude-generated-commits/"
   },
   {
     "id": 44204155,
@@ -30,23 +45,8 @@
     "url": "https://veitner.bearblog.dev/highly-efficient-matrix-transpose-in-mojo/"
   },
   {
-    "id": 44206007,
-    "title": "Dear High Schoolers, Time Is Precious",
-    "url": "https://byronsharman.com/blog/dear-high-schoolers"
-  },
-  {
-    "id": 44201812,
-    "title": "Sandia turns on brain-like storage-free supercomputer",
-    "url": "https://blocksandfiles.com/2025/06/06/sandia-turns-on-brain-like-storage-free-supercomputer/"
-  },
-  {
-    "id": 44203562,
-    "title": "The Illusion of Thinking: Understanding the Limitations of Reasoning LLMs [pdf]",
-    "url": "https://ml-site.cdn-apple.com/papers/the-illusion-of-thinking.pdf"
-  },
-  {
     "id": 44205718,
-    "title": "What \"Working\" Means in the Era of AI Apps",
+    "title": "What “working” means in the era of AI apps",
     "url": "https://a16z.com/revenue-benchmarks-ai-apps/"
   }
 ]
