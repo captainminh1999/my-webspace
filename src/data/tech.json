@@ -1,13 +1,13 @@
 [
   {
-    "id": 44208050,
-    "title": "Windows 10 spies on your use of System Settings (2021)",
-    "url": "https://www.michaelhorowitz.com/Windows10.spying.onsettings.php"
-  },
-  {
     "id": 44208060,
     "title": "Low-Level Optimization with Zig",
     "url": "https://alloc.dev/2025/06/07/zig_optimization"
+  },
+  {
+    "id": 44209091,
+    "title": "Taurine and Aging: Is There Anything to It?",
+    "url": "https://www.science.org/content/blog-post/taurine-and-aging-there-anything-it"
   },
   {
     "id": 44207503,
@@ -25,28 +25,28 @@
     "url": "https://qz.com/tech-layoffs-tax-code-trump-section-174-microsoft-meta-1851783502"
   },
   {
-    "id": 44205590,
-    "title": "Falsehoods programmers believe about aviation",
-    "url": "https://flightaware.engineering/falsehoods-programmers-believe-about-aviation/"
-  },
-  {
-    "id": 44207095,
-    "title": "Getting Past Procrastination",
-    "url": "https://spectrum.ieee.org/getting-past-procastination"
-  },
-  {
     "id": 44201975,
     "title": "How we decreased GitLab repo backup times from 48 hours to 41 minutes",
     "url": "https://about.gitlab.com/blog/2025/06/05/how-we-decreased-gitlab-repo-backup-times-from-48-hours-to-41-minutes/"
   },
   {
-    "id": 44207967,
-    "title": "Ziina (YC W21) the Series A fintech is hiring product engineers",
-    "url": "https://ziina.notion.site/Senior-Backend-Engineer-8b6642ec52ac45869656c135e07c6e86"
+    "id": 44209082,
+    "title": "Gander (YC F24) Is Hiring Founding Engineers and Interns",
+    "url": "https://www.ycombinator.com/companies/gander/jobs/vwkK1FC-founding-engineer"
+  },
+  {
+    "id": 44206553,
+    "title": "Why are smokestacks so tall?",
+    "url": "https://practical.engineering/blog/2025/6/3/why-are-smokestacks-so-tall"
   },
   {
     "id": 44204224,
     "title": "A year of funded FreeBSD development",
     "url": "https://www.daemonology.net/blog/2025-06-06-A-year-of-funded-FreeBSD.html"
+  },
+  {
+    "id": 44201527,
+    "title": "Sharing everything I could understand about gradient noise",
+    "url": "https://blog.pkh.me/p/42-sharing-everything-i-could-understand-about-gradient-noise.html"
   }
 ]
