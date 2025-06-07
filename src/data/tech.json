@@ -1,5 +1,20 @@
 [
   {
+    "id": 44208050,
+    "title": "Windows 10 spies on your use of System Settings (2021)",
+    "url": "https://www.michaelhorowitz.com/Windows10.spying.onsettings.php"
+  },
+  {
+    "id": 44208060,
+    "title": "Low-Level Optimization with Zig",
+    "url": "https://alloc.dev/2025/06/07/zig_optimization"
+  },
+  {
+    "id": 44207503,
+    "title": "The FAIR Package Manager: Decentralized WordPress infrastructure",
+    "url": "https://joost.blog/path-forward-for-wordpress/"
+  },
+  {
     "id": 44205282,
     "title": "Researchers develop ‘transparent paper’ as alternative to plastics",
     "url": "https://japannews.yomiuri.co.jp/science-nature/technology/20250605-259501/"
@@ -10,9 +25,14 @@
     "url": "https://qz.com/tech-layoffs-tax-code-trump-section-174-microsoft-meta-1851783502"
   },
   {
-    "id": 44204224,
-    "title": "A year of funded FreeBSD development",
-    "url": "https://www.daemonology.net/blog/2025-06-06-A-year-of-funded-FreeBSD.html"
+    "id": 44205590,
+    "title": "Falsehoods programmers believe about aviation",
+    "url": "https://flightaware.engineering/falsehoods-programmers-believe-about-aviation/"
+  },
+  {
+    "id": 44207095,
+    "title": "Getting Past Procrastination",
+    "url": "https://spectrum.ieee.org/getting-past-procastination"
   },
   {
     "id": 44201975,
@@ -20,33 +40,13 @@
     "url": "https://about.gitlab.com/blog/2025/06/05/how-we-decreased-gitlab-repo-backup-times-from-48-hours-to-41-minutes/"
   },
   {
-    "id": 44205590,
-    "title": "Falsehoods Programmers Believe About Aviation",
-    "url": "https://flightaware.engineering/falsehoods-programmers-believe-about-aviation/"
+    "id": 44207967,
+    "title": "Ziina (YC W21) the Series A fintech is hiring product engineers",
+    "url": "https://ziina.notion.site/Senior-Backend-Engineer-8b6642ec52ac45869656c135e07c6e86"
   },
   {
-    "id": 44201527,
-    "title": "Sharing everything I could understand about gradient noise",
-    "url": "https://blog.pkh.me/p/42-sharing-everything-i-could-understand-about-gradient-noise.html"
-  },
-  {
-    "id": 44205599,
-    "title": "Medieval Africans had a unique process for purifying gold with glass (2019)",
-    "url": "https://www.atlasobscura.com/articles/medieval-african-gold"
-  },
-  {
-    "id": 44205697,
-    "title": "I Read All of Cloudflare's Claude-Generated Commits",
-    "url": "https://www.maxemitchell.com/writings/i-read-all-of-cloudflares-claude-generated-commits/"
-  },
-  {
-    "id": 44204155,
-    "title": "Highly efficient matrix transpose in Mojo",
-    "url": "https://veitner.bearblog.dev/highly-efficient-matrix-transpose-in-mojo/"
-  },
-  {
-    "id": 44205718,
-    "title": "What “working” means in the era of AI apps",
-    "url": "https://a16z.com/revenue-benchmarks-ai-apps/"
+    "id": 44204224,
+    "title": "A year of funded FreeBSD development",
+    "url": "https://www.daemonology.net/blog/2025-06-06-A-year-of-funded-FreeBSD.html"
   }
 ]
