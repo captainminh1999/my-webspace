@@ -1,9 +1,9 @@
 {
   "photos": [
     {
-      "id": 1322714,
-      "img_src": "https://mars.nasa.gov/msl-raw-images/proj/msl/redops/ods/surface/sol/04561/opgs/edr/ncam/NRB_802392979EDR_F1161944NCAM00353M_.JPG",
-      "camera": "NAV_RIGHT_B",
+      "id": 1322995,
+      "img_src": "https://mars.nasa.gov/msl-raw-images/proj/msl/redops/ods/surface/sol/04562/opgs/edr/ccam/CR0_802484809EDR_F1161944CCAM04561M_.JPG",
+      "camera": "CHEMCAM_RMI",
       "rover": "Curiosity"
     }
   ]
