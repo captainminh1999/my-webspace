@@ -1,12 +1,12 @@
-name: Fetch Weather (every 4 hours)
+name: Fetch Weather (every 12 hours)
 
 permissions:
   contents: write
 
 on:
   schedule:
-    # Runs at 10 minutes past every 4th hour (UTC)
-    - cron: '10 */4 * * *'
+    # Runs at 10 minutes past every 12th hour (UTC)
+    - cron: '10 */12 * * *'
   workflow_dispatch:
 
 jobs:
