@@ -1,5 +1,10 @@
 [
   {
+    "id": 44214522,
+    "title": "<Blink> and <Marquee> (2020)",
+    "url": "https://danq.me/2020/11/11/blink-and-marquee/"
+  },
+  {
     "id": 44212441,
     "title": "Joining Apple Computer (2018)",
     "url": "https://www.folklore.org/Joining_Apple_Computer.html"
@@ -15,9 +20,24 @@
     "url": "https://daringfireball.net/linked/2025/06/07/bill-atkinson-rip"
   },
   {
+    "id": 44215117,
+    "title": "YouTuber claims to have received an offer to buy the Commodore brand",
+    "url": "https://www.amiga-news.de/en/news/AN-2025-06-00029-EN.html"
+  },
+  {
+    "id": 44214926,
+    "title": "Reverse engineering Claude Code (April 2025)",
+    "url": "https://kirshatrov.com/posts/claude-code-internals"
+  },
+  {
     "id": 44211273,
     "title": "Self-Host and Tech Independence: The Joy of Building Your Own",
     "url": "https://www.ssp.sh/blog/self-host-self-independence/"
+  },
+  {
+    "id": 44214960,
+    "title": "Fray: A Controlled Concurrency Testing Framework for the JVM",
+    "url": "https://github.com/cmu-pasta/fray"
   },
   {
     "id": 44210736,
@@ -25,28 +45,8 @@
     "url": "https://corentin.trebaol.com/Blog/8.+The+Homelessness+Experiment"
   },
   {
-    "id": 44211612,
-    "title": "BorgBackup 2 has no server-side append-only anymore",
-    "url": "https://github.com/borgbackup/borg/pull/8798"
-  },
-  {
-    "id": 44213878,
-    "title": "Should I Use a Carousel? (2013)",
-    "url": "https://shouldiuseacarousel.com/"
-  },
-  {
-    "id": 44212845,
-    "title": "Coventry Very Light Rail",
-    "url": "https://www.coventry.gov.uk/coventry-light-rail"
-  },
-  {
-    "id": 44212650,
-    "title": "Why Understanding Software Cycle Time Is Messy, Not Magic",
-    "url": "https://arxiv.org/abs/2503.05040"
-  },
-  {
-    "id": 44211779,
-    "title": "Discovering a JDK Race Condition, and Debugging It in 30 Minutes with Fray",
-    "url": "https://aoli.al/blogs/jdk-bug/"
+    "id": 44214835,
+    "title": "Maintaining an Android app in Google Play Store is a lot of work",
+    "url": "https://ashishb.net/programming/maintaining-android-app/"
   }
 ]
