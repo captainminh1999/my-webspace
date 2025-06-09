@@ -12,10 +12,10 @@ interface Apod {
   hdurl?: string;
 }
 
-import raw from "@/data/space.json";
-import marsRaw from "@/data/marsPhoto.json";
-import epicRaw from "@/data/epic.json";
-import weatherRaw from "@/data/marsWeather.json";
+import raw from "@/data/space.json" assert { type: "json" };
+import marsRaw from "@/data/marsPhoto.json" assert { type: "json" };
+import epicRaw from "@/data/epic.json" assert { type: "json" };
+import weatherRaw from "@/data/marsWeather.json" assert { type: "json" };
 import type { MarsPhotoData, EpicData, MarsWeatherData } from "@/types/spaceExtra";
 
 const space = raw as Apod;
@@ -37,6 +37,7 @@ export const SpaceCard: React.FC = () => (
       sizes="(max-width: 768px) 100vw, 33vw"
       className="object-cover rounded"
       priority={false}
+      unoptimized
     />
   </div>
 );
@@ -58,6 +59,7 @@ export const SpaceModalBody: React.FC = () => {
           width={800}
           height={450}
           className="w-full rounded"
+          unoptimized
         />
         <p className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-line">
           {space.explanation}
@@ -84,7 +86,7 @@ export const SpaceModalBody: React.FC = () => {
           <h4 className="font-semibold">Mars Rover Photo</h4>
           {mars.photos.map((p) => (
             <div key={p.id} className="space-y-1">
-              <Image src={p.img_src} alt={p.camera} width={800} height={450} className="w-full rounded" />
+              <Image src={p.img_src} alt={p.camera} width={800} height={450} className="w-full rounded" unoptimized />
               <p className="text-sm text-gray-700 dark:text-gray-300">
                 {p.rover} – {p.camera}
               </p>
@@ -96,7 +98,7 @@ export const SpaceModalBody: React.FC = () => {
       {/* EPIC Earth image */}
       <WidgetSection className="space-y-2">
         <h4 className="font-semibold">Earth from EPIC</h4>
-        <Image src={epicUrl} alt="EPIC Earth" width={512} height={512} className="w-full rounded" />
+        <Image src={epicUrl} alt="EPIC Earth" width={512} height={512} className="w-full rounded" unoptimized />
         <p className="text-sm text-gray-700 dark:text-gray-300">{epic.caption}</p>
         <p className="text-xs text-right italic text-gray-500">{epic.date.split(" ")[0]}</p>
       </WidgetSection>
