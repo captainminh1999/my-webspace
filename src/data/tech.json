@@ -1,8 +1,23 @@
 [
   {
+    "id": 44223448,
+    "title": "LLMs are cheap",
+    "url": "https://www.snellman.net/blog/archive/2025-06-02-llms-are-cheap/"
+  },
+  {
+    "id": 44222119,
+    "title": "Finding Shawn Mendes (2019)",
+    "url": "https://ericneyman.wordpress.com/2019/11/26/finding-shawn-mendes/"
+  },
+  {
     "id": 44219405,
     "title": "Why Android can't use CDC Ethernet (2023)",
     "url": "https://jordemort.dev/blog/why-android-cant-use-cdc-ethernet/"
+  },
+  {
+    "id": 44223283,
+    "title": "Ex-FCC Chair Ajit Pai is now a wireless lobbyist",
+    "url": "https://arstechnica.com/tech-policy/2025/06/ex-fcc-chair-ajit-pai-is-now-a-wireless-lobbyist-and-enemy-of-cable-companies/"
   },
   {
     "id": 44220179,
@@ -15,29 +30,9 @@
     "url": "https://computer.rip/2025-06-08-Omnimax.html"
   },
   {
-    "id": 44188839,
-    "title": "Tracking Copilot vs. Codex vs. Cursor vs. Devin PR Performance",
-    "url": "https://aavetis.github.io/ai-pr-watcher/"
-  },
-  {
-    "id": 44219519,
-    "title": "Building supercomputers for autocrats probably isn't good for democracy",
-    "url": "https://helentoner.substack.com/p/supercomputers-for-autocrats"
-  },
-  {
-    "id": 44187765,
-    "title": "Panjandrum: The 'giant firework' built to break Hitler's Atlantic Wall",
-    "url": "https://www.bbc.com/future/article/20250603-the-giant-firework-built-to-break-hitlers-atlantic-wall"
-  },
-  {
-    "id": 44220583,
-    "title": "Analyzing IPv4 Trades with Gnuplot",
-    "url": "https://ipv4a-5539ad.gitlab.io/"
-  },
-  {
-    "id": 44219857,
-    "title": "Zig Devlog: Self-Hosted x86 Back End Is Now Default in Debug Mode",
-    "url": "https://ziglang.org/devlog/2025/#2025-06-08"
+    "id": 44188373,
+    "title": "Endangered classic Mac plastic color returns as 3D-printer filament",
+    "url": "https://arstechnica.com/apple/2025/06/new-filament-lets-you-3d-print-parts-in-authentic-1980s-apple-computer-color/"
   },
   {
     "id": 44217876,
@@ -45,8 +40,13 @@
     "url": "https://www.owlposting.com/p/the-time-of-day-that-immunotherapy"
   },
   {
-    "id": 44219270,
-    "title": "The Wire That Transforms Much of Manhattan into One Big, Symbolic Home",
-    "url": "https://www.atlasobscura.com/articles/eruv-manhattan-invisible-wire-jewish-symbolic-religious-home"
+    "id": 44220860,
+    "title": "FSE meets the FBI",
+    "url": "https://blog.freespeechextremist.com/blog/fse-vs-fbi.html"
+  },
+  {
+    "id": 44187765,
+    "title": "Panjandrum: The ‘giant firework’ built to break Hitler's Atlantic Wall",
+    "url": "https://www.bbc.com/future/article/20250603-the-giant-firework-built-to-break-hitlers-atlantic-wall"
   }
 ]
