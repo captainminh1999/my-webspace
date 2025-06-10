@@ -1,5 +1,10 @@
 [
   {
+    "id": 44235628,
+    "title": "Show HN: High End Color Quantizer",
+    "url": "https://github.com/big-nacho/patolette"
+  },
+  {
     "id": 44226145,
     "title": "Tell HN: Help restore the tax deduction for software dev in the US (Section 174)",
     "url": null
@@ -15,38 +20,33 @@
     "url": "https://www.apple.com/newsroom/2025/06/apple-supercharges-its-tools-and-technologies-for-developers/"
   },
   {
+    "id": 44205620,
+    "title": "NASA Mars Orbiter Captures Volcano Peeking Above Morning Cloud Tops",
+    "url": "https://www.jpl.nasa.gov/news/nasa-mars-orbiter-captures-volcano-peeking-above-morning-cloud-tops/"
+  },
+  {
+    "id": 44205077,
+    "title": "'Proof' Review: Finding Truth in Numbers",
+    "url": "https://www.wsj.com/arts-culture/books/proof-review-finding-truth-in-numbers-b9779228"
+  },
+  {
+    "id": 44205319,
+    "title": "Animate a mesh across a sphere's surface",
+    "url": "https://garden.bradwoods.io/notes/javascript/three-js/animate-a-mesh-on-a-spheres-surface"
+  },
+  {
+    "id": 44235716,
+    "title": "Onlook (YC W25) Is Hiring a a Founding Engineer in SF",
+    "url": null
+  },
+  {
+    "id": 44232714,
+    "title": "Successful people set constraints rather than chasing goals",
+    "url": "https://www.joanwestenberg.com/smart-people-dont-chase-goals-they-create-limits/"
+  },
+  {
     "id": 44229841,
     "title": "Sly Stone has died",
     "url": "https://abcnews.go.com/US/sly-stone-pioneering-leader-funk-band-sly-family/story?id=122666345"
-  },
-  {
-    "id": 44231594,
-    "title": "Implementing DOES> in Forth, the entire reason I started this mess",
-    "url": "https://boston.conman.org/2025/06/09.1"
-  },
-  {
-    "id": 44230838,
-    "title": "Why agents are bad pair programmers",
-    "url": "https://justin.searls.co/posts/why-agents-are-bad-pair-programmers/"
-  },
-  {
-    "id": 44199408,
-    "title": "Show HN: An open-source rhythm dungeon crawler in 16 x 9 pixels",
-    "url": "https://github.com/jgalecki/qrawl-tiny-mass-disco"
-  },
-  {
-    "id": 44226879,
-    "title": "Show HN: Munal OS: a graphical experimental OS with WASM sandboxing",
-    "url": "https://github.com/Askannz/munal-os"
-  },
-  {
-    "id": 44226612,
-    "title": "Apple introduces a universal design across platforms",
-    "url": "https://www.apple.com/newsroom/2025/06/apple-introduces-a-delightful-and-elegant-new-software-design/"
-  },
-  {
-    "id": 44229694,
-    "title": "The Xerox Alto, Smalltalk, and Rewriting a Running GUI (2017)",
-    "url": "https://www.righto.com/2017/10/the-xerox-alto-smalltalk-and-rewriting.html"
   }
 ]
