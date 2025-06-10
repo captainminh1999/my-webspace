@@ -32,7 +32,7 @@ export const GamesCard: React.FC = () => {
             className="rounded-sm"
           />
           <div className="flex-1">
-            <p className="text-xs font-medium text-gray-800 dark:text-gray-200 line-clamp-2">
+            <p className="text-xs font-medium text-black dark:text-white line-clamp-2">
               {game.name}
             </p>
             <p className="text-[10px] text-gray-500 dark:text-gray-400">
@@ -66,7 +66,7 @@ export const GamesModalBody: React.FC = () => (
             className="rounded-md shrink-0"
           />
           <div className="flex-1">
-            <p className="text-base font-semibold text-indigo-600">
+            <p className="text-base font-semibold text-black dark:text-white">
               {game.name}
             </p>
             <p className="text-[11px] text-gray-500 dark:text-gray-400">
