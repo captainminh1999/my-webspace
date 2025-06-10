@@ -66,7 +66,7 @@ export const GamesModalBody: React.FC = () => (
             className="rounded-md shrink-0"
           />
           <div className="flex-1">
-            <p className="text-base font-semibold text-indigo-600">
+            <p className="text-base font-semibold text-black dark:text-white">
               {game.name}
             </p>
             <p className="text-[11px] text-gray-500 dark:text-gray-400">

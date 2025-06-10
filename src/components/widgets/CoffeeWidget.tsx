@@ -72,7 +72,7 @@ export const CoffeeModalBody: React.FC = () => (
             <div className="w-40 h-24 bg-gray-200 dark:bg-gray-700 rounded-md" />
           )}
           <div className="flex-1">
-            <p className="text-base font-semibold text-indigo-600">{item.title}</p>
+            <p className="text-base font-semibold text-black dark:text-white">{item.title}</p>
             <p className="text-[11px] text-gray-500 dark:text-gray-400 mt-1">
               {format(new Date(item.publishedAt), "MMM d, yyyy")}
             </p>

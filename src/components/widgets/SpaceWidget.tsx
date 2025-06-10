@@ -66,7 +66,7 @@ export const SpaceModalBody: React.FC = () => {
         </p>
         {space.hdurl && (
           <a
-            className="underline text-indigo-600"
+            className="underline text-black dark:text-white"
             href={space.hdurl}
             target="_blank"
             rel="noopener noreferrer"
