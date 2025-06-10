@@ -37,7 +37,7 @@ export const DroneNewsCard: React.FC = () => {
             <div className="w-16 h-9 bg-gray-200 dark:bg-gray-700 rounded-sm" />
           )}
           <div className="flex-1">
-            <p className="text-xs font-medium text-gray-800 dark:text-gray-200 line-clamp-2">
+            <p className="text-xs font-medium text-black dark:text-white line-clamp-2">
               {item.title}
             </p>
             <p className="text-[10px] text-gray-500 dark:text-gray-400">
