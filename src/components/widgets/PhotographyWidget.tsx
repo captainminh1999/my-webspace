@@ -28,7 +28,7 @@ export const PhotographyCard: React.FC = () => {
           href={photo.profile}
           target="_blank"
           rel="noopener noreferrer"
-          className="font-semibold hover:underline"
+          className="font-semibold hover:underline text-black dark:text-white"
         >
           {photo.photographer}
         </Link>{" "}
@@ -60,7 +60,7 @@ export const PhotographyModalBody: React.FC = () => {
             href={photo.profile}
             target="_blank"
             rel="noopener noreferrer"
-            className="font-medium hover:underline"
+            className="font-medium hover:underline text-black dark:text-white"
           >
             {photo.photographer}
           </Link>{" "}

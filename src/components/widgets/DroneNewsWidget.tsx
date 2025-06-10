@@ -72,7 +72,7 @@ export const DroneNewsModalBody: React.FC = () => (
             href={item.url}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-base font-semibold text-indigo-600 hover:underline"
+            className="text-base font-semibold text-black dark:text-white hover:underline"
           >
             {item.title}
           </Link>
