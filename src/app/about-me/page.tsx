@@ -85,7 +85,7 @@ export default function AboutMePage() { // Renamed component for clarity
         <div className="mb-8">
           <Link
             href="/"
-            className="inline-flex items-center text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-200 transition-colors duration-150 group"
+            className="inline-flex items-center text-black dark:text-white hover:underline transition-colors duration-150 group"
           >
             <ArrowLeft size={20} className="mr-2 transition-transform duration-150 group-hover:-translate-x-1" />
             Back to Daily Dash
@@ -98,13 +98,13 @@ export default function AboutMePage() { // Renamed component for clarity
           <div className="text-sm text-gray-600 dark:text-gray-400 space-y-1 px-4">
             {profileData.address && <p>{profileData.address}</p>}
             {(profileData.geoLocation || profileData.zipCode) && <p>{profileData.geoLocation}{profileData.geoLocation && profileData.zipCode && `, `}{profileData.zipCode}</p>}
-            {profileData.twitterHandles && <p>Twitter: <a href={`https://twitter.com/${profileData.twitterHandles.replace('@', '')}`} target="_blank" rel="noopener noreferrer" className="text-indigo-500 hover:underline">{profileData.twitterHandles}</a></p>}
+            {profileData.twitterHandles && <p>Twitter: <a href={`https://twitter.com/${profileData.twitterHandles.replace('@', '')}`} target="_blank" rel="noopener noreferrer" className="text-black dark:text-white hover:underline">{profileData.twitterHandles}</a></p>}
             {websiteEntries.length > 0 && (
               <div className="mt-4 flex flex-wrap justify-center items-center gap-3">
                 <span className="text-sm font-medium text-gray-700 dark:text-gray-300">My Links:</span>
                 {websiteEntries.map((site, index) => {
                   const IconComponent = site.icon || LinkIcon; 
-                  return (<a key={index} href={site.url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-3 py-1.5 bg-indigo-500 text-white text-xs font-semibold rounded-md shadow-sm hover:bg-indigo-600 transition duration-150 transform hover:scale-105" title={site.url}><IconComponent size={14} />{site.label}</a>);
+                  return (<a key={index} href={site.url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-3 py-1.5 bg-indigo-500 text-black dark:text-white text-xs font-semibold rounded-md shadow-sm hover:bg-indigo-600 transition duration-150 transform hover:scale-105" title={site.url}><IconComponent size={14} />{site.label}</a>);
                 })}
               </div>
             )}
@@ -176,7 +176,7 @@ export default function AboutMePage() { // Renamed component for clarity
                     <p className="text-md text-gray-700 dark:text-gray-300">{lic.authority}</p>
                     {(lic.startedOn || lic.finishedOn) && <p className="text-sm text-indigo-500 dark:text-indigo-400 mb-1">Issued: {lic.startedOn}{lic.finishedOn && lic.startedOn ? ` - ${lic.finishedOn}` : lic.finishedOn || ''}</p>}
                     {lic.licenseNumber && <p className="text-sm text-gray-600 dark:text-gray-300">Credential ID: {lic.licenseNumber}</p>}
-                    {lic.url && <a href={lic.url} target="_blank" rel="noopener noreferrer" className="mt-2 inline-flex items-center gap-1 px-4 py-2 bg-indigo-600 text-white text-xs font-semibold rounded-md shadow-sm hover:bg-indigo-700 transition duration-150"><ExternalLink size={14} /> Show Credential</a>}
+                    {lic.url && <a href={lic.url} target="_blank" rel="noopener noreferrer" className="mt-2 inline-flex items-center gap-1 px-4 py-2 bg-indigo-600 text-black dark:text-white text-xs font-semibold rounded-md shadow-sm hover:bg-indigo-700 transition duration-150"><ExternalLink size={14} /> Show Credential</a>}
                 </div>
             ))}
             {licensesData.length > MAX_ITEMS_MAIN_PAGE && (
@@ -193,7 +193,7 @@ export default function AboutMePage() { // Renamed component for clarity
                     <h3 className="text-xl font-semibold text-gray-800 dark:text-white">{proj.title}</h3>
                     {(proj.startedOn || proj.finishedOn) && <p className="text-sm text-indigo-500 dark:text-indigo-400 mb-1">{proj.startedOn}{proj.finishedOn && proj.startedOn ? ` - ${proj.finishedOn}` : proj.finishedOn || ''}</p>}
                     {proj.description && <ExpandableText text={formatTextWithLineBreaks(proj.description)} lineClamp={DESCRIPTION_LINE_CLAMP} className="text-sm text-gray-600 dark:text-gray-300 my-2"/>}
-                    {proj.url && <a href={proj.url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-indigo-500 hover:underline text-sm mt-2"><ExternalLink size={14} /> View Project</a>}
+                    {proj.url && <a href={proj.url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-black dark:text-white hover:underline text-sm mt-2"><ExternalLink size={14} /> View Project</a>}
                 </div>
             ))}
             {projectsData.length > MAX_ITEMS_MAIN_PAGE && (

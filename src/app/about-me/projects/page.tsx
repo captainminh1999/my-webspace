@@ -29,7 +29,7 @@ export default function AllProjectsPage() {
         
         {/* MODIFIED: Back to Home Link */}
         <div className="mb-8">
-          <Link href="/about-me" className="inline-flex items-center text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-200 transition-colors duration-150 group">
+          <Link href="/about-me" className="inline-flex items-center text-black dark:text-white hover:underline transition-colors duration-150 group">
             <ArrowLeft size={20} className="mr-2 transition-transform duration-150 group-hover:-translate-x-1" />
             Back to Main CV
           </Link>
@@ -60,7 +60,7 @@ export default function AllProjectsPage() {
                       href={proj.url} 
                       target="_blank" 
                       rel="noopener noreferrer" 
-                      className="mt-2 inline-flex items-center gap-1 text-indigo-500 hover:underline text-sm"
+                      className="mt-2 inline-flex items-center gap-1 text-black dark:text-white hover:underline text-sm"
                     >
                       <ExternalLink size={14} /> View Project
                     </a>

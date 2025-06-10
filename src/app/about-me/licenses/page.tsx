@@ -26,7 +26,7 @@ export default function AllLicensesPage() {
         
         {/* MODIFIED: Back to Home Link */}
         <div className="mb-8">
-          <Link href="/about-me" className="inline-flex items-center text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-200 transition-colors duration-150 group">
+          <Link href="/about-me" className="inline-flex items-center text-black dark:text-white hover:underline transition-colors duration-150 group">
             <ArrowLeft size={20} className="mr-2 transition-transform duration-150 group-hover:-translate-x-1" />
             Back to Main CV
           </Link>
@@ -54,7 +54,7 @@ export default function AllLicensesPage() {
                       href={lic.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="mt-2 inline-flex items-center gap-1 px-4 py-2 bg-indigo-600 text-white text-xs font-semibold rounded-md shadow-sm hover:bg-indigo-700 transition duration-150"
+                      className="mt-2 inline-flex items-center gap-1 px-4 py-2 bg-indigo-600 text-black dark:text-white text-xs font-semibold rounded-md shadow-sm hover:bg-indigo-700 transition duration-150"
                     >
                       <ExternalLink size={14} /> Show Credential
                     </a>
