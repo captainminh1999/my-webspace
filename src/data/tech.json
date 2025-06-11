@@ -1,18 +1,23 @@
 [
   {
+    "id": 44245577,
+    "title": "Show HN: S3mini – Tiny and fast S3-compatible client, no-deps, edge-ready",
+    "url": "https://github.com/good-lly/s3mini"
+  },
+  {
     "id": 44240302,
     "title": "Launch HN: Vassar Robotics (YC X25) – $219 robot arm that learns new skills",
     "url": null
   },
   {
-    "id": 44243050,
-    "title": "It's the end of observability as we know it (and I feel fine)",
-    "url": "https://www.honeycomb.io/blog/its-the-end-of-observability-as-we-know-it-and-i-feel-fine"
+    "id": 44212911,
+    "title": "Lessons from That 1834 Landscape Gardening Guidebook",
+    "url": "https://fi-le.net/pueckler/"
   },
   {
-    "id": 44241278,
-    "title": "Show HN: I made a 3D printed VTOL drone",
-    "url": "https://www.tsungxu.com/p/i-made-a-3d-printed-vtol-that-can"
+    "id": 44245053,
+    "title": "AlphaWrite: AI that improves at writing by evolving its own stories",
+    "url": "https://tobysimonds.com/research/2025/06/06/AlphaWrite.html"
   },
   {
     "id": 44236997,
@@ -20,33 +25,28 @@
     "url": "https://mistral.ai/news/magistral"
   },
   {
-    "id": 44239481,
-    "title": "Low-background Steel: content without AI contamination",
-    "url": "https://blog.jgc.org/2025/06/low-background-steel-content-without-ai.html"
+    "id": 44210649,
+    "title": "The “Frankfurt Kitchen”",
+    "url": "https://museumderdinge.org/programme/exhibitions/the-frankfurt-kitchen/"
   },
   {
-    "id": 44210921,
-    "title": "The librarian immediately attempts to sell you a vuvuzela",
-    "url": "https://kaveland.no/posts/2025-06-06-library"
+    "id": 44241278,
+    "title": "Show HN: I made a 3D printed VTOL drone",
+    "url": "https://www.tsungxu.com/p/i-made-a-3d-printed-vtol-that-can"
   },
   {
-    "id": 44240265,
-    "title": "Xeneva Operating System",
-    "url": "https://github.com/manaskamal/XenevaOS"
+    "id": 44215160,
+    "title": "The Hashtable Packing Problem (2020)",
+    "url": "https://backscattering.de/chess/hashtable-packing/"
   },
   {
-    "id": 44241202,
-    "title": "Show HN: A “Course” as an MCP Server",
-    "url": "https://mastra.ai/course"
+    "id": 44246518,
+    "title": "Firefox OS's story from a Mozilla insider not working on the project (2024)",
+    "url": "https://ludovic.hirlimann.net/2024/01/firefox-oss-story-from-mozila-insider.html"
   },
   {
-    "id": 44240286,
-    "title": "You Can Drive but Not Hide: Detection of Hidden Cellular GPS Vehicle Trackers",
-    "url": "https://www.researchgate.net/publication/391704077_You_Can_Drive_But_You_Cannot_Hide_Detection_of_Hidden_Cellular_GPS_Vehicle_Trackers"
-  },
-  {
-    "id": 44241832,
-    "title": "Modern Minimal Perfect Hashing: A Survey",
-    "url": "https://arxiv.org/abs/2506.06536"
+    "id": 44221655,
+    "title": "How I Program with Agents",
+    "url": "https://crawshaw.io/blog/programming-with-agents"
   }
 ]
