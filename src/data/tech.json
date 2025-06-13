@@ -1,52 +1,52 @@
 [
   {
+    "id": 44261777,
+    "title": "Frequent reauth doesn't make you more secure",
+    "url": "https://tailscale.com/blog/frequent-reath-security"
+  },
+  {
+    "id": 44264958,
+    "title": "jemalloc Postmortem",
+    "url": "https://jasone.github.io/2025/06/12/jemalloc-postmortem/"
+  },
+  {
+    "id": 44263780,
+    "title": "A Dark Adtech Empire Fed by Fake CAPTCHAs",
+    "url": "https://krebsonsecurity.com/2025/06/inside-a-dark-adtech-empire-fed-by-fake-captchas/"
+  },
+  {
+    "id": 44264376,
+    "title": "The Case for Software Craftsmanship in the Era of Vibes",
+    "url": "https://zed.dev/blog/software-craftsmanship-in-the-era-of-vibes"
+  },
+  {
     "id": 44256499,
     "title": "A receipt printer cured my procrastination",
     "url": "https://www.laurieherault.com/articles/a-thermal-receipt-printer-cured-my-procrastination"
   },
   {
-    "id": 44255728,
-    "title": "Maximizing Battery Storage Profits via High-Frequency Intraday Trading",
-    "url": "https://arxiv.org/abs/2504.06932"
+    "id": 44258670,
+    "title": "iPhone 11 emulation done in QEMU",
+    "url": "https://github.com/ChefKissInc/QEMUAppleSilicon"
   },
   {
-    "id": 44255602,
-    "title": "Air India flight to London crashes in Ahmedabad with more than 240 onboard",
-    "url": "https://www.theguardian.com/world/live/2025/jun/12/air-india-flight-ai171-plane-crash-ahmedabad-india-latest-updates"
+    "id": 44256765,
+    "title": "Show HN: Tritium – The Legal IDE in Rust",
+    "url": "https://tritium.legal/preview"
   },
   {
-    "id": 44251411,
-    "title": "Chatterbox TTS",
-    "url": "https://github.com/resemble-ai/chatterbox"
+    "id": 44263562,
+    "title": "The curse of Toumaï: an ancient skull and a bitter feud over humanity's origins",
+    "url": "https://www.theguardian.com/science/2025/may/27/the-curse-of-toumai-ancient-skull-disputed-femur-feud-humanity-origins"
   },
   {
-    "id": 44253212,
-    "title": "Microsoft Office migration from Source Depot to Git",
-    "url": "https://danielsada.tech/blog/carreer-part-7-how-office-moved-to-git-and-i-loved-devex/"
+    "id": 44257655,
+    "title": "Show HN: Tool-Assisted Speedrunning the Boring Parts of Animal Crossing (GCN)",
+    "url": "https://github.com/hunterirving/pico-crossing"
   },
   {
-    "id": 44222307,
-    "title": "Quantum Computation Lecture Notes by Peter Shor",
-    "url": "https://math.mit.edu/~shor/435-LN/"
-  },
-  {
-    "id": 44256701,
-    "title": "GauntletAI (YC S17): All expenses paid AI training and guaranteed $200k+ job",
-    "url": "https://www.gauntletai.com/"
-  },
-  {
-    "id": 44216370,
-    "title": "Dancing brainwaves: How sound reshapes your brain networks in real time",
-    "url": "https://www.sciencedaily.com/releases/2025/06/250602155001.htm"
-  },
-  {
-    "id": 44219822,
-    "title": "The Sixties Come Back to Life in \"Everything Is Now\"",
-    "url": "https://www.newyorker.com/culture/the-front-row/the-sixties-come-back-to-life-in-everything-is-now"
-  },
-  {
-    "id": 44231386,
-    "title": "The hunt for Marie Curie's radioactive fingerprints in Paris",
-    "url": "https://www.bbc.com/future/article/20250605-the-hunt-for-marie-curies-radioactive-fingerprints-in-paris"
+    "id": 44262537,
+    "title": "Worldwide power grid with glass insulated HVDC cables",
+    "url": "https://omattos.com/2025/06/12/glass-hvdc-cables.html"
   }
 ]
