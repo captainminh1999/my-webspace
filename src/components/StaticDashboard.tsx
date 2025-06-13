@@ -43,7 +43,10 @@ export default function StaticDashboard() {
         className="grid gap-4 mx-auto max-w-[1200px]"
         style={{ gridTemplateColumns: "repeat(3, minmax(0, 1fr))" }}
       >
-        {layout.map((item) => {
+        {layout
+          .slice()
+          .sort((a, b) => (a.y - b.y) || (a.x - b.x))
+          .map((item) => {
           const widget = widgets.find((w) => w.id === item.i)!;
           return (
             <div

@@ -65,14 +65,19 @@ export default function DashboardGrid() {
         className="mx-auto max-w-[1200px] grid gap-4"
         style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))` }}
       >
-        {layout.map((item) => {
+        {layout
+          .slice()
+          .sort((a, b) => (a.y - b.y) || (a.x - b.x))
+          .map((item) => {
           const widget = widgets.find((w) => w.id === item.i)!;
           return (
             <div
               key={item.i}
               style={{
                 gridColumn: `${item.x + 1} / span ${item.w}`,
-                gridRow: `${item.y + 1} / span ${item.h}`,
+                // let items flow naturally without binding them to specific rows
+                // this prevents tall widgets from stretching shorter ones in the same row
+                // while keeping their column span
               }}
               className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden border border-gray-200 dark:border-gray-700 flex flex-col transform transition-transform duration-[300ms] ease-in-out hover:scale-[1.02]"
             >
