@@ -9,9 +9,9 @@ import { format } from "date-fns";
 
 const data = raw as GameData;
 
-// ─── 1. Grid Cell: show top 3 games ─────────────────────
+// ─── 1. Grid Cell: show top 5 games ─────────────────────
 export const GamesCard: React.FC = () => {
-  const preview: GameItem[] = data.slice(0, 3);
+  const preview: GameItem[] = data.slice(0, 5);
 
   return (
     <div className="space-y-2 p-2">
