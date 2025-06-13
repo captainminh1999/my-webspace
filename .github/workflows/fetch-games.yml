@@ -18,13 +18,13 @@ jobs:
         with:
           persist-credentials: true
 
-      - name: Fetch RAWG new releases this week
+      - name: Fetch RAWG popular releases (last 30 days)
         env:
           RAWG_KEY: ${{ secrets.RAWG_KEY }}
         run: |
           mkdir -p data
-          start=$(date -d "$(( $(date +%u) - 1 )) days ago" +%F)
-          end=$(date -d "$((7-$(date +%u))) days" +%F)
+          start=$(date -d "30 days ago" +%F)
+          end=$(date +%F)
           curl -s \
             "https://api.rawg.io/api/games?key=$RAWG_KEY&dates=$start,$end&ordering=-rating&page_size=10" \
             > raw_games.json
