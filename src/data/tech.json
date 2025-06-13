@@ -1,23 +1,38 @@
 [
   {
+    "id": 44266828,
+    "title": "If the moon were only 1 pixel: A tediously accurate solar system model (2014)",
+    "url": "https://joshworth.com/dev/pixelspace/pixelspace_solarsystem.html"
+  },
+  {
+    "id": 44264958,
+    "title": "Jemalloc Postmortem",
+    "url": "https://jasone.github.io/2025/06/12/jemalloc-postmortem/"
+  },
+  {
+    "id": 44267091,
+    "title": "The European public DNS that makes your Internet safer",
+    "url": "https://www.dns0.eu"
+  },
+  {
     "id": 44261777,
     "title": "Frequent reauth doesn't make you more secure",
     "url": "https://tailscale.com/blog/frequent-reath-security"
   },
   {
-    "id": 44264958,
-    "title": "jemalloc Postmortem",
-    "url": "https://jasone.github.io/2025/06/12/jemalloc-postmortem/"
+    "id": 44267705,
+    "title": "The Missing Manual for Signals: State Management for Python Developers",
+    "url": "https://bui.app/the-missing-manual-for-signals-state-management-for-python-developers/"
   },
   {
-    "id": 44263780,
-    "title": "A Dark Adtech Empire Fed by Fake CAPTCHAs",
-    "url": "https://krebsonsecurity.com/2025/06/inside-a-dark-adtech-empire-fed-by-fake-captchas/"
+    "id": 44265233,
+    "title": "Rendering Crispy Text on the GPU",
+    "url": "https://osor.io/text"
   },
   {
-    "id": 44264376,
-    "title": "The Case for Software Craftsmanship in the Era of Vibes",
-    "url": "https://zed.dev/blog/software-craftsmanship-in-the-era-of-vibes"
+    "id": 44267746,
+    "title": "Kyber (YC W23) Is Hiring a Technical Account Manager",
+    "url": "https://www.ycombinator.com/companies/kyber/jobs/5kSq3Jd-technical-account-manager-tam"
   },
   {
     "id": 44256499,
@@ -25,28 +40,13 @@
     "url": "https://www.laurieherault.com/articles/a-thermal-receipt-printer-cured-my-procrastination"
   },
   {
-    "id": 44258670,
-    "title": "iPhone 11 emulation done in QEMU",
-    "url": "https://github.com/ChefKissInc/QEMUAppleSilicon"
+    "id": 44263780,
+    "title": "A Dark Adtech Empire Fed by Fake CAPTCHAs",
+    "url": "https://krebsonsecurity.com/2025/06/inside-a-dark-adtech-empire-fed-by-fake-captchas/"
   },
   {
-    "id": 44256765,
-    "title": "Show HN: Tritium – The Legal IDE in Rust",
-    "url": "https://tritium.legal/preview"
-  },
-  {
-    "id": 44263562,
-    "title": "The curse of Toumaï: an ancient skull and a bitter feud over humanity's origins",
-    "url": "https://www.theguardian.com/science/2025/may/27/the-curse-of-toumai-ancient-skull-disputed-femur-feud-humanity-origins"
-  },
-  {
-    "id": 44257655,
-    "title": "Show HN: Tool-Assisted Speedrunning the Boring Parts of Animal Crossing (GCN)",
-    "url": "https://github.com/hunterirving/pico-crossing"
-  },
-  {
-    "id": 44262537,
-    "title": "Worldwide power grid with glass insulated HVDC cables",
-    "url": "https://omattos.com/2025/06/12/glass-hvdc-cables.html"
+    "id": 44265869,
+    "title": "Slow and steady, this poem will win your heart",
+    "url": "https://www.nytimes.com/interactive/2025/06/12/books/kay-ryan-turtle-poem.html"
   }
 ]
