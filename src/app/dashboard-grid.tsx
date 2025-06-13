@@ -65,7 +65,10 @@ export default function DashboardGrid() {
         className="mx-auto max-w-[1200px] grid gap-4"
         style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))` }}
       >
-        {layout.map((item) => {
+        {layout
+          .slice()
+          .sort((a, b) => (a.y - b.y) || (a.x - b.x))
+          .map((item) => {
           const widget = widgets.find((w) => w.id === item.i)!;
           return (
             <div
