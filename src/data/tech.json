@@ -1,52 +1,52 @@
 [
   {
-    "id": 44272773,
-    "title": "The Emperor's New LLM",
-    "url": "https://dayafter.substack.com/p/the-emperors-new-llm"
+    "id": 44275575,
+    "title": "Model Once, Represent Everywhere: UDA (Unified Data Architecture) at Netflix",
+    "url": "https://netflixtechblog.com/uda-unified-data-architecture-6a6aee261d8d"
   },
   {
-    "id": 44272467,
-    "title": "Implementing Logic Programming",
-    "url": "https://btmc.substack.com/p/implementing-logic-programming"
+    "id": 44269822,
+    "title": "Peano arithmetic is enough, because Peano arithmetic  encodes computation",
+    "url": "https://math.stackexchange.com/a/5075056/6708"
   },
   {
-    "id": 44271284,
-    "title": "Self-Adapting Language Models",
-    "url": "https://arxiv.org/abs/2506.10943"
+    "id": 44274567,
+    "title": "Last fifty years of integer linear programming: Recent practical advances",
+    "url": "https://inria.hal.science/hal-04776866v1"
   },
   {
-    "id": 44266828,
-    "title": "If the moon were only 1 pixel: A tediously accurate solar system model (2014)",
-    "url": "https://joshworth.com/dev/pixelspace/pixelspace_solarsystem.html"
+    "id": 44216921,
+    "title": "The Many Sides of Erik Satie",
+    "url": "https://thereader.mitpress.mit.edu/the-many-sides-of-erik-satie/"
   },
   {
-    "id": 44268782,
-    "title": "OxCaml - a set of extensions to the OCaml programming language.",
-    "url": "https://oxcaml.org/"
+    "id": 44275843,
+    "title": "Solidroad (YC W25) Is Hiring",
+    "url": "https://solidroad.com/careers"
   },
   {
-    "id": 44243059,
-    "title": "Student discovers fungus predicted by Albert Hoffman",
-    "url": "https://wvutoday.wvu.edu/stories/2025/06/02/wvu-student-makes-long-awaited-discovery-of-mystery-fungus-sought-by-lsd-s-inventor"
+    "id": 44274001,
+    "title": "SIMD-friendly algorithms for substring searching",
+    "url": "http://0x80.pl/notesen/2016-11-28-simd-strfind.html"
   },
   {
-    "id": 44249338,
-    "title": "Whatever Happened to Sandboxfs?",
-    "url": "https://blogsystem5.substack.com/p/whatever-happened-to-sandboxfs"
+    "id": 44240909,
+    "title": "Slowing the flow of core-dump-related CVEs",
+    "url": "https://lwn.net/SubscriberLink/1024160/f18b880c8cd1eef1/"
   },
   {
-    "id": 44258633,
-    "title": "The International Standard for Identifying Postal Items",
-    "url": "https://www.akpain.net/blog/s10-upu/"
+    "id": 44272933,
+    "title": "Endometriosis is an interesting disease",
+    "url": "https://www.owlposting.com/p/endometriosis-is-an-incredibly-interesting"
   },
   {
-    "id": 44270709,
-    "title": "I convinced HP's board to buy Palm and watched them kill it",
-    "url": "https://philmckinney.substack.com/p/i-convinced-hps-board-to-buy-palm"
+    "id": 44273857,
+    "title": "Filedb: Disk-based key-value store inspired by Bitcask",
+    "url": "https://github.com/rajivharlalka/filedb"
   },
   {
-    "id": 44268197,
-    "title": "Meta invests $14.3B in Scale AI to kick-start superintelligence lab",
-    "url": "https://www.nytimes.com/2025/06/12/technology/meta-scale-ai.html"
+    "id": 44237654,
+    "title": "Me an' Algernon – grappling with (temporary) cognitive decline",
+    "url": "https://tidyfirst.substack.com/p/me-an-algernon"
   }
 ]
