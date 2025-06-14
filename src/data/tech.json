@@ -1,52 +1,52 @@
 [
   {
+    "id": 44272773,
+    "title": "The Emperor's New LLM",
+    "url": "https://dayafter.substack.com/p/the-emperors-new-llm"
+  },
+  {
+    "id": 44272467,
+    "title": "Implementing Logic Programming",
+    "url": "https://btmc.substack.com/p/implementing-logic-programming"
+  },
+  {
+    "id": 44271284,
+    "title": "Self-Adapting Language Models",
+    "url": "https://arxiv.org/abs/2506.10943"
+  },
+  {
     "id": 44266828,
     "title": "If the moon were only 1 pixel: A tediously accurate solar system model (2014)",
     "url": "https://joshworth.com/dev/pixelspace/pixelspace_solarsystem.html"
   },
   {
-    "id": 44264958,
-    "title": "Jemalloc Postmortem",
-    "url": "https://jasone.github.io/2025/06/12/jemalloc-postmortem/"
+    "id": 44268782,
+    "title": "OxCaml - a set of extensions to the OCaml programming language.",
+    "url": "https://oxcaml.org/"
   },
   {
-    "id": 44267091,
-    "title": "The European public DNS that makes your Internet safer",
-    "url": "https://www.dns0.eu"
+    "id": 44243059,
+    "title": "Student discovers fungus predicted by Albert Hoffman",
+    "url": "https://wvutoday.wvu.edu/stories/2025/06/02/wvu-student-makes-long-awaited-discovery-of-mystery-fungus-sought-by-lsd-s-inventor"
   },
   {
-    "id": 44261777,
-    "title": "Frequent reauth doesn't make you more secure",
-    "url": "https://tailscale.com/blog/frequent-reath-security"
+    "id": 44249338,
+    "title": "Whatever Happened to Sandboxfs?",
+    "url": "https://blogsystem5.substack.com/p/whatever-happened-to-sandboxfs"
   },
   {
-    "id": 44267705,
-    "title": "The Missing Manual for Signals: State Management for Python Developers",
-    "url": "https://bui.app/the-missing-manual-for-signals-state-management-for-python-developers/"
+    "id": 44258633,
+    "title": "The International Standard for Identifying Postal Items",
+    "url": "https://www.akpain.net/blog/s10-upu/"
   },
   {
-    "id": 44265233,
-    "title": "Rendering Crispy Text on the GPU",
-    "url": "https://osor.io/text"
+    "id": 44270709,
+    "title": "I convinced HP's board to buy Palm and watched them kill it",
+    "url": "https://philmckinney.substack.com/p/i-convinced-hps-board-to-buy-palm"
   },
   {
-    "id": 44267746,
-    "title": "Kyber (YC W23) Is Hiring a Technical Account Manager",
-    "url": "https://www.ycombinator.com/companies/kyber/jobs/5kSq3Jd-technical-account-manager-tam"
-  },
-  {
-    "id": 44256499,
-    "title": "A receipt printer cured my procrastination",
-    "url": "https://www.laurieherault.com/articles/a-thermal-receipt-printer-cured-my-procrastination"
-  },
-  {
-    "id": 44263780,
-    "title": "A Dark Adtech Empire Fed by Fake CAPTCHAs",
-    "url": "https://krebsonsecurity.com/2025/06/inside-a-dark-adtech-empire-fed-by-fake-captchas/"
-  },
-  {
-    "id": 44265869,
-    "title": "Slow and steady, this poem will win your heart",
-    "url": "https://www.nytimes.com/interactive/2025/06/12/books/kay-ryan-turtle-poem.html"
+    "id": 44268197,
+    "title": "Meta invests $14.3B in Scale AI to kick-start superintelligence lab",
+    "url": "https://www.nytimes.com/2025/06/12/technology/meta-scale-ai.html"
   }
 ]
