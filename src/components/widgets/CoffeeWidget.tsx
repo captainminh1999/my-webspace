@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
 import type { CoffeeData, CoffeeArticle } from "@/types/coffee";
-import { useWidgetData } from "@/lib/useWidgetData";
+import { useWidgetData } from "@/lib/widgetData";
 import Link from "next/link";
 import Image from "next/image";
 import { format } from "date-fns";

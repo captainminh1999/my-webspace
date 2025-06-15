@@ -2,7 +2,7 @@
 // src/components/widgets/TechWidget.tsx
 import type { TechStory } from "@/types/tech";
 import WidgetSection from "@/components/WidgetSection";
-import { useWidgetData } from "@/lib/useWidgetData";
+import { useWidgetData } from "@/lib/widgetData";
 
 export function TechCard() {
   const { data, loading, error } = useWidgetData<TechStory[]>("tech");

@@ -4,7 +4,7 @@
 import React from "react";
 import type { YouTubeRecData, YouTubeRecItem } from "@/types/youtubeRecs";
 import WidgetSection from "@/components/WidgetSection";
-import { useWidgetData } from "@/lib/useWidgetData";
+import { useWidgetData } from "@/lib/widgetData";
 import Link from "next/link";
 import Image from "next/image";
 import { format } from "date-fns";
