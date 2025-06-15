@@ -69,7 +69,7 @@ jobs:
           echo "  ]" >> temp_videos.json
           echo "}" >> temp_videos.json
 
-          mv temp_videos.json src/data/youtubeRecs.json
+          mv temp_videos.json data/youtubeRecs.json
 
 
       - name: Update MongoDB with new data

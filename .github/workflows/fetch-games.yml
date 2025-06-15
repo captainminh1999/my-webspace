@@ -49,7 +49,7 @@ jobs:
             released: g.released
           }));
 
-          fs.writeFileSync('src/data/games.json', JSON.stringify(out, null, 2));
+          fs.writeFileSync('data/games.json', JSON.stringify(out, null, 2));
           NODE
 
 

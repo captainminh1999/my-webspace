@@ -9,7 +9,8 @@
     "start": "next start",
     "lint": "next lint",
     "test": "bun test",
-    "migrate": "node --loader ts-node/esm --experimental-specifier-resolution=node scripts/migrate-json.ts"
+    "migrate": "node --loader ts-node/esm --experimental-specifier-resolution=node scripts/migrate-json.ts",
+    "push-to-mongo": "node --loader ts-node/esm scripts/push-to-mongo.ts"
   },
   "dependencies": {
     "@octokit/rest": "^22.0.0",
