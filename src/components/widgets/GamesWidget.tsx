@@ -11,8 +11,10 @@ import { format } from "date-fns";
 
 // ─── 1. Grid Cell: show top 5 games ─────────────────────
 export const GamesCard: React.FC = () => {
-  const data = useWidgetData<GameData>("games");
-  if (!data) return <div className="p-2 text-sm">Loading…</div>;
+  const { data, loading, error } = useWidgetData<GameData>("games");
+  if (loading) return <div className="p-2 text-sm">Loading…</div>;
+  if (error) return <div className="p-2 text-sm">Failed to load</div>;
+  if (!data) return null;
   const preview: GameItem[] = data.slice(0, 5);
 
   return (
@@ -49,8 +51,10 @@ export const GamesCard: React.FC = () => {
 
 // ─── 2. Modal Body: list all 5 games ──────────────────
 export const GamesModalBody: React.FC = () => {
-  const data = useWidgetData<GameData>("games");
-  if (!data) return <div className="p-4 text-sm">Loading…</div>;
+  const { data, loading, error } = useWidgetData<GameData>("games");
+  if (loading) return <div className="p-4 text-sm">Loading…</div>;
+  if (error) return <div className="p-4 text-sm">Failed to load</div>;
+  if (!data) return null;
   return (
   <article className="space-y-4 p-4">
     {data.map((game) => (

@@ -10,8 +10,10 @@ import { format } from "date-fns";
 
 /** ─────────────── Photo Card (grid cell) ────────────────── */
 export const PhotographyCard: React.FC = () => {
-  const photo = useWidgetData<PhotographyData>("camera");
-  if (!photo) return <div className="p-2 text-sm">Loading…</div>;
+  const { data: photo, loading, error } = useWidgetData<PhotographyData>("camera");
+  if (loading) return <div className="p-2 text-sm">Loading…</div>;
+  if (error) return <div className="p-2 text-sm">Failed to load</div>;
+  if (!photo) return null;
   // We show the thumbnail, plus a small credit line underneath
   return (
     <div className="h-full flex flex-col items-center justify-center p-2 space-y-2">
@@ -41,8 +43,10 @@ export const PhotographyCard: React.FC = () => {
 
 /** ──────────── Photography Modal Body ───────────────────── */
 export const PhotographyModalBody: React.FC = () => {
-  const photo = useWidgetData<PhotographyData>("camera");
-  if (!photo) return <div className="p-4 text-sm">Loading…</div>;
+  const { data: photo, loading, error } = useWidgetData<PhotographyData>("camera");
+  if (loading) return <div className="p-4 text-sm">Loading…</div>;
+  if (error) return <div className="p-4 text-sm">Failed to load</div>;
+  if (!photo) return null;
   return (
     <article className="px-4 py-6 space-y-4">
       <div className="w-full">

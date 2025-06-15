@@ -9,7 +9,9 @@ const widgetPending: Record<string, Promise<unknown>> = {};
  * Results are cached to avoid refetching the same widget repeatedly.
  */
 export async function fetchWidgetData<T = unknown>(id: string): Promise<T> {
-  if (widgetCache[id]) return widgetCache[id] as T;
+  const cached = widgetCache[id];
+  if (cached instanceof Error) throw cached;
+  if (cached !== undefined) return cached as T;
   if (!widgetPending[id]) {
     widgetPending[id] = fetch(`/.netlify/functions/get-widget?widget=${id}`)
       .then((res) => {
@@ -22,6 +24,7 @@ export async function fetchWidgetData<T = unknown>(id: string): Promise<T> {
         return data;
       })
       .catch((err) => {
+        widgetCache[id] = err as Error;
         delete widgetPending[id];
         throw err;
       });
@@ -29,20 +32,43 @@ export async function fetchWidgetData<T = unknown>(id: string): Promise<T> {
   return widgetPending[id] as Promise<T>;
 }
 
-export function useWidgetData<T = unknown>(id: string): T | null {
-  const [data, setData] = useState<T | null>(
-    (widgetCache[id] as T) ?? null,
-  );
+export interface WidgetState<T> {
+  data: T | null;
+  loading: boolean;
+  error: Error | null;
+}
+
+export function useWidgetData<T = unknown>(id: string): WidgetState<T> {
+  const cached = widgetCache[id];
+  const [state, setState] = useState<WidgetState<T>>(() => {
+    if (cached instanceof Error) {
+      return { data: null, loading: false, error: cached };
+    }
+    if (cached !== undefined) {
+      return { data: cached as T, loading: false, error: null };
+    }
+    return { data: null, loading: true, error: null };
+  });
 
   useEffect(() => {
+    let cancelled = false;
+    setState((prev) => ({ ...prev, loading: true, error: null }));
     fetchWidgetData<T>(id)
-      .then((d) => setData(d))
+      .then((d) => {
+        if (!cancelled) setState({ data: d, loading: false, error: null });
+      })
       .catch((err) => {
-        console.error("Failed to load widget data", err);
+        if (!cancelled) {
+          console.error("Failed to load widget data", err);
+          setState({ data: null, loading: false, error: err });
+        }
       });
+    return () => {
+      cancelled = true;
+    };
   }, [id]);
 
-  return data;
+  return state;
 }
 
 /**

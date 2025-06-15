@@ -10,8 +10,10 @@ import { format } from "date-fns";
 
 /** ─── DroneNewsCard (grid-cell preview) ─────────────────── */
 export const DroneNewsCard: React.FC = () => {
-  const data = useWidgetData<DroneNewsData>("drones");
-  if (!data) return <div className="p-2 text-sm">Loading…</div>;
+  const { data, loading, error } = useWidgetData<DroneNewsData>("drones");
+  if (loading) return <div className="p-2 text-sm">Loading…</div>;
+  if (error) return <div className="p-2 text-sm">Failed to load</div>;
+  if (!data) return null;
   // Show up to 3 items in the small widget
   const preview: DroneNewsItem[] = data.slice(0, 3);
 
@@ -53,8 +55,10 @@ export const DroneNewsCard: React.FC = () => {
 
 /** ─── DroneNewsModalBody (full list in modal) ───────────── */
 export const DroneNewsModalBody: React.FC = () => {
-  const data = useWidgetData<DroneNewsData>("drones");
-  if (!data) return <div className="p-4 text-sm">Loading…</div>;
+  const { data, loading, error } = useWidgetData<DroneNewsData>("drones");
+  if (loading) return <div className="p-4 text-sm">Loading…</div>;
+  if (error) return <div className="p-4 text-sm">Failed to load</div>;
+  if (!data) return null;
   return (
   <article className="space-y-4 p-4">
     {data.map((item) => (
