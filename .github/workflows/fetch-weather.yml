@@ -72,5 +72,5 @@ jobs:
           MONGODB_URI: ${{ secrets.MONGODB_URI }}
           MONGODB_DB: ${{ secrets.MONGODB_DB }}
         run: |
-          node --loader ts-node/esm scripts/push-to-mongo.ts \
+          node --loader ts-node/esm --experimental-specifier-resolution=node scripts/push-to-mongo.ts \
             --file weather.json --singleton weather
