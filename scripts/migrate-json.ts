@@ -8,6 +8,10 @@
  *
  * Ensure you have "ts-node" and "typescript" installed, and that
  * your package.json is set to "type": "module" for ESM support.
+ *
+ * This version handles arrays that contain primitive values (e.g. ["PugJS", "React"])
+ * by wrapping each primitive in an object: { value: "PugJS" }. MongoDB then assigns
+ * an _id as usual and avoids the "Cannot create property '_id' on string" error.
  */
 
 // Tell TS that our "singletons" docs use a string _id
@@ -29,6 +33,19 @@ const dataDirs = [
   path.join(process.cwd(), 'data'),
 ];
 
+/**
+ * Convert primitive array items (string | number | boolean) into objects so
+ * MongoDB can insert them (and generate _id fields). Example:
+ *   "PugJS"  → { value: "PugJS" }
+ */
+function normaliseArray(content: unknown[]): Record<string, unknown>[] {
+  return content.map((item) =>
+    typeof item === 'object' && item !== null && !Array.isArray(item)
+      ? (item as Record<string, unknown>)
+      : { value: item }
+  );
+}
+
 async function migrate() {
   let client: MongoClient | null = null;
   try {
@@ -40,7 +57,7 @@ async function migrate() {
     for (const dir of dataDirs) {
       let files: string[] = [];
       try {
-        files = (await fs.readdir(dir)).filter(f => f.endsWith('.json'));
+        files = (await fs.readdir(dir)).filter((f) => f.endsWith('.json'));
       } catch {
         continue; // Skip missing directories
       }
@@ -55,8 +72,9 @@ async function migrate() {
           // Array JSON: insert into a collection named after the file
           const coll = db.collection(name);
           await coll.deleteMany({}); // Clear old data
-          if (content.length) {
-            await coll.insertMany(content);
+          const docs = normaliseArray(content);
+          if (docs.length) {
+            await coll.insertMany(docs);
           }
           console.log(`→ Migrated array collection: ${name}`);
         } else {
