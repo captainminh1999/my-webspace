@@ -1,6 +1,8 @@
 // src/app/about-me/projects/page.tsx // MODIFIED: Path assumes it's moved here
 
 import React from 'react';
+
+export const dynamic = "force-dynamic";
 import Link from 'next/link';
 import { ArrowLeft, ExternalLink } from 'lucide-react'; 
 import type { Metadata } from 'next';

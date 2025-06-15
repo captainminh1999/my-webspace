@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react";
 
 function decodeHtmlEntities(str: string): string {
   const entities: Record<string, string> = {
@@ -42,6 +41,10 @@ function decodeStrings<T>(input: T): T {
 const widgetCache: Record<string, unknown> = {};
 const widgetPending: Record<string, Promise<unknown>> = {};
 
+export function getCachedWidget(id: string): unknown {
+  return widgetCache[id];
+}
+
 /**
  * Fetch data for a single widget using the Netlify `get-widget` function.
  * Results are cached to avoid refetching the same widget repeatedly.
@@ -51,7 +54,13 @@ export async function fetchWidgetData<T = unknown>(id: string): Promise<T> {
   if (cached instanceof Error) throw cached;
   if (cached !== undefined) return cached as T;
   if (!widgetPending[id]) {
-    widgetPending[id] = fetch(`/.netlify/functions/get-widget?widget=${id}`)
+    const baseUrl =
+      process.env.NEXT_PUBLIC_BASE_URL ||
+      (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : '') ||
+      process.env.URL ||
+      'http://localhost:8888';
+    const url = `${baseUrl}/.netlify/functions/get-widget?widget=${id}`;
+    widgetPending[id] = fetch(url)
       .then((res) => {
         if (!res.ok) throw new Error("Failed to fetch widget data");
         return res.json();
@@ -71,44 +80,6 @@ export async function fetchWidgetData<T = unknown>(id: string): Promise<T> {
   return widgetPending[id] as Promise<T>;
 }
 
-export interface WidgetState<T> {
-  data: T | null;
-  loading: boolean;
-  error: Error | null;
-}
-
-export function useWidgetData<T = unknown>(id: string): WidgetState<T> {
-  const cached = widgetCache[id];
-  const [state, setState] = useState<WidgetState<T>>(() => {
-    if (cached instanceof Error) {
-      return { data: null, loading: false, error: cached };
-    }
-    if (cached !== undefined) {
-      return { data: cached as T, loading: false, error: null };
-    }
-    return { data: null, loading: true, error: null };
-  });
-
-  useEffect(() => {
-    let cancelled = false;
-    setState((prev) => ({ ...prev, loading: true, error: null }));
-    fetchWidgetData<T>(id)
-      .then((d) => {
-        if (!cancelled) setState({ data: d, loading: false, error: null });
-      })
-      .catch((err) => {
-        if (!cancelled) {
-          console.error("Failed to load widget data", err);
-          setState({ data: null, loading: false, error: err });
-        }
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, [id]);
-
-  return state;
-}
 
 /**
  * Helper to prefetch all widget data at once. This populates the single-widget
@@ -116,9 +87,23 @@ export function useWidgetData<T = unknown>(id: string): WidgetState<T> {
  * server components that need all widget data.
  */
 export async function fetchAllWidgetsData(): Promise<Record<string, unknown>> {
-  const res = await fetch("/.netlify/functions/get-all-widgets");
+  const baseUrl =
+    process.env.NEXT_PUBLIC_BASE_URL ||
+    (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : '') ||
+    process.env.URL ||
+    'http://localhost:8888';
+  const url = `${baseUrl}/.netlify/functions/get-all-widgets`;
+  const res = await fetch(url);
   if (!res.ok) throw new Error("Failed to fetch widget data");
   const all = decodeStrings(await res.json()) as Record<string, unknown>;
   Object.assign(widgetCache, all);
   return all;
+}
+
+/**
+ * Hydrate the widget cache with data fetched on the server. This allows
+ * client components to access the data without additional network requests.
+ */
+export function hydrateWidgetCache(data: Record<string, unknown>) {
+  Object.assign(widgetCache, data);
 }
