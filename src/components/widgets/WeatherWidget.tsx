@@ -23,7 +23,18 @@ export const WeatherCard: React.FC = () => {
   if (loading) return <div className="p-2 text-sm">Loading…</div>;
   if (error) return <div className="p-2 text-sm">Failed to load</div>;
   if (!data) return null;
-  const iconUrl = `https://openweathermap.org/img/wn/${data.current.icon}.png`;
+  // Use the hourly reading closest to the current time
+  const firstHourEpoch = data.hourly[0]?.dt ? data.hourly[0].dt * 1000 : 0;
+  const hourIndex = Math.min(
+    Math.max(
+      Math.round((now.getTime() - firstHourEpoch) / 3_600_000),
+      0
+    ),
+    data.hourly.length - 1
+  );
+  const reading = data.hourly[hourIndex] ?? data.current;
+  const currentHourTemp = reading.temp;
+  const iconUrl = `https://openweathermap.org/img/wn/${reading.icon}.png`;
 
   const timeString = now.toLocaleTimeString('en-AU', {
     hour: '2-digit',
@@ -38,7 +49,7 @@ export const WeatherCard: React.FC = () => {
     <div className="flex items-center space-x-1">
       <Image src={iconUrl} alt="" width={50} height={50} unoptimized />
       <div className="flex flex-col leading-tight">
-        <span className="text-lg font-semibold">{Math.round(data.current.temp)}°C</span>
+        <span className="text-lg font-semibold">{Math.round(currentHourTemp)}°C</span>
         <span className="text-[10px] text-gray-500 dark:text-gray-400">
           {timeString}
         </span>

@@ -216,8 +216,13 @@ export default function UploadForm() {
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (!selectedFile || !isFileValid || !selectedSection) { 
+    if (!selectedFile || !isFileValid || !selectedSection) {
       setMessage({ type: 'error', text: 'Please select a valid CSV file for the chosen section.' });
+      return;
+    }
+
+    if (!secretKey) {
+      setMessage({ type: 'error', text: 'Please enter the secret key.' });
       return;
     }
 
@@ -284,8 +289,8 @@ export default function UploadForm() {
             </select>
           </div>
           <div>
-            <label htmlFor="secretKey" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Secret Key (if configured)</label>
-            <input id="secretKey" name="secretKey" type="password" value={secretKey} onChange={handleSecretKeyChange} disabled={isProcessing}
+            <label htmlFor="secretKey" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Secret Key</label>
+            <input id="secretKey" name="secretKey" type="password" value={secretKey} onChange={handleSecretKeyChange} required disabled={isProcessing}
               className="mt-1 appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white bg-white dark:bg-gray-700 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
               placeholder="Enter secret key" />
           </div>
