@@ -1,6 +1,8 @@
 // src/app/about-me/honors-awards/page.tsx // MODIFIED: Path assumes it's moved here
 
 import React from 'react';
+
+export const dynamic = "force-dynamic";
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react'; 
 import type { Metadata } from 'next';

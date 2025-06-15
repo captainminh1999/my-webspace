@@ -1,6 +1,8 @@
 // src/app/education/page.tsx
 
 import React from 'react';
+
+export const dynamic = "force-dynamic";
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react'; // For back button
 import type { Metadata } from 'next';
