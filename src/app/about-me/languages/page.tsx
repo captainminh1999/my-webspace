@@ -9,7 +9,7 @@ import type { Metadata } from 'next';
 import type { LanguageEntry } from '@/types'; 
 
 // Import the full languages data
-import languagesDataFromFile from '@/data/languages.json'; // Assuming data file is still at src/data/
+import { getCvSection } from '@/lib/getCvSection';
 
 // --- Metadata for this specific page ---
 export const metadata: Metadata = {
@@ -17,8 +17,8 @@ export const metadata: Metadata = {
   description: 'A list of languages and proficiency levels.',
 };
 
-export default function AllLanguagesPage() {
-  const languagesData = languagesDataFromFile as LanguageEntry[] || [];
+export default async function AllLanguagesPage() {
+  const languagesData: LanguageEntry[] = await getCvSection('languages');
 
   return (
     <main className="min-h-screen bg-gray-50 dark:bg-gray-950 py-10 px-4 sm:px-6 lg:px-8">

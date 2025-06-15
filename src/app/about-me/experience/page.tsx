@@ -9,10 +9,11 @@ import type { Metadata } from 'next';
 import type { CompanyExperience } from '@/types'; 
 
 // Import shared helper functions
-import { formatTextWithLineBreaks } from '@/utils/formatters'; 
+import { formatTextWithLineBreaks } from '@/utils/formatters';
+import { normalizeSkillsArray } from '@/utils/cvData';
 
 // Import the full experience data
-import experienceDataFromFile from '@/data/experience.json'; // Assuming data file is still at src/data/
+import { getCvSection } from '@/lib/getCvSection';
 
 // --- Metadata for this specific page ---
 export const metadata: Metadata = {
@@ -20,8 +21,8 @@ export const metadata: Metadata = {
   description: 'A detailed overview of all work experience.',
 };
 
-export default function AllExperiencePage() {
-  const experienceData = experienceDataFromFile as CompanyExperience[] || [];
+export default async function AllExperiencePage() {
+  const experienceData: CompanyExperience[] = await getCvSection('experience');
 
   return (
     <main className="min-h-screen bg-gray-50 dark:bg-gray-950 py-10 px-4 sm:px-6 lg:px-8">
@@ -78,7 +79,7 @@ export default function AllExperiencePage() {
                       <div className="mt-3">
                         <strong className="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase">Skills: </strong>
                         <span className="text-xs text-gray-500 dark:text-gray-300">
-                          {role.skills.join(' · ')}
+                          {normalizeSkillsArray(role.skills).join(' · ')}
                         </span>
                       </div>
                     )}

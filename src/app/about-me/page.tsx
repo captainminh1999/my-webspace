@@ -8,32 +8,24 @@ import { Link as LinkIcon, ExternalLink, ArrowLeft } from 'lucide-react';
 // Import shared types
 import type {
   ProfileData, AboutData, CompanyExperience, EducationEntry,
-  LicenseCertificationEntry, ProjectEntry, VolunteeringEntry, SkillsData,
+  LicenseCertificationEntry, ProjectEntry, VolunteeringEntry,
   RecommendationReceivedEntry, HonorAwardEntry, LanguageEntry, ParsedWebsite
-} from '@/types'; 
+} from '@/types';
 
 // Import shared helper functions
 import {
   getDisplayCause,
   parseWebsiteString,
   formatTextWithLineBreaks
-} from '@/utils/formatters'; 
+} from '@/utils/formatters';
+import { normalizeSkillsArray } from '@/utils/cvData';
 
 // Import the ExpandableText component
 import ExpandableText from '@/components/ExpandableText'; // Assuming path is correct
 
 // Import data from JSON files
-import profileDataFromFile from '@/data/profile.json';
-import aboutDataFromFile from '@/data/about.json';
-import experienceDataFromFile from '@/data/experience.json';
-import educationDataFromFile from '@/data/education.json';
-import licensesDataFromFile from '@/data/licenses.json';
-import projectsDataFromFile from '@/data/projects.json';
-import volunteeringDataFromFile from '@/data/volunteering.json';
-import skillsDataFromFile from '@/data/skills.json';
-import recommendationsReceivedDataFromFile from '@/data/recommendationsReceived.json';
-import honorsAwardsDataFromFile from '@/data/honorsAwards.json';
-import languagesDataFromFile from '@/data/languages.json';
+import { getFullCv } from '@/lib/getFullCv';
+import type { FullCvData } from '@/types';
 
 // Predefined styles for the skill cloud for variety
 const skillCloudStyles = [
@@ -47,18 +39,20 @@ const skillCloudStyles = [
 
 
 // --- Main Page Component (Now for /about-me route) ---
-export default function AboutMePage() { // Renamed component for clarity
-  const profileData = profileDataFromFile as ProfileData || {} as ProfileData;
-  const aboutData = aboutDataFromFile as AboutData || {} as AboutData;
-  const experienceData = experienceDataFromFile as CompanyExperience[] || [];
-  const educationData = educationDataFromFile as EducationEntry[] || [];
-  const licensesData = licensesDataFromFile as LicenseCertificationEntry[] || [];
-  const projectsData = projectsDataFromFile as ProjectEntry[] || [];
-  const volunteeringData = volunteeringDataFromFile as VolunteeringEntry[] || [];
-  const skillsData = skillsDataFromFile as SkillsData || [];
-  const recommendationsReceivedData = recommendationsReceivedDataFromFile as RecommendationReceivedEntry[] || [];
-  const honorsAwardsData = honorsAwardsDataFromFile as HonorAwardEntry[] || [];
-  const languagesData = languagesDataFromFile as LanguageEntry[] || [];
+export default async function AboutMePage() { // Renamed component for clarity
+  const fullCv: FullCvData = await getFullCv();
+
+  const profileData = fullCv.profile as ProfileData || ({} as ProfileData);
+  const aboutData = fullCv.about as AboutData || ({} as AboutData);
+  const experienceData = fullCv.experience as CompanyExperience[] || [];
+  const educationData = fullCv.education as EducationEntry[] || [];
+  const licensesData = fullCv.licenses as LicenseCertificationEntry[] || [];
+  const projectsData = fullCv.projects as ProjectEntry[] || [];
+  const volunteeringData = fullCv.volunteering as VolunteeringEntry[] || [];
+  const skillsData: string[] = normalizeSkillsArray(fullCv.skills);
+  const recommendationsReceivedData = fullCv.recommendationsReceived as RecommendationReceivedEntry[] || [];
+  const honorsAwardsData = fullCv.honorsAwards as HonorAwardEntry[] || [];
+  const languagesData = fullCv.languages as LanguageEntry[] || [];
 
   const getFullName = () => { 
     if (!profileData.firstName && !profileData.lastName) return "Your Name";
@@ -69,11 +63,11 @@ export default function AboutMePage() { // Renamed component for clarity
   };
   const fullName = getFullName();
 
-  const websiteEntries = React.useMemo(() => { 
-    if (!profileData.websites) return [];
-    const websitesArray = Array.isArray(profileData.websites) ? profileData.websites : [profileData.websites];
-    return websitesArray.map(siteStr => parseWebsiteString(siteStr)).filter(parsedSite => parsedSite !== null) as ParsedWebsite[];
-  }, [profileData.websites]);
+  const websiteEntries = profileData.websites
+    ? (Array.isArray(profileData.websites) ? profileData.websites : [profileData.websites])
+        .map(siteStr => parseWebsiteString(siteStr))
+        .filter((parsedSite): parsedSite is ParsedWebsite => parsedSite !== null)
+    : [];
 
   const MAX_ITEMS_MAIN_PAGE = 3;
   const DESCRIPTION_LINE_CLAMP = 2; 
@@ -138,7 +132,14 @@ export default function AboutMePage() { // Renamed component for clarity
                         ))}
                         </div>
                     )}
-                    {role.skills && role.skills.length > 0 && <div className="mt-3"><strong className="text-xs font-semibold text-gray-700 dark:text-white uppercase">Skills: </strong><span className="text-xs text-gray-600 dark:text-gray-300">{role.skills.join(' · ')}</span></div>}
+                    {role.skills && role.skills.length > 0 && (
+                      <div className="mt-3">
+                        <strong className="text-xs font-semibold text-gray-700 dark:text-white uppercase">Skills: </strong>
+                        <span className="text-xs text-gray-600 dark:text-gray-300">
+                          {normalizeSkillsArray(role.skills).join(' · ')}
+                        </span>
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>
