@@ -49,17 +49,33 @@ export function getCachedWidget(id: string): unknown {
  * Fetch data for a single widget using the Netlify `get-widget` function.
  * Results are cached to avoid refetching the same widget repeatedly.
  */
+async function computeBaseUrl(): Promise<string> {
+  if (typeof window !== "undefined") {
+    return "";
+  }
+  try {
+    const headersFn = (await import("next/headers")).headers;
+    const h = await headersFn();
+    const proto = h.get("x-forwarded-proto") ?? "http";
+    const host = h.get("x-forwarded-host") ?? h.get("host");
+    if (host) return `${proto}://${host}`;
+  } catch {
+    // headers() may throw if there's no request context
+  }
+  return (
+    process.env.NEXT_PUBLIC_BASE_URL ||
+    (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "") ||
+    process.env.URL ||
+    "http://localhost:8888"
+  );
+}
+
 export async function fetchWidgetData<T = unknown>(id: string): Promise<T> {
   const cached = widgetCache[id];
   if (cached instanceof Error) throw cached;
   if (cached !== undefined) return cached as T;
   if (!widgetPending[id]) {
-    const baseUrl =
-      process.env.NEXT_PUBLIC_BASE_URL ||
-      (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : '') ||
-      process.env.URL ||
-      'http://localhost:8888';
-    const url = `${baseUrl}/.netlify/functions/get-widget?widget=${id}`;
+    const url = `${await computeBaseUrl()}/.netlify/functions/get-widget?widget=${id}`;
     widgetPending[id] = fetch(url)
       .then((res) => {
         if (!res.ok) throw new Error("Failed to fetch widget data");
@@ -87,12 +103,7 @@ export async function fetchWidgetData<T = unknown>(id: string): Promise<T> {
  * server components that need all widget data.
  */
 export async function fetchAllWidgetsData(): Promise<Record<string, unknown>> {
-  const baseUrl =
-    process.env.NEXT_PUBLIC_BASE_URL ||
-    (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : '') ||
-    process.env.URL ||
-    'http://localhost:8888';
-  const url = `${baseUrl}/.netlify/functions/get-all-widgets`;
+  const url = `${await computeBaseUrl()}/.netlify/functions/get-all-widgets`;
   const res = await fetch(url);
   if (!res.ok) throw new Error("Failed to fetch widget data");
   const all = decodeStrings(await res.json()) as Record<string, unknown>;
