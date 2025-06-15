@@ -14,7 +14,7 @@ interface Apod {
 }
 
 import type { MarsPhotoData, EpicData, MarsWeatherData } from "@/types/spaceExtra";
-import { useWidgetData } from "@/lib/widgetData";
+import { useWidgetData } from "@/lib/useWidgetData";
 
 interface SpaceWidgetData {
   space: Apod;

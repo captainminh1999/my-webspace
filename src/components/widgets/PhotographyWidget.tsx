@@ -2,7 +2,7 @@
 // src/components/widgets/PhotographyWidget.tsx
 import React from "react";
 import type { PhotographyData } from "@/types/photography";
-import { useWidgetData } from "@/lib/widgetData";
+import { useWidgetData } from "@/lib/useWidgetData";
 import Image from "next/image";
 import Link from "next/link";
 import { format } from "date-fns";
