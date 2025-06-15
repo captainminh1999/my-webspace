@@ -1,16 +1,17 @@
+"use client";
 // src/components/widgets/YouTubeRecsWidget.tsx
 
 import React from "react";
 import type { YouTubeRecData, YouTubeRecItem } from "@/types/youtubeRecs";
-import raw from "@/data/youtubeRecs.json" assert { type: "json" };
 import WidgetSection from "@/components/WidgetSection";
+import { useWidgetData } from "@/lib/widgetData";
 import Link from "next/link";
 import Image from "next/image";
 import { format } from "date-fns";
 
-const data = raw as YouTubeRecData;
-
 export const YouTubeRecsCard: React.FC = () => {
+  const data = useWidgetData<YouTubeRecData>("youtube");
+  if (!data) return <div className="p-2 text-sm">Loading…</div>;
   const preview: YouTubeRecItem[] = data.items.slice(0, 5);
 
   return (
@@ -45,7 +46,10 @@ export const YouTubeRecsCard: React.FC = () => {
   );
 };
 
-export const YouTubeRecsModalBody: React.FC = () => (
+export const YouTubeRecsModalBody: React.FC = () => {
+  const data = useWidgetData<YouTubeRecData>("youtube");
+  if (!data) return <div className="p-4 text-sm">Loading…</div>;
+  return (
   <article className="space-y-4 p-4">
     {data.items.map((item) => (
       <Link
@@ -76,6 +80,7 @@ export const YouTubeRecsModalBody: React.FC = () => (
       </Link>
     ))}
   </article>
-);
+  );
+};
 
 export default YouTubeRecsCard;

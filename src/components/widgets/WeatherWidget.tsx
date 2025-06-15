@@ -3,24 +3,25 @@
 import React, { useEffect, useState } from "react";
 import WidgetSection from "@/components/WidgetSection";
 import type { WeatherData } from "@/types/weather";
-import dataRaw from "@/data/weather.json" assert { type: "json" };
+import { useWidgetData } from "@/lib/widgetData";
 import { format } from "date-fns";
 import Image from "next/image";
 
-const data = dataRaw as WeatherData;
 
 /* -------------------------------------------------------------
  * Small dashboard cell – shows icon + current temp + updated time
  * ------------------------------------------------------------- */
 export const WeatherCard: React.FC = () => {
-  const iconUrl = `https://openweathermap.org/img/wn/${data.current.icon}.png`;
-
+  const data = useWidgetData<WeatherData>("weather");
   const [now, setNow] = useState<Date>(() => new Date());
 
   useEffect(() => {
     const id = setInterval(() => setNow(new Date()), 1000);
     return () => clearInterval(id);
   }, []);
+
+  if (!data) return <div className="p-2 text-sm">Loading…</div>;
+  const iconUrl = `https://openweathermap.org/img/wn/${data.current.icon}.png`;
 
   const timeString = now.toLocaleTimeString('en-AU', {
     hour: '2-digit',
@@ -50,7 +51,10 @@ export const WeatherCard: React.FC = () => {
 /* -------------------------------------------------------------
  * Modal body – next‑12‑hour strip + 7‑day table
  * ------------------------------------------------------------- */
-export const WeatherModalBody: React.FC = () => (
+export const WeatherModalBody: React.FC = () => {
+  const data = useWidgetData<WeatherData>("weather");
+  if (!data) return <div className="p-4 text-sm">Loading…</div>;
+  return (
   <article className="space-y-6 p-4">
     {/* 12‑hour forecast */}
     <WidgetSection className="grid grid-cols-4 gap-6 overflow-x-auto pb-4">
@@ -95,6 +99,7 @@ export const WeatherModalBody: React.FC = () => (
       </table>
     </WidgetSection>
   </article>
-);
+  );
+};
 
 export default WeatherCard;
