@@ -54,7 +54,13 @@ export async function fetchWidgetData<T = unknown>(id: string): Promise<T> {
   if (cached instanceof Error) throw cached;
   if (cached !== undefined) return cached as T;
   if (!widgetPending[id]) {
-    widgetPending[id] = fetch(`/.netlify/functions/get-widget?widget=${id}`)
+    const baseUrl =
+      process.env.NEXT_PUBLIC_BASE_URL ||
+      (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : '') ||
+      process.env.URL ||
+      'http://localhost:8888';
+    const url = `${baseUrl}/.netlify/functions/get-widget?widget=${id}`;
+    widgetPending[id] = fetch(url)
       .then((res) => {
         if (!res.ok) throw new Error("Failed to fetch widget data");
         return res.json();
@@ -81,7 +87,13 @@ export async function fetchWidgetData<T = unknown>(id: string): Promise<T> {
  * server components that need all widget data.
  */
 export async function fetchAllWidgetsData(): Promise<Record<string, unknown>> {
-  const res = await fetch("/.netlify/functions/get-all-widgets");
+  const baseUrl =
+    process.env.NEXT_PUBLIC_BASE_URL ||
+    (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : '') ||
+    process.env.URL ||
+    'http://localhost:8888';
+  const url = `${baseUrl}/.netlify/functions/get-all-widgets`;
+  const res = await fetch(url);
   if (!res.ok) throw new Error("Failed to fetch widget data");
   const all = decodeStrings(await res.json()) as Record<string, unknown>;
   Object.assign(widgetCache, all);
