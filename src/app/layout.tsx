@@ -1,11 +1,10 @@
 // src/app/layout.tsx
 import "./globals.css"; // Keep this for Tailwind and other global styles
 import type { Metadata, Viewport } from "next";
-import { Inter } from "next/font/google";
+// Use system fonts to avoid build-time downloads
 
 import profileDataFromFile from '@/data/profile.json';
 
-const inter = Inter({ subsets: ["latin"] });
 
 interface ProfileTitleData {
   firstName?: string | null;
@@ -40,7 +39,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${inter.className} bg-background text-foreground`}>
+      <body className="font-sans bg-background text-foreground">
         {children}
       </body>
     </html>
