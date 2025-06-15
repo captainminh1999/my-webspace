@@ -13,7 +13,12 @@ interface ProfileTitleData {
 
 
 export async function generateMetadata(): Promise<Metadata> {
-  const profileDataForTitle = (await getCvSection('profile')) as ProfileTitleData | null;
+  let profileDataForTitle: ProfileTitleData | null = null;
+  try {
+    profileDataForTitle = (await getCvSection('profile')) as ProfileTitleData | null;
+  } catch (err) {
+    console.error('Failed to fetch profile data for metadata', err);
+  }
   const firstName = profileDataForTitle?.firstName;
   const lastName = profileDataForTitle?.lastName;
   let siteTitle = "My Space - Interactive CV";

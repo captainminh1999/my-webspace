@@ -21,7 +21,12 @@ export const metadata: Metadata = {
 };
 
 export default async function AllRecommendationsReceivedPage() {
-  const recommendationsReceivedData: RecommendationReceivedEntry[] = await getCvSection('recommendationsReceived');
+  let recommendationsReceivedData: RecommendationReceivedEntry[] = [];
+  try {
+    recommendationsReceivedData = await getCvSection('recommendationsReceived');
+  } catch (err) {
+    console.error('Failed to fetch recommendations section', err);
+  }
 
   return (
     <main className="min-h-screen bg-gray-50 dark:bg-gray-950 py-10 px-4 sm:px-6 lg:px-8">

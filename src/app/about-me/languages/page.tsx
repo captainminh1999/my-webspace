@@ -18,7 +18,12 @@ export const metadata: Metadata = {
 };
 
 export default async function AllLanguagesPage() {
-  const languagesData: LanguageEntry[] = await getCvSection('languages');
+  let languagesData: LanguageEntry[] = [];
+  try {
+    languagesData = await getCvSection('languages');
+  } catch (err) {
+    console.error('Failed to fetch languages section', err);
+  }
 
   return (
     <main className="min-h-screen bg-gray-50 dark:bg-gray-950 py-10 px-4 sm:px-6 lg:px-8">

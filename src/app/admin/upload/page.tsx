@@ -20,7 +20,12 @@ interface ProfileTitleData {
 
 // Dynamically generate metadata for THIS PAGE
 export async function generateMetadata(): Promise<Metadata> {
-  const profileDataForTitle = (await getCvSection('profile')) as ProfileTitleData | null;
+  let profileDataForTitle: ProfileTitleData | null = null;
+  try {
+    profileDataForTitle = (await getCvSection('profile')) as ProfileTitleData | null;
+  } catch (err) {
+    console.error('Failed to fetch profile data for metadata', err);
+  }
   const firstName = profileDataForTitle?.firstName;
   const lastName = profileDataForTitle?.lastName;
 

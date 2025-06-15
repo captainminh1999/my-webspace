@@ -40,7 +40,25 @@ const skillCloudStyles = [
 
 // --- Main Page Component (Now for /about-me route) ---
 export default async function AboutMePage() { // Renamed component for clarity
-  const fullCv: FullCvData = await getFullCv();
+  let fullCv: FullCvData = {
+    profile: null,
+    about: null,
+    experience: [],
+    education: [],
+    licenses: [],
+    projects: [],
+    volunteering: [],
+    skills: null,
+    recommendationsGiven: [],
+    recommendationsReceived: [],
+    honorsAwards: [],
+    languages: [],
+  };
+  try {
+    fullCv = await getFullCv();
+  } catch (err) {
+    console.error('Failed to fetch full CV data', err);
+  }
 
   const profileData = fullCv.profile as ProfileData || ({} as ProfileData);
   const aboutData = fullCv.about as AboutData || ({} as AboutData);
