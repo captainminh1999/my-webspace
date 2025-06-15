@@ -94,7 +94,7 @@ export default async function AboutMePage() { // Renamed component for clarity
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-start bg-gray-100 dark:bg-gray-900 p-4 sm:p-8">
-      <div className="w-full max-w-4xl space-y-12">
+      <div className="w-full max-w-4xl space-y-6">
         {/* Back to Daily Dash Link */}
         <div className="mb-8">
           <Link

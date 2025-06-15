@@ -58,7 +58,7 @@ export const widgets: WidgetItem[] = [
   {
     id: "space",
     title: "Space News",
-    defaultSize: { w: 1, h: 2 },
+    defaultSize: { w: 1, h: 1 },
     modalContent: <SpaceModalBody />,
     content: <SpaceCard />,
   },
@@ -72,21 +72,21 @@ export const widgets: WidgetItem[] = [
   {
     id: "youtube",
     title: "YouTube Recs",
-    defaultSize: { w: 1, h: 2 },
+    defaultSize: { w: 1, h: 1 },
     content: <YouTubeRecsCard />,
     modalContent: <YouTubeRecsModalBody />,
   },
   {
     id: "drones",
     title: "Drones",
-    defaultSize: { w: 1, h: 1, minW: 1, minH: 1, maxW: 2, maxH: 2 },
+    defaultSize: { w: 1, h: 1 },
     content: <DroneNewsCard />,
     modalContent: <DroneNewsModalBody />,
   },
   {
     id: "camera",
     title: "Photography",
-    defaultSize: { w: 1, h: 1, minW: 1, minH: 1, maxW: 2, maxH: 2 },
+    defaultSize: { w: 1, h: 1 },
     content: <PhotographyCard />,
     modalContent: <PhotographyModalBody />,
   },
@@ -154,27 +154,27 @@ const make1Col = (): Layout[] => {
 export const layoutSm: Layout[] = [
   { i: "weather", x: 0, y: 0, w: 1, h: 1 },
   { i: "coffee", x: 1, y: 0, w: 1, h: 1 },
-  { i: "space", x: 0, y: 1, w: 1, h: 2 },
+  { i: "space", x: 0, y: 1, w: 1, h: 1 },
   { i: "tech", x: 1, y: 1, w: 1, h: 1 },
-  { i: "youtube", x: 0, y: 3, w: 1, h: 2 },
-  { i: "drones", x: 1, y: 3, w: 1, h: 1 },
-  { i: "games", x: 0, y: 5, w: 1, h: 1 },
-  { i: "camera", x: 1, y: 4, w: 1, h: 2 },
-  { i: "cvLink", x: 1, y: 6, w: 1, h: 1 },
+  { i: "youtube", x: 0, y: 2, w: 1, h: 1 },
+  { i: "drones", x: 1, y: 2, w: 1, h: 1 },
+  { i: "games", x: 0, y: 3, w: 1, h: 1 },
+  { i: "camera", x: 1, y: 3, w: 1, h: 1 },
+  { i: "cvLink", x: 1, y: 4, w: 1, h: 1 },
 ];
 
 export const layoutMd: Layout[] = [
   { i: "weather", x: 0, y: 0, w: 1, h: 1 },
   { i: "drones", x: 0, y: 1, w: 1, h: 1 },
-  { i: "space", x: 0, y: 2, w: 1, h: 2 },
+  { i: "space", x: 0, y: 2, w: 1, h: 1 },
 
   { i: "tech", x: 1, y: 0, w: 1, h: 1 },
   { i: "camera", x: 1, y: 1, w: 1, h: 1 },
   { i: "games", x: 1, y: 2, w: 1, h: 1 },
 
   { i: "coffee", x: 2, y: 0, w: 1, h: 1 },
-  { i: "youtube", x: 2, y: 1, w: 1, h: 2 },
-  { i: "cvLink", x: 2, y: 3, w: 1, h: 1 },
+  { i: "youtube", x: 2, y: 1, w: 1, h: 1 },
+  { i: "cvLink", x: 2, y: 2, w: 1, h: 1 },
 ];
 
 export const ORIGINAL_LAYOUTS: Record<BreakpointKey, Layout[]> = {
