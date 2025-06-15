@@ -12,7 +12,7 @@ import type { CompanyExperience } from '@/types';
 import { formatTextWithLineBreaks } from '@/utils/formatters'; 
 
 // Import the full experience data
-import experienceDataFromFile from '@/data/experience.json'; // Assuming data file is still at src/data/
+import { getCvSection } from '@/lib/getCvSection';
 
 // --- Metadata for this specific page ---
 export const metadata: Metadata = {
@@ -20,8 +20,8 @@ export const metadata: Metadata = {
   description: 'A detailed overview of all work experience.',
 };
 
-export default function AllExperiencePage() {
-  const experienceData = experienceDataFromFile as CompanyExperience[] || [];
+export default async function AllExperiencePage() {
+  const experienceData: CompanyExperience[] = await getCvSection('experience');
 
   return (
     <main className="min-h-screen bg-gray-50 dark:bg-gray-950 py-10 px-4 sm:px-6 lg:px-8">

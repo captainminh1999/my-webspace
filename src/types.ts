@@ -104,3 +104,27 @@ export interface ParsedWebsite {
   icon?: ElementType; // Type for a React component (like an icon)
   siteName?: string; // Detected site name
 }
+
+export interface RecommendationGivenEntry {
+  recipientFirstName: string;
+  recipientLastName: string;
+  recipientJobTitle: string;
+  recipientCompany: string;
+  text: string;
+  creationDate: string;
+}
+
+export interface FullCvData {
+  profile: ProfileData | null;
+  about: AboutData | null;
+  experience: CompanyExperience[];
+  education: EducationEntry[];
+  licenses: LicenseCertificationEntry[];
+  projects: ProjectEntry[];
+  volunteering: VolunteeringEntry[];
+  skills: SkillsData;
+  recommendationsGiven: RecommendationGivenEntry[];
+  recommendationsReceived: RecommendationReceivedEntry[];
+  honorsAwards: HonorAwardEntry[];
+  languages: LanguageEntry[];
+}

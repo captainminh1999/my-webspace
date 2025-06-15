@@ -9,7 +9,7 @@ import type { Metadata } from 'next';
 import type { LicenseCertificationEntry } from '@/types'; 
 
 // Import the full licenses & certifications data
-import licensesDataFromFile from '@/data/licenses.json'; // Assuming data file is still at src/data/
+import { getCvSection } from '@/lib/getCvSection';
 
 // --- Metadata for this specific page ---
 export const metadata: Metadata = {
@@ -17,8 +17,8 @@ export const metadata: Metadata = {
   description: 'A detailed list of all licenses and certifications.',
 };
 
-export default function AllLicensesPage() {
-  const licensesData = licensesDataFromFile as LicenseCertificationEntry[] || [];
+export default async function AllLicensesPage() {
+  const licensesData: LicenseCertificationEntry[] = await getCvSection('licenses');
 
   return (
     <main className="min-h-screen bg-gray-50 dark:bg-gray-950 py-10 px-4 sm:px-6 lg:px-8">
