@@ -8,16 +8,17 @@ import { Link as LinkIcon, ExternalLink, ArrowLeft } from 'lucide-react';
 // Import shared types
 import type {
   ProfileData, AboutData, CompanyExperience, EducationEntry,
-  LicenseCertificationEntry, ProjectEntry, VolunteeringEntry, SkillsData,
+  LicenseCertificationEntry, ProjectEntry, VolunteeringEntry,
   RecommendationReceivedEntry, HonorAwardEntry, LanguageEntry, ParsedWebsite
-} from '@/types'; 
+} from '@/types';
 
 // Import shared helper functions
 import {
   getDisplayCause,
   parseWebsiteString,
   formatTextWithLineBreaks
-} from '@/utils/formatters'; 
+} from '@/utils/formatters';
+import { normalizeSkillsArray } from '@/utils/cvData';
 
 // Import the ExpandableText component
 import ExpandableText from '@/components/ExpandableText'; // Assuming path is correct
@@ -48,7 +49,7 @@ export default async function AboutMePage() { // Renamed component for clarity
   const licensesData = fullCv.licenses as LicenseCertificationEntry[] || [];
   const projectsData = fullCv.projects as ProjectEntry[] || [];
   const volunteeringData = fullCv.volunteering as VolunteeringEntry[] || [];
-  const skillsData = fullCv.skills as SkillsData || [];
+  const skillsData: string[] = normalizeSkillsArray(fullCv.skills);
   const recommendationsReceivedData = fullCv.recommendationsReceived as RecommendationReceivedEntry[] || [];
   const honorsAwardsData = fullCv.honorsAwards as HonorAwardEntry[] || [];
   const languagesData = fullCv.languages as LanguageEntry[] || [];
@@ -131,7 +132,14 @@ export default async function AboutMePage() { // Renamed component for clarity
                         ))}
                         </div>
                     )}
-                    {role.skills && role.skills.length > 0 && <div className="mt-3"><strong className="text-xs font-semibold text-gray-700 dark:text-white uppercase">Skills: </strong><span className="text-xs text-gray-600 dark:text-gray-300">{role.skills.join(' · ')}</span></div>}
+                    {role.skills && role.skills.length > 0 && (
+                      <div className="mt-3">
+                        <strong className="text-xs font-semibold text-gray-700 dark:text-white uppercase">Skills: </strong>
+                        <span className="text-xs text-gray-600 dark:text-gray-300">
+                          {normalizeSkillsArray(role.skills).join(' · ')}
+                        </span>
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>

@@ -9,7 +9,8 @@ import type { Metadata } from 'next';
 import type { CompanyExperience } from '@/types'; 
 
 // Import shared helper functions
-import { formatTextWithLineBreaks } from '@/utils/formatters'; 
+import { formatTextWithLineBreaks } from '@/utils/formatters';
+import { normalizeSkillsArray } from '@/utils/cvData';
 
 // Import the full experience data
 import { getCvSection } from '@/lib/getCvSection';
@@ -78,7 +79,7 @@ export default async function AllExperiencePage() {
                       <div className="mt-3">
                         <strong className="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase">Skills: </strong>
                         <span className="text-xs text-gray-500 dark:text-gray-300">
-                          {role.skills.join(' · ')}
+                          {normalizeSkillsArray(role.skills).join(' · ')}
                         </span>
                       </div>
                     )}
