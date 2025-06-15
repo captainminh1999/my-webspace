@@ -25,6 +25,16 @@ export const WeatherCard: React.FC = () => {
   if (!data) return null;
   const iconUrl = `https://openweathermap.org/img/wn/${data.current.icon}.png`;
 
+  // Find the hourly entry that best matches the current time
+  const firstHour = data.hourly[0]?.dt * 1000;
+  const diff = now.getTime() - firstHour;
+  const hoursSinceFirst = Math.floor(diff / 3600_000);
+  const hourIndex = Math.min(
+    Math.max(hoursSinceFirst, 0),
+    data.hourly.length - 1
+  );
+  const currentHourTemp = data.hourly[hourIndex]?.temp ?? data.current.temp;
+
   const timeString = now.toLocaleTimeString('en-AU', {
     hour: '2-digit',
     minute: '2-digit',
@@ -38,7 +48,7 @@ export const WeatherCard: React.FC = () => {
     <div className="flex items-center space-x-1">
       <Image src={iconUrl} alt="" width={50} height={50} unoptimized />
       <div className="flex flex-col leading-tight">
-        <span className="text-lg font-semibold">{Math.round(data.current.temp)}°C</span>
+        <span className="text-lg font-semibold">{Math.round(currentHourTemp)}°C</span>
         <span className="text-[10px] text-gray-500 dark:text-gray-400">
           {timeString}
         </span>
