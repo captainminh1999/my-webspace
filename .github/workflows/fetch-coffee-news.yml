@@ -25,7 +25,6 @@ jobs:
         env:
           KEY: ${{ secrets.NEWSAPI_KEY }}
         run: |
-          mkdir -p data
           curl -sG "https://newsapi.org/v2/everything" \
             --data-urlencode 'qInTitle=coffee OR robusta OR barista OR arabica OR liberica OR "latte," OR "flat white" OR espresso OR americano' \
             --data-urlencode 'pageSize=5' \
@@ -52,12 +51,13 @@ jobs:
             publishedAt: a.publishedAt,
           }));
 
-          fs.writeFileSync('data/coffee.json', JSON.stringify(trimmed, null, 2));
+          fs.writeFileSync('coffee.json', JSON.stringify(trimmed, null, 2));
           NODE
 
-
-      - name: Update MongoDB with new data
+      - name: Push to MongoDB (coffee)
         env:
           MONGODB_URI: ${{ secrets.MONGODB_URI }}
           MONGODB_DB: ${{ secrets.MONGODB_DB }}
-        run: npm run migrate
+        run: |
+          node --loader ts-node/esm --experimental-specifier-resolution=node scripts/push-to-mongo.ts \
+            --file coffee.json --collection coffee

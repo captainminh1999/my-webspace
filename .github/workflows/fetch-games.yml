@@ -23,7 +23,6 @@ jobs:
         env:
           RAWG_KEY: ${{ secrets.RAWG_KEY }}
         run: |
-          mkdir -p data
           start=$(date -d "30 days ago" +%F)
           end=$(date +%F)
           curl -s \
@@ -49,12 +48,14 @@ jobs:
             released: g.released
           }));
 
-          fs.writeFileSync('data/games.json', JSON.stringify(out, null, 2));
+          fs.writeFileSync('games.json', JSON.stringify(out, null, 2));
           NODE
 
 
-      - name: Update MongoDB with new data
+      - name: Push to MongoDB (games)
         env:
           MONGODB_URI: ${{ secrets.MONGODB_URI }}
           MONGODB_DB: ${{ secrets.MONGODB_DB }}
-        run: npm run migrate
+        run: |
+          node --loader ts-node/esm --experimental-specifier-resolution=node scripts/push-to-mongo.ts \
+            --file games.json --collection games
