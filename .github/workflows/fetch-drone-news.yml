@@ -20,6 +20,9 @@ jobs:
         with:
           persist-credentials: true
 
+      - name: Install dependencies
+        run: npm ci
+
       # 2) Fetch the latest “drone” articles via NewsAPI
       - name: Fetch Drone Articles
         env:
@@ -83,3 +86,9 @@ jobs:
           git diff --cached --quiet && exit 0
           git commit -m "chore: update Drone News"
           git push
+
+      - name: Update MongoDB with new data
+        env:
+          MONGODB_URI: ${{ secrets.MONGODB_URI }}
+          MONGODB_DB: ${{ secrets.MONGODB_DB }}
+        run: npm run migrate

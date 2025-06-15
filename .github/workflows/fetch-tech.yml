@@ -18,6 +18,9 @@ jobs:
         with:
           persist-credentials: true
 
+      - name: Install dependencies
+        run: npm ci
+
       - name: Fetch top Hacker News stories
         run: |
           TOP_IDS=$(curl -s https://hacker-news.firebaseio.com/v0/topstories.json | jq '.[0:10]')
@@ -35,3 +38,9 @@ jobs:
           git diff --cached --quiet && exit 0
           git commit -m "chore: update tech headlines"
           git push
+
+      - name: Update MongoDB with new data
+        env:
+          MONGODB_URI: ${{ secrets.MONGODB_URI }}
+          MONGODB_DB: ${{ secrets.MONGODB_DB }}
+        run: npm run migrate

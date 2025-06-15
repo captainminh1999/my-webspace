@@ -20,6 +20,9 @@ jobs:
         with:
           persist-credentials: true
 
+      - name: Install dependencies
+        run: npm ci
+
       # 2) Fetch a single random Unsplash photo (using a "topic" if desired)
       - name: Fetch daily photo from Unsplash
         env:
@@ -73,3 +76,9 @@ jobs:
           git diff --cached --quiet && exit 0
           git commit -m "chore: update Photography widget"
           git push
+
+      - name: Update MongoDB with new data
+        env:
+          MONGODB_URI: ${{ secrets.MONGODB_URI }}
+          MONGODB_DB: ${{ secrets.MONGODB_DB }}
+        run: npm run migrate
