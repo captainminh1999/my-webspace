@@ -28,30 +28,22 @@ You can start editing the page by modifying `app/page.tsx`. The page auto-update
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
-## Local Development with Netlify
+## Environment Variables
 
-Serverless functions live in the `netlify/functions` directory. When developing locally you need the Netlify CLI so these functions are served on port `8888`.
-
-Install the CLI if you have not already:
+Copy `.env.example` to `.env` and update each value for your environment.
 
 ```bash
-npm install -g netlify-cli
+cp .env.example .env
+# then edit .env and provide real values
 ```
 
-Then run the project with the required environment variables. The important variables are:
-
-- `NEXT_PUBLIC_BASE_URL` – base URL that the frontend uses to call the functions. In development this should be `http://localhost:8888`.
-- `MONGODB_URI` – connection string for your MongoDB database.
-- `MONGODB_DB` – name of the database (defaults to `cv`).
-- Other optional variables like `NETLIFY_API_PAT` and `UPLOAD_SECRET_KEY` are required if you plan to use those particular functions.
-
-Example development command:
+The example file declares the following keys:
 
 ```bash
-NEXT_PUBLIC_BASE_URL=http://localhost:8888 \
-MONGODB_URI=mongodb://localhost:27017 \
-MONGODB_DB=cv \
-netlify dev
+NEXT_PUBLIC_BASE_URL=http://localhost:8888
+MONGODB_URI=mongodb://...
+MONGODB_DB=cv
+UPLOAD_SECRET_KEY=your-secret
 ```
 
 ## Learn More
