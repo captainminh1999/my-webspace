@@ -77,13 +77,14 @@ async function run() {
       if (Array.isArray(data) && data.length) {
         await coll.insertMany(data);
       }
-      console.log(`→ Updated collection: ${opts.collection}`);
+      console.log(`→ Wrote collection: ${opts.collection}`);
     }
 
     if (opts.singleton) {
       const singletons = db.collection<{ _id: string }>('singletons');
-      await singletons.updateOne({ _id: opts.singleton }, { $set: data }, { upsert: true });
-      console.log(`→ Upserted singleton: ${opts.singleton}`);
+      await singletons.deleteOne({ _id: opts.singleton });
+      await singletons.insertOne({ _id: opts.singleton, ...(typeof data === 'object' ? data : { value: data }) });
+      console.log(`→ Wrote singleton: ${opts.singleton}`);
     }
   } finally {
     await client.close();
