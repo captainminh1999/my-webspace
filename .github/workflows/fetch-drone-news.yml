@@ -1,7 +1,7 @@
 name: Fetch Drone News (daily)
 
 permissions:
-  contents: write   # so we can commit src/data/droneNews.json
+  contents: read
 
 on:
   schedule:
@@ -14,11 +14,8 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1) Check out the repo with credentials so we can push
       - name: Checkout repo
         uses: actions/checkout@v4
-        with:
-          persist-credentials: true
 
       - name: Install dependencies
         run: npm ci
@@ -77,15 +74,6 @@ jobs:
           fs.writeFileSync('src/data/droneNews.json', JSON.stringify(trimmed, null, 2));
           NODE
 
-      # 4) Commit & push if src/data/droneNews.json changed
-      - name: Commit & push updated droneNews.json
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add src/data/droneNews.json
-          git diff --cached --quiet && exit 0
-          git commit -m "chore: update Drone News"
-          git push
 
       - name: Update MongoDB with new data
         env:

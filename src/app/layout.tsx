@@ -3,19 +3,19 @@ import "./globals.css"; // Keep this for Tailwind and other global styles
 import type { Metadata, Viewport } from "next";
 // Use system fonts to avoid build-time downloads
 
-import profileDataFromFile from '@/data/profile.json';
+import { getCvSection } from '@/lib/getCvSection';
 
 
 interface ProfileTitleData {
   firstName?: string | null;
   lastName?: string | null;
 }
-const profileDataForTitle = profileDataFromFile as ProfileTitleData;
+
 
 export async function generateMetadata(): Promise<Metadata> {
-  // ... (your existing generateMetadata function)
-  const firstName = profileDataForTitle.firstName;
-  const lastName = profileDataForTitle.lastName;
+  const profileDataForTitle = (await getCvSection('profile')) as ProfileTitleData | null;
+  const firstName = profileDataForTitle?.firstName;
+  const lastName = profileDataForTitle?.lastName;
   let siteTitle = "My Space - Interactive CV";
   if (firstName && lastName) {
     siteTitle = `${firstName} ${lastName} - My Space`;

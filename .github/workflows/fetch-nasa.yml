@@ -1,7 +1,7 @@
 name: Fetch NASA Data
 
 permissions:
-  contents: write
+  contents: read
 
 on:
   schedule:
@@ -12,10 +12,8 @@ jobs:
   update-nasa:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repo (with credentials)
+      - name: Checkout repo
         uses: actions/checkout@v4
-        with:
-          persist-credentials: true
 
       - name: Install dependencies
         run: npm ci
@@ -53,14 +51,6 @@ jobs:
           curl -s "https://api.nasa.gov/insight_weather/?api_key=$NASA_KEY&feedtype=json&ver=1.0" > weather_raw.json
           jq '{sol_keys: .sol_keys, latest: (.sol_keys[-1] as $s | .[$s] | {sol: $s, AT: .AT.av, HWS: .HWS.av, PRE: .PRE.av})}' weather_raw.json > src/data/marsWeather.json
 
-      - name: Commit & push updated NASA data
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add src/data/space.json src/data/marsPhoto.json src/data/epic.json src/data/marsWeather.json
-          git diff --cached --quiet && exit 0
-          git commit -m "chore: update NASA data"
-          git push
 
       - name: Update MongoDB with new data
         env:
