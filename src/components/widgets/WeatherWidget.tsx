@@ -23,28 +23,18 @@ export const WeatherCard: React.FC = () => {
   if (loading) return <div className="p-2 text-sm">Loading…</div>;
   if (error) return <div className="p-2 text-sm">Failed to load</div>;
   if (!data) return null;
-  // Find the hourly entry that best matches the current time
-  const firstHour = data.hourly[0]?.dt * 1000;
-  const diff = now.getTime() - firstHour;
-  const hoursSinceFirst = Math.floor(diff / 3600_000);
+  // Use the hourly reading closest to the current time
+  const firstHourEpoch = data.hourly[0]?.dt ? data.hourly[0].dt * 1000 : 0;
   const hourIndex = Math.min(
-    Math.max(hoursSinceFirst, 0),
+    Math.max(
+      Math.round((now.getTime() - firstHourEpoch) / 3_600_000),
+      0
+    ),
     data.hourly.length - 1
   );
-  const currentHourTemp = data.hourly[hourIndex]?.temp ?? data.current.temp;
-  const iconUrl = `https://openweathermap.org/img/wn/${
-    data.hourly[hourIndex]?.icon ?? data.current.icon
-  }.png`;
-
-  // Find the hourly entry that best matches the current time
-  const firstHour = data.hourly[0]?.dt * 1000;
-  const diff = now.getTime() - firstHour;
-  const hoursSinceFirst = Math.floor(diff / 3600_000);
-  const hourIndex = Math.min(
-    Math.max(hoursSinceFirst, 0),
-    data.hourly.length - 1
-  );
-  const currentHourTemp = data.hourly[hourIndex]?.temp ?? data.current.temp;
+  const reading = data.hourly[hourIndex] ?? data.current;
+  const currentHourTemp = reading.temp;
+  const iconUrl = `https://openweathermap.org/img/wn/${reading.icon}.png`;
 
   const timeString = now.toLocaleTimeString('en-AU', {
     hour: '2-digit',
