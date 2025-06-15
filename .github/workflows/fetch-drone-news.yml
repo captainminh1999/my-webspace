@@ -71,7 +71,7 @@ jobs:
               publishedAt: a.publishedAt || '',
             }));
 
-          fs.writeFileSync('src/data/droneNews.json', JSON.stringify(trimmed, null, 2));
+          fs.writeFileSync('data/droneNews.json', JSON.stringify(trimmed, null, 2));
           NODE
 
 
