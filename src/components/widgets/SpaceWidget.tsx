@@ -1,3 +1,4 @@
+"use client";
 // src/components/widgets/SpaceWidget.tsx
 import React from "react";
 import Image from "next/image";
@@ -12,23 +13,25 @@ interface Apod {
   hdurl?: string;
 }
 
-import raw from "@/data/space.json" assert { type: "json" };
-import marsRaw from "@/data/marsPhoto.json" assert { type: "json" };
-import epicRaw from "@/data/epic.json" assert { type: "json" };
-import weatherRaw from "@/data/marsWeather.json" assert { type: "json" };
 import type { MarsPhotoData, EpicData, MarsWeatherData } from "@/types/spaceExtra";
+import { useWidgetData } from "@/lib/widgetData";
 
-const space = raw as Apod;
-const mars = marsRaw as MarsPhotoData;
-const epic = epicRaw as EpicData;
-const marsWeather = weatherRaw as MarsWeatherData;
+interface SpaceWidgetData {
+  space: Apod;
+  mars: MarsPhotoData;
+  epic: EpicData;
+  marsWeather: MarsWeatherData;
+}
 
-/* Fallback to `url` if thumbnail is missing (image APODs). */
-const thumb = space.thumbnail_url ?? space.url;
 /**
  * Small preview for the dashboard grid – shows thumbnail with cover fit.
  */
-export const SpaceCard: React.FC = () => (
+export const SpaceCard: React.FC = () => {
+  const data = useWidgetData<SpaceWidgetData>("space");
+  if (!data) return <div className="p-2 text-sm">Loading…</div>;
+  const { space } = data;
+  const thumb = space.thumbnail_url ?? space.url;
+  return (
   <div className="h-full flex flex-col items-center justify-center p-2 space-y-2">
     <div className="relative w-full aspect-video">
       <Image
@@ -45,12 +48,16 @@ export const SpaceCard: React.FC = () => (
       {space.title}
     </p>
   </div>
-);
+  );
+};
 
 /**
  * Detailed content inside the modal.
  */
 export const SpaceModalBody: React.FC = () => {
+  const data = useWidgetData<SpaceWidgetData>("space");
+  if (!data) return <div className="p-4 text-sm">Loading…</div>;
+  const { space, mars, epic, marsWeather } = data;
   const epicUrl = epic.url;
 
   return (

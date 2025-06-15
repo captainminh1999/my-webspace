@@ -1,15 +1,15 @@
+"use client";
 import React from "react";
-import raw from "@/data/coffee.json" assert { type: "json" };
 import type { CoffeeData, CoffeeArticle } from "@/types/coffee";
+import { useWidgetData } from "@/lib/widgetData";
 import Link from "next/link";
 import Image from "next/image";
 import { format } from "date-fns";
 import WidgetSection from "@/components/WidgetSection";
 
-const data = raw as CoffeeData;
-
-/** Show just the first 2–3 headlines in the small widget */
 export const CoffeeCard: React.FC = () => {
+  const data = useWidgetData<CoffeeData>("coffee");
+  if (!data) return <div className="p-2 text-sm">Loading…</div>;
   const preview: CoffeeArticle[] = data.slice(0, 3);
 
   return (
@@ -48,7 +48,10 @@ export const CoffeeCard: React.FC = () => {
   );
 };
 
-export const CoffeeModalBody: React.FC = () => (
+export const CoffeeModalBody: React.FC = () => {
+  const data = useWidgetData<CoffeeData>("coffee");
+  if (!data) return <div className="p-4 text-sm">Loading…</div>;
+  return (
   <article className="space-y-4 p-4">
     {data.map((item) => (
       <Link
@@ -81,6 +84,7 @@ export const CoffeeModalBody: React.FC = () => (
       </Link>
     ))}
   </article>
-);
+  );
+};
 
 export default CoffeeCard;

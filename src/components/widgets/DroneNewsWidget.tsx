@@ -1,16 +1,17 @@
+"use client";
 // src/components/widgets/DroneNewsWidget.tsx
 import React from "react";
 import type { DroneNewsItem, DroneNewsData } from "@/types/drone";
-import raw from "@/data/droneNews.json" assert { type: "json" };
+import { useWidgetData } from "@/lib/widgetData";
 import Link from "next/link";
 import Image from "next/image";
 import { format } from "date-fns";
 
-// Parse our static JSON file
-const data = raw as DroneNewsData;
 
 /** ─── DroneNewsCard (grid-cell preview) ─────────────────── */
 export const DroneNewsCard: React.FC = () => {
+  const data = useWidgetData<DroneNewsData>("drones");
+  if (!data) return <div className="p-2 text-sm">Loading…</div>;
   // Show up to 3 items in the small widget
   const preview: DroneNewsItem[] = data.slice(0, 3);
 
@@ -51,7 +52,10 @@ export const DroneNewsCard: React.FC = () => {
 };
 
 /** ─── DroneNewsModalBody (full list in modal) ───────────── */
-export const DroneNewsModalBody: React.FC = () => (
+export const DroneNewsModalBody: React.FC = () => {
+  const data = useWidgetData<DroneNewsData>("drones");
+  if (!data) return <div className="p-4 text-sm">Loading…</div>;
+  return (
   <article className="space-y-4 p-4">
     {data.map((item) => (
       <div key={item.url} className="flex items-start space-x-4">
@@ -83,6 +87,7 @@ export const DroneNewsModalBody: React.FC = () => (
       </div>
     ))}
   </article>
-);
+  );
+};
 
 export default DroneNewsCard;

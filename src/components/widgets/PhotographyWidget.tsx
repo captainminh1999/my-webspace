@@ -1,16 +1,17 @@
+"use client";
 // src/components/widgets/PhotographyWidget.tsx
 import React from "react";
 import type { PhotographyData } from "@/types/photography";
-import raw from "@/data/photography.json" assert { type: "json" };
+import { useWidgetData } from "@/lib/widgetData";
 import Image from "next/image";
 import Link from "next/link";
 import { format } from "date-fns";
 
-// Cast imported JSON to our type
-const photo = raw as PhotographyData;
 
 /** ─────────────── Photo Card (grid cell) ────────────────── */
 export const PhotographyCard: React.FC = () => {
+  const photo = useWidgetData<PhotographyData>("camera");
+  if (!photo) return <div className="p-2 text-sm">Loading…</div>;
   // We show the thumbnail, plus a small credit line underneath
   return (
     <div className="h-full flex flex-col items-center justify-center p-2 space-y-2">
@@ -40,6 +41,8 @@ export const PhotographyCard: React.FC = () => {
 
 /** ──────────── Photography Modal Body ───────────────────── */
 export const PhotographyModalBody: React.FC = () => {
+  const photo = useWidgetData<PhotographyData>("camera");
+  if (!photo) return <div className="p-4 text-sm">Loading…</div>;
   return (
     <article className="px-4 py-6 space-y-4">
       <div className="w-full">
