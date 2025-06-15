@@ -122,3 +122,11 @@ export async function fetchAllWidgetsData(): Promise<Record<string, unknown>> {
   Object.assign(widgetCache, all);
   return all;
 }
+
+/**
+ * Hydrate the widget cache with data fetched on the server. This allows
+ * client components to access the data without additional network requests.
+ */
+export function hydrateWidgetCache(data: Record<string, unknown>) {
+  Object.assign(widgetCache, data);
+}
