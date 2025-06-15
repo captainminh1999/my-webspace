@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "test": "bun test"
+    "test": "bun test",
+    "migrate": "node --loader ts-node/esm --experimental-specifier-resolution=node scripts/migrate-json.ts"
   },
   "dependencies": {
     "@octokit/rest": "^22.0.0",
@@ -43,6 +44,8 @@
     "eslint-config-next": "15.3.3",
     "postcss": "^8.5.4",
     "tailwindcss": "^4.1.8",
+    "ts-node": "^10.9.2",
     "typescript": "^5"
-  }
+  },
+  "type": "module"
 }
