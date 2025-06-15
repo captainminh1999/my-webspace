@@ -1,52 +1,52 @@
 [
   {
-    "id": 44275575,
-    "title": "Model Once, Represent Everywhere: UDA (Unified Data Architecture) at Netflix",
-    "url": "https://netflixtechblog.com/uda-unified-data-architecture-6a6aee261d8d"
+    "id": 44279181,
+    "title": "Infinite Grid of Resistors",
+    "url": "https://www.mathpages.com/home/kmath668/kmath668.htm"
   },
   {
-    "id": 44269822,
-    "title": "Peano arithmetic is enough, because Peano arithmetic  encodes computation",
-    "url": "https://math.stackexchange.com/a/5075056/6708"
+    "id": 44276476,
+    "title": "I have reimplemented Stable Diffusion 3.5 from scratch in pure PyTorch",
+    "url": "https://github.com/yousef-rafat/miniDiffusion"
   },
   {
-    "id": 44274567,
-    "title": "Last fifty years of integer linear programming: Recent practical advances",
-    "url": "https://inria.hal.science/hal-04776866v1"
+    "id": 44279850,
+    "title": "Q-learning is not yet scalable",
+    "url": "https://seohong.me/blog/q-learning-is-not-yet-scalable/"
   },
   {
-    "id": 44216921,
-    "title": "The Many Sides of Erik Satie",
-    "url": "https://thereader.mitpress.mit.edu/the-many-sides-of-erik-satie/"
+    "id": 44277051,
+    "title": "Inside the Apollo \"8-Ball\" FDAI (Flight Director / Attitude Indicator)",
+    "url": "https://www.righto.com/2025/06/inside-apollo-fdai.html"
   },
   {
-    "id": 44275843,
-    "title": "Solidroad (YC W25) Is Hiring",
-    "url": "https://solidroad.com/careers"
+    "id": 44260659,
+    "title": "Have a damaged painting? Restore it in just hours with an AI-generated \"mask\"",
+    "url": "https://news.mit.edu/2025/restoring-damaged-paintings-using-ai-generated-mask-0611"
   },
   {
-    "id": 44274001,
-    "title": "SIMD-friendly algorithms for substring searching",
-    "url": "http://0x80.pl/notesen/2016-11-28-simd-strfind.html"
+    "id": 44244675,
+    "title": "Chicken Eyeglasses",
+    "url": "https://en.wikipedia.org/wiki/Chicken_eyeglasses"
   },
   {
-    "id": 44240909,
-    "title": "Slowing the flow of core-dump-related CVEs",
-    "url": "https://lwn.net/SubscriberLink/1024160/f18b880c8cd1eef1/"
+    "id": 44252717,
+    "title": "Solar Orbiter gets world-first views of the Sun's poles",
+    "url": "https://www.esa.int/Science_Exploration/Space_Science/Solar_Orbiter/Solar_Orbiter_gets_world-first_views_of_the_Sun_s_poles"
   },
   {
-    "id": 44272933,
-    "title": "Endometriosis is an interesting disease",
-    "url": "https://www.owlposting.com/p/endometriosis-is-an-incredibly-interesting"
+    "id": 44278746,
+    "title": "AMD's AI Future Is Rack Scale 'Helios'",
+    "url": "https://morethanmoore.substack.com/p/amds-ai-future-is-rack-scale-helios"
   },
   {
-    "id": 44273857,
-    "title": "Filedb: Disk-based key-value store inspired by Bitcask",
-    "url": "https://github.com/rajivharlalka/filedb"
+    "id": 44260964,
+    "title": "Wrong ways to use the databases, when the pendulum swung too far",
+    "url": "https://www.luu.io/posts/2025-database-pendulum"
   },
   {
-    "id": 44237654,
-    "title": "Me an' Algernon – grappling with (temporary) cognitive decline",
-    "url": "https://tidyfirst.substack.com/p/me-an-algernon"
+    "id": 44246340,
+    "title": "How to Bring Back Oddly Shaped App Icons in macOS 26 Tahoe",
+    "url": "https://simonbs.dev/posts/how-to-bring-back-oddly-shaped-app-icons-on-macos-26-tahoe/"
   }
 ]
