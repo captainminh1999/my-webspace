@@ -22,7 +22,10 @@ export function TechCard() {
           className="block"
         >
           <WidgetSection className="space-y-1 p-0 hover:bg-gray-100 dark:hover:bg-gray-700">
-            <p className="text-xs font-medium text-black dark:text-white line-clamp-2">
+            <p
+              className="text-xs font-medium text-black dark:text-white truncate"
+              title={s.title}
+            >
               {s.title}
             </p>
           </WidgetSection>
