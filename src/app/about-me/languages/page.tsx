@@ -18,7 +18,7 @@ export const metadata: Metadata = {
 };
 
 export default async function AllLanguagesPage() {
-  const languagesData = await getCvSection<LanguageEntry[]>('languages');
+  const languagesData: LanguageEntry[] = await getCvSection('languages');
 
   return (
     <main className="min-h-screen bg-gray-50 dark:bg-gray-950 py-10 px-4 sm:px-6 lg:px-8">

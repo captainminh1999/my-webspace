@@ -21,7 +21,7 @@ export const metadata: Metadata = {
 };
 
 export default async function AllProjectsPage() {
-  const projectsData = await getCvSection<ProjectEntry[]>('projects');
+  const projectsData: ProjectEntry[] = await getCvSection('projects');
 
   return (
     <main className="min-h-screen bg-gray-50 dark:bg-gray-950 py-10 px-4 sm:px-6 lg:px-8">

@@ -21,7 +21,7 @@ export const metadata: Metadata = {
 };
 
 export default async function AllVolunteeringPage() {
-  const volunteeringData = await getCvSection<VolunteeringEntry[]>('volunteering');
+  const volunteeringData: VolunteeringEntry[] = await getCvSection('volunteering');
 
   return (
     <main className="min-h-screen bg-gray-50 dark:bg-gray-950 py-10 px-4 sm:px-6 lg:px-8">
