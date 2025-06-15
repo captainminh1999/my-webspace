@@ -23,7 +23,18 @@ export const WeatherCard: React.FC = () => {
   if (loading) return <div className="p-2 text-sm">Loading…</div>;
   if (error) return <div className="p-2 text-sm">Failed to load</div>;
   if (!data) return null;
-  const iconUrl = `https://openweathermap.org/img/wn/${data.current.icon}.png`;
+  // Find the hourly entry that best matches the current time
+  const firstHour = data.hourly[0]?.dt * 1000;
+  const diff = now.getTime() - firstHour;
+  const hoursSinceFirst = Math.floor(diff / 3600_000);
+  const hourIndex = Math.min(
+    Math.max(hoursSinceFirst, 0),
+    data.hourly.length - 1
+  );
+  const currentHourTemp = data.hourly[hourIndex]?.temp ?? data.current.temp;
+  const iconUrl = `https://openweathermap.org/img/wn/${
+    data.hourly[hourIndex]?.icon ?? data.current.icon
+  }.png`;
 
   // Find the hourly entry that best matches the current time
   const firstHour = data.hourly[0]?.dt * 1000;
