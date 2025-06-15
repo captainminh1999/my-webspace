@@ -1,16 +1,6 @@
 import type { Handler, HandlerEvent } from "@netlify/functions";
 import { connectToDatabase } from "../../src/lib/mongodb";
-
-const ALLOWED_WIDGETS = [
-  "coffee",
-  "weather",
-  "space",
-  "tech",
-  "youtube",
-  "drones",
-  "camera",
-  "games",
-];
+import { ALLOWED_WIDGETS, fetchWidget } from "./widget-utils";
 
 const handler: Handler = async (event: HandlerEvent) => {
   if (event.httpMethod !== "GET") {
@@ -21,8 +11,8 @@ const handler: Handler = async (event: HandlerEvent) => {
     };
   }
 
-  const widget = event.queryStringParameters?.widget;
-  if (!widget || !ALLOWED_WIDGETS.includes(widget)) {
+  const widget = event.queryStringParameters?.widget as string | undefined;
+  if (!widget || !(ALLOWED_WIDGETS as readonly string[]).includes(widget)) {
     return {
       statusCode: 400,
       body: JSON.stringify({ message: "Bad Request: Invalid or missing widget" }),
@@ -33,15 +23,14 @@ const handler: Handler = async (event: HandlerEvent) => {
   try {
     const client = await connectToDatabase();
     const db = client.db(process.env.MONGODB_DB || "cv");
-    const doc = await db.collection("widgets").findOne({ _id: widget });
-    if (!doc) {
+    const data = await fetchWidget(db, widget);
+    if (!data) {
       return {
         statusCode: 404,
         body: JSON.stringify({ message: "Not Found" }),
         headers: { "Content-Type": "application/json" },
       };
     }
-    const { _id, ...data } = doc as any;
     return {
       statusCode: 200,
       body: JSON.stringify(data),
