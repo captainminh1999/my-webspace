@@ -29,6 +29,15 @@ cp .env.example .env
 # then edit .env and provide real values
 ```
 
+The example file declares the following keys:
+
+```bash
+NEXT_PUBLIC_BASE_URL=http://localhost:8888
+MONGODB_URI=mongodb://...
+MONGODB_DB=cv
+UPLOAD_SECRET_KEY=your-secret
+```
+
 ## Learn More
 
 To learn more about Next.js, take a look at the following resources:
