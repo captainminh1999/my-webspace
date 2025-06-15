@@ -20,7 +20,20 @@ export interface ProfileData {
 }
 
 export interface AboutData {
+  /**
+   * Legacy single-string summary used by older versions of the app.
+   */
   content?: string | null;
+
+  /**
+   * New structured fields migrated from about.json
+   */
+  introduction?: string | null;
+  topPrioritiesAndAchievements?: {
+    context?: string | null;
+    description: string;
+  }[];
+  additionalNotes?: string | null;
 }
 
 export interface RoleItem {

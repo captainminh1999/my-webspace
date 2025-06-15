@@ -107,9 +107,29 @@ export default async function AboutMePage() { // Renamed component for clarity
         </header>
 
         {/* 2. About Section (Fully displayed, uses ExpandableText) */}
-        {aboutData?.content && (
+        {(aboutData?.content || aboutData?.introduction || aboutData?.topPrioritiesAndAchievements?.length || aboutData?.additionalNotes) && (
           <Section title="About">
-            <ExpandableText text={formatTextWithLineBreaks(aboutData.content)} lineClamp={5} className="text-gray-700 dark:text-gray-300 leading-relaxed" />
+            {aboutData?.content && (
+              <ExpandableText text={formatTextWithLineBreaks(aboutData.content)} lineClamp={5} className="text-gray-700 dark:text-gray-300 leading-relaxed mb-4" />
+            )}
+            {aboutData?.introduction && !aboutData.content && (
+              <p className="text-gray-700 dark:text-gray-300 whitespace-pre-line mb-4">
+                {formatTextWithLineBreaks(aboutData.introduction)}
+              </p>
+            )}
+            {aboutData?.topPrioritiesAndAchievements && aboutData.topPrioritiesAndAchievements.length > 0 && (
+              <ul className="list-disc list-inside space-y-1 mb-4 text-gray-700 dark:text-gray-300">
+                {aboutData.topPrioritiesAndAchievements.map((item, index) => (
+                  <li key={index}>
+                    {item.context ? <strong>{item.context}: </strong> : null}
+                    {formatTextWithLineBreaks(item.description)}
+                  </li>
+                ))}
+              </ul>
+            )}
+            {aboutData?.additionalNotes && (
+              <ExpandableText text={formatTextWithLineBreaks(aboutData.additionalNotes)} lineClamp={5} className="text-gray-700 dark:text-gray-300 leading-relaxed" />
+            )}
           </Section>
         )}
 
