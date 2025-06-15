@@ -1,5 +1,7 @@
 // src/app/about-me/page.tsx
 import React from 'react';
+
+export const dynamic = "force-dynamic";
 import Link from 'next/link';
 // Import icons from lucide-react that are used directly in this page's JSX
 import { Link as LinkIcon, ExternalLink, ArrowLeft } from 'lucide-react';

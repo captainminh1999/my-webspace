@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import WidgetSection from "@/components/WidgetSection";
 import type { WeatherData } from "@/types/weather";
-import { useWidgetData } from "@/lib/widgetData";
+import { useWidgetData } from "@/lib/useWidgetData";
 import { format } from "date-fns";
 import Image from "next/image";
 

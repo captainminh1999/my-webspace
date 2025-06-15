@@ -2,7 +2,7 @@
 // src/components/widgets/DroneNewsWidget.tsx
 import React from "react";
 import type { DroneNewsItem, DroneNewsData } from "@/types/drone";
-import { useWidgetData } from "@/lib/widgetData";
+import { useWidgetData } from "@/lib/useWidgetData";
 import Link from "next/link";
 import Image from "next/image";
 import { format } from "date-fns";
