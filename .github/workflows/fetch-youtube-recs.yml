@@ -23,7 +23,6 @@ jobs:
         env:
           KEY: ${{ secrets.YOUTUBE_KEY }}
         run: |
-          mkdir -p data
 
           CHANNEL_IDS=(
             "UCHnyfMqiRRG1u-2MsSQLbXA"
@@ -69,11 +68,13 @@ jobs:
           echo "  ]" >> temp_videos.json
           echo "}" >> temp_videos.json
 
-          mv temp_videos.json data/youtubeRecs.json
+          mv temp_videos.json youtubeRecs.json
 
 
-      - name: Update MongoDB with new data
+      - name: Push to MongoDB (youtubeRecs)
         env:
           MONGODB_URI: ${{ secrets.MONGODB_URI }}
           MONGODB_DB: ${{ secrets.MONGODB_DB }}
-        run: npm run migrate
+        run: |
+          node --loader ts-node/esm --experimental-specifier-resolution=node scripts/push-to-mongo.ts \
+            --file youtubeRecs.json --singleton youtubeRecs
