@@ -1,10 +1,10 @@
-#!/usr/bin/env ts-node-esm
+#!/usr/bin/env -S node --loader ts-node/esm --experimental-specifier-resolution=node
 
 /**
  * scripts/migrate-json.ts
  *
  * Run with:
- *   npx ts-node-esm scripts/migrate-json.ts
+ *   node --loader ts-node/esm --experimental-specifier-resolution=node scripts/migrate-json.ts
  *
  * Ensure you have "ts-node" and "typescript" installed, and that
  * your package.json is set to "type": "module" for ESM support.
