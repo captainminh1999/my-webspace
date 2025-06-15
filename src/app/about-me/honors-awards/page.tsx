@@ -21,7 +21,12 @@ export const metadata: Metadata = {
 };
 
 export default async function AllHonorsAwardsPage() {
-  const honorsAwardsData: HonorAwardEntry[] = await getCvSection('honorsAwards');
+  let honorsAwardsData: HonorAwardEntry[] = [];
+  try {
+    honorsAwardsData = await getCvSection('honorsAwards');
+  } catch (err) {
+    console.error('Failed to fetch honors & awards section', err);
+  }
 
   return (
     <main className="min-h-screen bg-gray-50 dark:bg-gray-950 py-10 px-4 sm:px-6 lg:px-8">

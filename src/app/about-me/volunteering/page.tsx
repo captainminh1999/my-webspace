@@ -21,7 +21,12 @@ export const metadata: Metadata = {
 };
 
 export default async function AllVolunteeringPage() {
-  const volunteeringData: VolunteeringEntry[] = await getCvSection('volunteering');
+  let volunteeringData: VolunteeringEntry[] = [];
+  try {
+    volunteeringData = await getCvSection('volunteering');
+  } catch (err) {
+    console.error('Failed to fetch volunteering section', err);
+  }
 
   return (
     <main className="min-h-screen bg-gray-50 dark:bg-gray-950 py-10 px-4 sm:px-6 lg:px-8">
