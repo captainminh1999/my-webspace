@@ -1,8 +1,16 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app) and enhanced with Netlify Functions for backend operations.
 
 ## Getting Started
 
-First, run the development server:
+First, run the Netlify development server:
+
+```bash
+npm run dev:netlify
+```
+
+This starts the Next.js app with Netlify Functions locally.
+
+If you prefer the plain Next.js server, you can still use:
 
 ```bash
 npm run dev
