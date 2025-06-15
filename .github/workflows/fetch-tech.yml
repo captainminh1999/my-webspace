@@ -26,7 +26,7 @@ jobs:
             curl -s "https://hacker-news.firebaseio.com/v0/item/${ID}.json" \
               | jq '{ id: .id, title: .title, url: .url }'
           done | jq -s '.')
-          echo "$STORIES" > src/data/tech.json
+          echo "$STORIES" > data/tech.json
 
 
       - name: Update MongoDB with new data

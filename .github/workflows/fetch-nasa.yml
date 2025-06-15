@@ -23,7 +23,7 @@ jobs:
           NASA_KEY: ${{ secrets.NASA_KEY }}
         run: |
           mkdir -p data
-          curl --silent "https://api.nasa.gov/planetary/apod?api_key=$NASA_KEY&thumbs=true" > src/data/space.json
+          curl --silent "https://api.nasa.gov/planetary/apod?api_key=$NASA_KEY&thumbs=true" > data/space.json
 
 
       - name: Fetch Mars Rover Photo
@@ -35,21 +35,21 @@ jobs:
           }
           YESTERDAY=$(get_yesterday)
           curl -s "https://api.nasa.gov/mars-photos/api/v1/rovers/curiosity/photos?earth_date=$YESTERDAY&api_key=$NASA_KEY" \
-            | jq '{photos: .photos[0:1] | map({id: .id, img_src: .img_src, camera: .camera.full_name, rover: .rover.name})}' > src/data/marsPhoto.json
+            | jq '{photos: .photos[0:1] | map({id: .id, img_src: .img_src, camera: .camera.full_name, rover: .rover.name})}' > data/marsPhoto.json
 
       - name: Fetch EPIC Earth image
         env:
           NASA_KEY: ${{ secrets.NASA_KEY }}
         run: |
           curl -s "https://api.nasa.gov/EPIC/api/natural?api_key=$NASA_KEY" \
-            | jq --arg key "$NASA_KEY" '.[0] | {date: .date, image: .image, caption: .caption, url: ("https://api.nasa.gov/EPIC/archive/natural/" + (.date | split(" ")[0] | gsub("-";"/")) + "/png/" + .image + ".png?api_key=" + $key) }' > src/data/epic.json
+            | jq --arg key "$NASA_KEY" '.[0] | {date: .date, image: .image, caption: .caption, url: ("https://api.nasa.gov/EPIC/archive/natural/" + (.date | split(" ")[0] | gsub("-";"/")) + "/png/" + .image + ".png?api_key=" + $key) }' > data/epic.json
 
       - name: Fetch Mars Weather
         env:
           NASA_KEY: ${{ secrets.NASA_KEY }}
         run: |
           curl -s "https://api.nasa.gov/insight_weather/?api_key=$NASA_KEY&feedtype=json&ver=1.0" > weather_raw.json
-          jq '{sol_keys: .sol_keys, latest: (.sol_keys[-1] as $s | .[$s] | {sol: $s, AT: .AT.av, HWS: .HWS.av, PRE: .PRE.av})}' weather_raw.json > src/data/marsWeather.json
+          jq '{sol_keys: .sol_keys, latest: (.sol_keys[-1] as $s | .[$s] | {sol: $s, AT: .AT.av, HWS: .HWS.av, PRE: .PRE.av})}' weather_raw.json > data/marsWeather.json
 
 
       - name: Update MongoDB with new data

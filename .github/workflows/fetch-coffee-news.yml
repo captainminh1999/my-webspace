@@ -25,7 +25,7 @@ jobs:
         env:
           KEY: ${{ secrets.NEWSAPI_KEY }}
         run: |
-          mkdir -p src/data
+          mkdir -p data
           curl -sG "https://newsapi.org/v2/everything" \
             --data-urlencode 'qInTitle=coffee OR robusta OR barista OR arabica OR liberica OR "latte," OR "flat white" OR espresso OR americano' \
             --data-urlencode 'pageSize=5' \
@@ -52,7 +52,7 @@ jobs:
             publishedAt: a.publishedAt,
           }));
 
-          fs.writeFileSync('src/data/coffee.json', JSON.stringify(trimmed, null, 2));
+          fs.writeFileSync('data/coffee.json', JSON.stringify(trimmed, null, 2));
           NODE
 
 
