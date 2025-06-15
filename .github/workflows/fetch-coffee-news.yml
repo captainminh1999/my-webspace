@@ -1,7 +1,7 @@
 name: Fetch Coffee News (daily)
 
 permissions:
-  contents: write   # so we can push data/coffee.json
+  contents: write   # so we can push src/data/coffee.json
 
 on:
   schedule:
@@ -25,7 +25,7 @@ jobs:
         env:
           KEY: ${{ secrets.NEWSAPI_KEY }}
         run: |
-          mkdir -p data
+          mkdir -p src/data
           curl -sG "https://newsapi.org/v2/everything" \
             --data-urlencode 'qInTitle=coffee OR robusta OR barista OR arabica OR liberica OR "latte," OR "flat white" OR espresso OR americano' \
             --data-urlencode 'pageSize=5' \
@@ -52,7 +52,7 @@ jobs:
             publishedAt: a.publishedAt,
           }));
 
-          fs.writeFileSync('data/coffee.json', JSON.stringify(trimmed, null, 2));
+          fs.writeFileSync('src/data/coffee.json', JSON.stringify(trimmed, null, 2));
           NODE
 
       # 4. Commit & push if data changed
@@ -60,7 +60,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add data/coffee.json
+          git add src/data/coffee.json
           git diff --cached --quiet && exit 0
           git commit -m "chore: update Coffee News"
           git push

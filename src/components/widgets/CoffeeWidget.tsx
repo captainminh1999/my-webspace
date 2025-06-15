@@ -1,5 +1,5 @@
 import React from "react";
-import raw from "../../../data/coffee.json" assert { type: "json" };
+import raw from "@/data/coffee.json" assert { type: "json" };
 import type { CoffeeData, CoffeeArticle } from "@/types/coffee";
 import Link from "next/link";
 import Image from "next/image";
