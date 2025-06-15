@@ -1,5 +1,43 @@
 import { useEffect, useState } from "react";
 
+function decodeHtmlEntities(str: string): string {
+  const entities: Record<string, string> = {
+    "&amp;": "&",
+    "&lt;": "<",
+    "&gt;": ">",
+    "&quot;": '"',
+    "&#39;": "'",
+  };
+  return str.replace(/&(#(?:x[0-9a-fA-F]+|\d+)|[a-zA-Z]+);/g, (match, code) => {
+    if (entities[match]) return entities[match];
+    if (code.startsWith("#x") || code.startsWith("#X")) {
+      const num = parseInt(code.slice(2), 16);
+      if (!isNaN(num)) return String.fromCharCode(num);
+    } else if (code.startsWith("#")) {
+      const num = parseInt(code.slice(1), 10);
+      if (!isNaN(num)) return String.fromCharCode(num);
+    }
+    return match;
+  });
+}
+
+function decodeStrings<T>(input: T): T {
+  if (typeof input === "string") {
+    return decodeHtmlEntities(input) as unknown as T;
+  }
+  if (Array.isArray(input)) {
+    return input.map((v) => decodeStrings(v)) as unknown as T;
+  }
+  if (input && typeof input === "object") {
+    const out: Record<string, unknown> = {};
+    for (const [k, v] of Object.entries(input)) {
+      out[k] = decodeStrings(v as unknown);
+    }
+    return out as T;
+  }
+  return input;
+}
+
 // Cache for data fetched via get-widget.ts
 const widgetCache: Record<string, unknown> = {};
 const widgetPending: Record<string, Promise<unknown>> = {};
@@ -19,9 +57,10 @@ export async function fetchWidgetData<T = unknown>(id: string): Promise<T> {
         return res.json();
       })
       .then((data) => {
-        widgetCache[id] = data;
+        const decoded = decodeStrings(data);
+        widgetCache[id] = decoded;
         delete widgetPending[id];
-        return data;
+        return decoded as T;
       })
       .catch((err) => {
         widgetCache[id] = err as Error;
@@ -79,7 +118,7 @@ export function useWidgetData<T = unknown>(id: string): WidgetState<T> {
 export async function fetchAllWidgetsData(): Promise<Record<string, unknown>> {
   const res = await fetch("/.netlify/functions/get-all-widgets");
   if (!res.ok) throw new Error("Failed to fetch widget data");
-  const all = (await res.json()) as Record<string, unknown>;
+  const all = decodeStrings(await res.json()) as Record<string, unknown>;
   Object.assign(widgetCache, all);
   return all;
 }
