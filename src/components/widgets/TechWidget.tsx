@@ -22,8 +22,11 @@ export function TechCard() {
           className="block"
         >
           <WidgetSection className="space-y-1 p-0 hover:bg-gray-100 dark:hover:bg-gray-700">
-            <p className="text-xs font-medium text-black dark:text-white">
-              {s.title.length > 40 ? s.title.slice(0, 37) + "…" : s.title}
+            <p
+              className="text-xs font-medium text-black dark:text-white truncate"
+              title={s.title}
+            >
+              {s.title}
             </p>
           </WidgetSection>
         </a>
