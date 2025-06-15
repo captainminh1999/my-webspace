@@ -1,16 +1,18 @@
+"use client";
 // src/components/widgets/GamesWidget.tsx
 import React from "react";
-import raw from "@/data/games.json" assert { type: "json" };
 import type { GameData, GameItem } from "@/types/games";
 import WidgetSection from "@/components/WidgetSection";
+import { useWidgetData } from "@/lib/widgetData";
 import Link from "next/link";
 import Image from "next/image";
 import { format } from "date-fns";
 
-const data = raw as GameData;
 
 // ─── 1. Grid Cell: show top 5 games ─────────────────────
 export const GamesCard: React.FC = () => {
+  const data = useWidgetData<GameData>("games");
+  if (!data) return <div className="p-2 text-sm">Loading…</div>;
   const preview: GameItem[] = data.slice(0, 5);
 
   return (
@@ -46,7 +48,10 @@ export const GamesCard: React.FC = () => {
 };
 
 // ─── 2. Modal Body: list all 5 games ──────────────────
-export const GamesModalBody: React.FC = () => (
+export const GamesModalBody: React.FC = () => {
+  const data = useWidgetData<GameData>("games");
+  if (!data) return <div className="p-4 text-sm">Loading…</div>;
+  return (
   <article className="space-y-4 p-4">
     {data.map((game) => (
       <Link
@@ -77,6 +82,7 @@ export const GamesModalBody: React.FC = () => (
       </Link>
     ))}
   </article>
-);
+  );
+};
 
 export default GamesCard;
