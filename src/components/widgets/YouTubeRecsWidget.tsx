@@ -10,8 +10,10 @@ import Image from "next/image";
 import { format } from "date-fns";
 
 export const YouTubeRecsCard: React.FC = () => {
-  const data = useWidgetData<YouTubeRecData>("youtube");
-  if (!data) return <div className="p-2 text-sm">Loading…</div>;
+  const { data, loading, error } = useWidgetData<YouTubeRecData>("youtube");
+  if (loading) return <div className="p-2 text-sm">Loading…</div>;
+  if (error) return <div className="p-2 text-sm">Failed to load</div>;
+  if (!data) return null;
   const preview: YouTubeRecItem[] = data.items.slice(0, 5);
 
   return (
@@ -47,8 +49,10 @@ export const YouTubeRecsCard: React.FC = () => {
 };
 
 export const YouTubeRecsModalBody: React.FC = () => {
-  const data = useWidgetData<YouTubeRecData>("youtube");
-  if (!data) return <div className="p-4 text-sm">Loading…</div>;
+  const { data, loading, error } = useWidgetData<YouTubeRecData>("youtube");
+  if (loading) return <div className="p-4 text-sm">Loading…</div>;
+  if (error) return <div className="p-4 text-sm">Failed to load</div>;
+  if (!data) return null;
   return (
   <article className="space-y-4 p-4">
     {data.items.map((item) => (

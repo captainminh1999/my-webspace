@@ -12,7 +12,7 @@ import Image from "next/image";
  * Small dashboard cell – shows icon + current temp + updated time
  * ------------------------------------------------------------- */
 export const WeatherCard: React.FC = () => {
-  const data = useWidgetData<WeatherData>("weather");
+  const { data, loading, error } = useWidgetData<WeatherData>("weather");
   const [now, setNow] = useState<Date>(() => new Date());
 
   useEffect(() => {
@@ -20,7 +20,9 @@ export const WeatherCard: React.FC = () => {
     return () => clearInterval(id);
   }, []);
 
-  if (!data) return <div className="p-2 text-sm">Loading…</div>;
+  if (loading) return <div className="p-2 text-sm">Loading…</div>;
+  if (error) return <div className="p-2 text-sm">Failed to load</div>;
+  if (!data) return null;
   const iconUrl = `https://openweathermap.org/img/wn/${data.current.icon}.png`;
 
   const timeString = now.toLocaleTimeString('en-AU', {
@@ -52,8 +54,10 @@ export const WeatherCard: React.FC = () => {
  * Modal body – next‑12‑hour strip + 7‑day table
  * ------------------------------------------------------------- */
 export const WeatherModalBody: React.FC = () => {
-  const data = useWidgetData<WeatherData>("weather");
-  if (!data) return <div className="p-4 text-sm">Loading…</div>;
+  const { data, loading, error } = useWidgetData<WeatherData>("weather");
+  if (loading) return <div className="p-4 text-sm">Loading…</div>;
+  if (error) return <div className="p-4 text-sm">Failed to load</div>;
+  if (!data) return null;
   return (
   <article className="space-y-6 p-4">
     {/* 12‑hour forecast */}

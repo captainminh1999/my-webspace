@@ -27,8 +27,10 @@ interface SpaceWidgetData {
  * Small preview for the dashboard grid – shows thumbnail with cover fit.
  */
 export const SpaceCard: React.FC = () => {
-  const data = useWidgetData<SpaceWidgetData>("space");
-  if (!data) return <div className="p-2 text-sm">Loading…</div>;
+  const { data, loading, error } = useWidgetData<SpaceWidgetData>("space");
+  if (loading) return <div className="p-2 text-sm">Loading…</div>;
+  if (error) return <div className="p-2 text-sm">Failed to load</div>;
+  if (!data) return null;
   const { space } = data;
   const thumb = space.thumbnail_url ?? space.url;
   return (
@@ -55,8 +57,10 @@ export const SpaceCard: React.FC = () => {
  * Detailed content inside the modal.
  */
 export const SpaceModalBody: React.FC = () => {
-  const data = useWidgetData<SpaceWidgetData>("space");
-  if (!data) return <div className="p-4 text-sm">Loading…</div>;
+  const { data, loading, error } = useWidgetData<SpaceWidgetData>("space");
+  if (loading) return <div className="p-4 text-sm">Loading…</div>;
+  if (error) return <div className="p-4 text-sm">Failed to load</div>;
+  if (!data) return null;
   const { space, mars, epic, marsWeather } = data;
   const epicUrl = epic.url;
 

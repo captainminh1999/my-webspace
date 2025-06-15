@@ -8,8 +8,10 @@ import { format } from "date-fns";
 import WidgetSection from "@/components/WidgetSection";
 
 export const CoffeeCard: React.FC = () => {
-  const data = useWidgetData<CoffeeData>("coffee");
-  if (!data) return <div className="p-2 text-sm">Loading…</div>;
+  const { data, loading, error } = useWidgetData<CoffeeData>("coffee");
+  if (loading) return <div className="p-2 text-sm">Loading…</div>;
+  if (error) return <div className="p-2 text-sm">Failed to load</div>;
+  if (!data) return null;
   const preview: CoffeeArticle[] = data.slice(0, 3);
 
   return (
@@ -49,8 +51,10 @@ export const CoffeeCard: React.FC = () => {
 };
 
 export const CoffeeModalBody: React.FC = () => {
-  const data = useWidgetData<CoffeeData>("coffee");
-  if (!data) return <div className="p-4 text-sm">Loading…</div>;
+  const { data, loading, error } = useWidgetData<CoffeeData>("coffee");
+  if (loading) return <div className="p-4 text-sm">Loading…</div>;
+  if (error) return <div className="p-4 text-sm">Failed to load</div>;
+  if (!data) return null;
   return (
   <article className="space-y-4 p-4">
     {data.map((item) => (

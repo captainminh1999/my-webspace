@@ -5,8 +5,10 @@ import WidgetSection from "@/components/WidgetSection";
 import { useWidgetData } from "@/lib/widgetData";
 
 export function TechCard() {
-  const data = useWidgetData<TechStory[]>("tech");
-  if (!data) return <div className="p-2 text-sm">Loading…</div>;
+  const { data, loading, error } = useWidgetData<TechStory[]>("tech");
+  if (loading) return <div className="p-2 text-sm">Loading…</div>;
+  if (error) return <div className="p-2 text-sm">Failed to load</div>;
+  if (!data) return null;
   const stories = data.slice(0, 5);
 
   return (
@@ -31,8 +33,10 @@ export function TechCard() {
 }
 
 export function TechModalBody() {
-  const all = useWidgetData<TechStory[]>("tech");
-  if (!all) return <div className="p-4 text-sm">Loading…</div>;
+  const { data: all, loading, error } = useWidgetData<TechStory[]>("tech");
+  if (loading) return <div className="p-4 text-sm">Loading…</div>;
+  if (error) return <div className="p-4 text-sm">Failed to load</div>;
+  if (!all) return null;
   return (
     <article className="p-4 space-y-2">
       {all.map((s) => (
