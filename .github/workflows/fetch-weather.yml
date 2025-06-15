@@ -1,12 +1,12 @@
-name: Fetch Weather (every 12 hours)
+name: Fetch Weather (hourly)
 
 permissions:
   contents: read
 
 on:
   schedule:
-    # Runs at 10 minutes past every 12th hour (UTC)
-    - cron: '10 */12 * * *'
+    # Runs at 10 minutes past every hour (UTC)
+    - cron: '10 * * * *'
   workflow_dispatch:
 
 jobs:
