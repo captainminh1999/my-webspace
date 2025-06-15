@@ -1,11 +1,14 @@
+"use client";
 // src/components/widgets/TechWidget.tsx
-import raw from "@/data/tech.json" assert { type: "json" };
 import type { TechStory } from "@/types/tech";
 import WidgetSection from "@/components/WidgetSection";
-
-const stories = (raw as TechStory[]).slice(0, 5);
+import { useWidgetData } from "@/lib/widgetData";
 
 export function TechCard() {
+  const data = useWidgetData<TechStory[]>("tech");
+  if (!data) return <div className="p-2 text-sm">Loading…</div>;
+  const stories = data.slice(0, 5);
+
   return (
     <article className="p-2 space-y-1 overflow-hidden">
       {stories.map((s) => (
@@ -28,7 +31,8 @@ export function TechCard() {
 }
 
 export function TechModalBody() {
-  const all = raw as TechStory[];
+  const all = useWidgetData<TechStory[]>("tech");
+  if (!all) return <div className="p-4 text-sm">Loading…</div>;
   return (
     <article className="p-4 space-y-2">
       {all.map((s) => (
