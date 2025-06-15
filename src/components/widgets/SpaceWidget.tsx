@@ -29,16 +29,21 @@ const thumb = space.thumbnail_url ?? space.url;
  * Small preview for the dashboard grid – shows thumbnail with cover fit.
  */
 export const SpaceCard: React.FC = () => (
-  <div className="relative w-full aspect-video">
-    <Image
-      src={thumb}
-      alt={space.title}
-      fill
-      sizes="(max-width: 768px) 100vw, 33vw"
-      className="object-cover rounded"
-      priority={false}
-      unoptimized
-    />
+  <div className="h-full flex flex-col items-center justify-center p-2 space-y-2">
+    <div className="relative w-full aspect-video">
+      <Image
+        src={thumb}
+        alt={space.title}
+        fill
+        sizes="(max-width: 768px) 100vw, 33vw"
+        className="object-cover rounded"
+        priority={false}
+        unoptimized
+      />
+    </div>
+    <p className="text-[10px] text-gray-600 dark:text-gray-400 text-center line-clamp-2">
+      {space.title}
+    </p>
   </div>
 );
 
