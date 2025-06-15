@@ -6,7 +6,7 @@ import type { Metadata } from 'next';
 import React from 'react';
 
 // Import your profile data to use for the title
-import profileDataFromFile from '@/data/profile.json';
+import { getCvSection } from '@/lib/getCvSection';
 
 // Import the client component that contains the form
 import UploadPortal from './UploadPortal.client';
@@ -17,13 +17,12 @@ interface ProfileTitleData {
   lastName?: string | null;
 }
 
-// Type assertion for the imported data
-const profileDataForTitle = profileDataFromFile as ProfileTitleData;
 
 // Dynamically generate metadata for THIS PAGE
 export async function generateMetadata(): Promise<Metadata> {
-  const firstName = profileDataForTitle.firstName;
-  const lastName = profileDataForTitle.lastName;
+  const profileDataForTitle = (await getCvSection('profile')) as ProfileTitleData | null;
+  const firstName = profileDataForTitle?.firstName;
+  const lastName = profileDataForTitle?.lastName;
 
   let pageTitle = "Upload Portal - Admin"; // Default/fallback title for this page
   if (firstName && lastName) {
