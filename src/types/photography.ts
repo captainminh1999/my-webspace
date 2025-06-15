@@ -1,6 +1,6 @@
 // src/types/photography.ts
 
-/** The trimmed shape we store in data/photography.json */
+/** The trimmed shape we store in src/data/photography.json */
 export interface PhotographyData {
   id: string;
   thumbnail: string;     // small version (~400px wide)

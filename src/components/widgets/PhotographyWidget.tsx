@@ -1,7 +1,7 @@
 // src/components/widgets/PhotographyWidget.tsx
 import React from "react";
 import type { PhotographyData } from "@/types/photography";
-import raw from "../../../data/photography.json" assert { type: "json" };
+import raw from "@/data/photography.json" assert { type: "json" };
 import Image from "next/image";
 import Link from "next/link";
 import { format } from "date-fns";
