@@ -6,12 +6,6 @@
     "released": "2025-06-05"
   },
   {
-    "id": 983381,
-    "name": "Doom: The Dark Ages",
-    "thumbnail": "https://media.rawg.io/media/games/018/01897340a06b9ed8e92ed1cc1b1eecb9.jpg",
-    "released": "2025-05-15"
-  },
-  {
     "id": 554786,
     "name": "Tainted Grail: The Fall of Avalon",
     "thumbnail": "https://media.rawg.io/media/games/c73/c73cd3a8bc46ccd7d62621bc19766f01.jpg",
@@ -22,6 +16,12 @@
     "name": "Elden Ring Nightreign",
     "thumbnail": "https://media.rawg.io/media/games/a14/a143ef815d323a3000840fc774d834c7.jpg",
     "released": "2025-05-30"
+  },
+  {
+    "id": 997553,
+    "name": "MindsEye",
+    "thumbnail": "https://media.rawg.io/media/games/579/5793be6f79c71ad0074d13fe439bc144.jpg",
+    "released": "2025-06-10"
   },
   {
     "id": 1000338,
