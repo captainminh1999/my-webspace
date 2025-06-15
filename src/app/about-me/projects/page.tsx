@@ -12,7 +12,7 @@ import type { ProjectEntry } from '@/types';
 import { formatTextWithLineBreaks } from '@/utils/formatters'; 
 
 // Import the full projects data
-import projectsDataFromFile from '@/data/projects.json'; // Assuming data file is still at src/data/
+import { getCvSection } from '@/lib/getCvSection';
 
 // --- Metadata for this specific page ---
 export const metadata: Metadata = {
@@ -20,8 +20,8 @@ export const metadata: Metadata = {
   description: 'A detailed list of all projects.',
 };
 
-export default function AllProjectsPage() {
-  const projectsData = projectsDataFromFile as ProjectEntry[] || [];
+export default async function AllProjectsPage() {
+  const projectsData = await getCvSection<ProjectEntry[]>('projects');
 
   return (
     <main className="min-h-screen bg-gray-50 dark:bg-gray-950 py-10 px-4 sm:px-6 lg:px-8">

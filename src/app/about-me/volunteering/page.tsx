@@ -12,7 +12,7 @@ import type { VolunteeringEntry } from '@/types';
 import { formatTextWithLineBreaks, getDisplayCause } from '@/utils/formatters'; 
 
 // Import the full volunteering data
-import volunteeringDataFromFile from '@/data/volunteering.json'; // Assuming data file is still at src/data/
+import { getCvSection } from '@/lib/getCvSection';
 
 // --- Metadata for this specific page ---
 export const metadata: Metadata = {
@@ -20,8 +20,8 @@ export const metadata: Metadata = {
   description: 'A detailed list of all volunteering activities.',
 };
 
-export default function AllVolunteeringPage() {
-  const volunteeringData = volunteeringDataFromFile as VolunteeringEntry[] || [];
+export default async function AllVolunteeringPage() {
+  const volunteeringData = await getCvSection<VolunteeringEntry[]>('volunteering');
 
   return (
     <main className="min-h-screen bg-gray-50 dark:bg-gray-950 py-10 px-4 sm:px-6 lg:px-8">

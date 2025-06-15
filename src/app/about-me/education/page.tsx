@@ -12,7 +12,7 @@ import type { EducationEntry } from '@/types'; // Assuming @/ is configured for 
 import { formatTextWithLineBreaks } from '@/utils/formatters'; // Assuming @/ is configured for src/
 
 // Import the full education data
-import educationDataFromFile from '@/data/education.json';
+import { getCvSection } from '@/lib/getCvSection';
 
 
 // --- Metadata for this specific page ---
@@ -26,9 +26,8 @@ export const metadata: Metadata = {
   description: 'Detailed overview of all educational qualifications and activities.',
 };
 
-export default function AllEducationPage() {
-  // Type assertion for the imported data, with a fallback to an empty array
-  const educationData = educationDataFromFile as EducationEntry[] || [];
+export default async function AllEducationPage() {
+  const educationData = await getCvSection<EducationEntry[]>('education');
 
   return (
     <main className="min-h-screen bg-gray-50 dark:bg-gray-950 py-10 px-4 sm:px-6 lg:px-8">

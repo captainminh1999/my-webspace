@@ -12,7 +12,7 @@ import type { RecommendationReceivedEntry } from '@/types';
 import { formatTextWithLineBreaks } from '@/utils/formatters'; 
 
 // Import the full recommendations received data
-import recommendationsReceivedDataFromFile from '@/data/recommendationsReceived.json'; // Assuming data file is still at src/data/
+import { getCvSection } from '@/lib/getCvSection';
 
 // --- Metadata for this specific page ---
 export const metadata: Metadata = {
@@ -20,8 +20,8 @@ export const metadata: Metadata = {
   description: 'A detailed list of all recommendations received.',
 };
 
-export default function AllRecommendationsReceivedPage() {
-  const recommendationsReceivedData = recommendationsReceivedDataFromFile as RecommendationReceivedEntry[] || [];
+export default async function AllRecommendationsReceivedPage() {
+  const recommendationsReceivedData = await getCvSection<RecommendationReceivedEntry[]>('recommendationsReceived');
 
   return (
     <main className="min-h-screen bg-gray-50 dark:bg-gray-950 py-10 px-4 sm:px-6 lg:px-8">

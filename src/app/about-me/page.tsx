@@ -23,17 +23,8 @@ import {
 import ExpandableText from '@/components/ExpandableText'; // Assuming path is correct
 
 // Import data from JSON files
-import profileDataFromFile from '@/data/profile.json';
-import aboutDataFromFile from '@/data/about.json';
-import experienceDataFromFile from '@/data/experience.json';
-import educationDataFromFile from '@/data/education.json';
-import licensesDataFromFile from '@/data/licenses.json';
-import projectsDataFromFile from '@/data/projects.json';
-import volunteeringDataFromFile from '@/data/volunteering.json';
-import skillsDataFromFile from '@/data/skills.json';
-import recommendationsReceivedDataFromFile from '@/data/recommendationsReceived.json';
-import honorsAwardsDataFromFile from '@/data/honorsAwards.json';
-import languagesDataFromFile from '@/data/languages.json';
+import { getFullCv } from '@/lib/getFullCv';
+import type { FullCvData } from '@/types';
 
 // Predefined styles for the skill cloud for variety
 const skillCloudStyles = [
@@ -47,18 +38,20 @@ const skillCloudStyles = [
 
 
 // --- Main Page Component (Now for /about-me route) ---
-export default function AboutMePage() { // Renamed component for clarity
-  const profileData = profileDataFromFile as ProfileData || {} as ProfileData;
-  const aboutData = aboutDataFromFile as AboutData || {} as AboutData;
-  const experienceData = experienceDataFromFile as CompanyExperience[] || [];
-  const educationData = educationDataFromFile as EducationEntry[] || [];
-  const licensesData = licensesDataFromFile as LicenseCertificationEntry[] || [];
-  const projectsData = projectsDataFromFile as ProjectEntry[] || [];
-  const volunteeringData = volunteeringDataFromFile as VolunteeringEntry[] || [];
-  const skillsData = skillsDataFromFile as SkillsData || [];
-  const recommendationsReceivedData = recommendationsReceivedDataFromFile as RecommendationReceivedEntry[] || [];
-  const honorsAwardsData = honorsAwardsDataFromFile as HonorAwardEntry[] || [];
-  const languagesData = languagesDataFromFile as LanguageEntry[] || [];
+export default async function AboutMePage() { // Renamed component for clarity
+  const fullCv: FullCvData = await getFullCv();
+
+  const profileData = fullCv.profile as ProfileData || ({} as ProfileData);
+  const aboutData = fullCv.about as AboutData || ({} as AboutData);
+  const experienceData = fullCv.experience as CompanyExperience[] || [];
+  const educationData = fullCv.education as EducationEntry[] || [];
+  const licensesData = fullCv.licenses as LicenseCertificationEntry[] || [];
+  const projectsData = fullCv.projects as ProjectEntry[] || [];
+  const volunteeringData = fullCv.volunteering as VolunteeringEntry[] || [];
+  const skillsData = fullCv.skills as SkillsData || [];
+  const recommendationsReceivedData = fullCv.recommendationsReceived as RecommendationReceivedEntry[] || [];
+  const honorsAwardsData = fullCv.honorsAwards as HonorAwardEntry[] || [];
+  const languagesData = fullCv.languages as LanguageEntry[] || [];
 
   const getFullName = () => { 
     if (!profileData.firstName && !profileData.lastName) return "Your Name";
@@ -69,11 +62,11 @@ export default function AboutMePage() { // Renamed component for clarity
   };
   const fullName = getFullName();
 
-  const websiteEntries = React.useMemo(() => { 
-    if (!profileData.websites) return [];
-    const websitesArray = Array.isArray(profileData.websites) ? profileData.websites : [profileData.websites];
-    return websitesArray.map(siteStr => parseWebsiteString(siteStr)).filter(parsedSite => parsedSite !== null) as ParsedWebsite[];
-  }, [profileData.websites]);
+  const websiteEntries = profileData.websites
+    ? (Array.isArray(profileData.websites) ? profileData.websites : [profileData.websites])
+        .map(siteStr => parseWebsiteString(siteStr))
+        .filter((parsedSite): parsedSite is ParsedWebsite => parsedSite !== null)
+    : [];
 
   const MAX_ITEMS_MAIN_PAGE = 3;
   const DESCRIPTION_LINE_CLAMP = 2; 
