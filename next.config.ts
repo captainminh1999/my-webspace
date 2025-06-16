@@ -15,6 +15,9 @@ const nextConfig: NextConfig = {
       { protocol: 'https', hostname: 'i.ytimg.com', pathname: '/vi/**' },
       { protocol: "https", hostname: "media.rawg.io", pathname: "/media/**" },
       { protocol: "https", hostname: "images.unsplash.com", pathname: "/**" },
+      // Fallback pattern for miscellaneous hosts used by widgets
+      { protocol: 'https', hostname: '**', pathname: '/**' },
+      { protocol: 'http', hostname: '**', pathname: '/**' },
       // add more hosts as needed:
       // {
       //   protocol: 'https',
