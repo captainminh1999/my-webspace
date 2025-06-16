@@ -13,14 +13,24 @@ export interface Layout {
   minH?: number;
   maxH?: number;
 }
-import { SpaceCard, SpaceModalBody } from "@/components/widgets/SpaceWidget";
-import { WeatherCard, WeatherModalBody } from "@/components/widgets/WeatherWidget";
-import CoffeeCard, { CoffeeModalBody } from "@/components/widgets/CoffeeWidget";
-import { TechCard, TechModalBody } from "@/components/widgets/TechWidget";
-import { YouTubeRecsCard, YouTubeRecsModalBody } from "@/components/widgets/YouTubeRecsWidget";
-import GamesCard, { GamesModalBody } from "@/components/widgets/GamesWidget";
-import DroneNewsCard, { DroneNewsModalBody } from "@/components/widgets/DroneNewsWidget";
-import PhotographyCard, { PhotographyModalBody } from "@/components/widgets/PhotographyWidget";
+import dynamic from "next/dynamic";
+
+const CoffeeCard = dynamic(() => import("@/components/widgets/CoffeeWidget").then(m => m.default));
+const CoffeeModalBody = dynamic(() => import("@/components/widgets/CoffeeWidget").then(m => m.CoffeeModalBody));
+const WeatherCard = dynamic(() => import("@/components/widgets/WeatherWidget").then(m => m.WeatherCard));
+const WeatherModalBody = dynamic(() => import("@/components/widgets/WeatherWidget").then(m => m.WeatherModalBody));
+const SpaceCard = dynamic(() => import("@/components/widgets/SpaceWidget").then(m => m.SpaceCard));
+const SpaceModalBody = dynamic(() => import("@/components/widgets/SpaceWidget").then(m => m.SpaceModalBody));
+const TechCard = dynamic(() => import("@/components/widgets/TechWidget").then(m => m.TechCard));
+const TechModalBody = dynamic(() => import("@/components/widgets/TechWidget").then(m => m.TechModalBody));
+const YouTubeRecsCard = dynamic(() => import("@/components/widgets/YouTubeRecsWidget").then(m => m.YouTubeRecsCard));
+const YouTubeRecsModalBody = dynamic(() => import("@/components/widgets/YouTubeRecsWidget").then(m => m.YouTubeRecsModalBody));
+const GamesCard = dynamic(() => import("@/components/widgets/GamesWidget").then(m => m.default));
+const GamesModalBody = dynamic(() => import("@/components/widgets/GamesWidget").then(m => m.GamesModalBody));
+const DroneNewsCard = dynamic(() => import("@/components/widgets/DroneNewsWidget").then(m => m.default));
+const DroneNewsModalBody = dynamic(() => import("@/components/widgets/DroneNewsWidget").then(m => m.DroneNewsModalBody));
+const PhotographyCard = dynamic(() => import("@/components/widgets/PhotographyWidget").then(m => m.default));
+const PhotographyModalBody = dynamic(() => import("@/components/widgets/PhotographyWidget").then(m => m.PhotographyModalBody));
 
 
 /**************************************************************
