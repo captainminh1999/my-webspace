@@ -42,7 +42,7 @@ export const SpaceCard: React.FC = () => {
         fill
         sizes="(max-width: 768px) 100vw, 33vw"
         className="object-cover rounded"
-        priority={false}
+        priority
         unoptimized
       />
     </div>
