@@ -31,7 +31,7 @@ export const YouTubeRecsCard: React.FC = () => {
             alt={item.title}
             width={80}
             height={45}
-            unoptimized
+            sizes="80px"
             className="rounded-sm"
           />
           <div className="flex-1">
@@ -69,7 +69,7 @@ export const YouTubeRecsModalBody: React.FC = () => {
             width={160}
             height={90}
             alt={item.title}
-            unoptimized
+            sizes="160px"
             className="rounded-md shrink-0"
           />
           <div className="flex-1">

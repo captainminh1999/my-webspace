@@ -32,7 +32,7 @@ export const GamesCard: React.FC = () => {
             width={80}
             height={45}
             alt={game.name}
-            unoptimized
+            sizes="80px"
             className="rounded-sm"
           />
           <div className="flex-1">
@@ -71,7 +71,7 @@ export const GamesModalBody: React.FC = () => {
             width={160}
             height={90}
             alt={game.name}
-            unoptimized
+            sizes="160px"
             className="rounded-md shrink-0"
           />
           <div className="flex-1">
