@@ -30,7 +30,7 @@ export const CoffeeCard: React.FC = () => {
               width={64}
               height={36}
               alt={item.title}
-              unoptimized
+              sizes="64px"
               className="rounded-sm object-cover"
             />
           ) : (
@@ -72,7 +72,7 @@ export const CoffeeModalBody: React.FC = () => {
               width={160}
               height={90}
               alt={item.title}
-              unoptimized
+              sizes="160px"
               className="rounded-md object-cover shrink-0"
             />
           ) : (
