@@ -1,6 +1,18 @@
 // src/lib/widgetRegistry.ts
 
-import { Layout } from "react-grid-layout";
+
+/** Simplified layout type so we can drop the react-grid-layout dependency */
+export interface Layout {
+  i: string;
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+  minW?: number;
+  maxW?: number;
+  minH?: number;
+  maxH?: number;
+}
 import { SpaceCard, SpaceModalBody } from "@/components/widgets/SpaceWidget";
 import { WeatherCard, WeatherModalBody } from "@/components/widgets/WeatherWidget";
 import CoffeeCard, { CoffeeModalBody } from "@/components/widgets/CoffeeWidget";

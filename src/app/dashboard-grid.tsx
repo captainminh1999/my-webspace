@@ -9,7 +9,12 @@ import {
   colsConfig,
   BreakpointKey,
 } from "@/lib/widgetRegistry";
-import ModalFrame from "@/components/ModalFrame";
+import dynamic from "next/dynamic";
+
+// Lazily load the modal component so framer-motion isn't in the main bundle
+const ModalFrame = dynamic(() => import("@/components/ModalFrame"), {
+  ssr: false,
+});
 import GenericWidgetContent from "@/components/widgets/GenericWidgetContent";
 import ProfileWidget from "@/components/widgets/ProfileWidget";
 
