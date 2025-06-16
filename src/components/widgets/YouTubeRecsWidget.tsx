@@ -4,22 +4,12 @@
 import React from "react";
 import type { YouTubeRecData, YouTubeRecItem } from "@/types/youtubeRecs";
 import WidgetSection from "@/components/WidgetSection";
-import { useWidgetData } from "@/lib/useWidgetData";
+import { withWidgetData } from "./withWidgetData";
 import Link from "next/link";
 import Image from "next/image";
 import { format } from "date-fns";
-import Skeleton from "@/components/Skeleton";
 
-export const YouTubeRecsCard: React.FC = () => {
-  const { data, loading, error } = useWidgetData<YouTubeRecData>("youtube");
-  if (loading)
-    return (
-      <div className="relative h-24">
-        <Skeleton />
-      </div>
-    );
-  if (error) return <div className="p-2 text-sm">Failed to load</div>;
-  if (!data) return null;
+const YouTubeRecsCardBase: React.FC<{ data: YouTubeRecData }> = ({ data }) => {
   const preview: YouTubeRecItem[] = data.items.slice(0, 5);
 
   return (
@@ -54,17 +44,9 @@ export const YouTubeRecsCard: React.FC = () => {
   );
 };
 
-export const YouTubeRecsModalBody: React.FC = () => {
-  const { data, loading, error } = useWidgetData<YouTubeRecData>("youtube");
-  if (loading)
-    return (
-      <div className="relative h-40">
-        <Skeleton />
-      </div>
-    );
-  if (error) return <div className="p-4 text-sm">Failed to load</div>;
-  if (!data) return null;
-  return (
+export const YouTubeRecsCard = withWidgetData<YouTubeRecData>("youtube")(YouTubeRecsCardBase);
+
+const YouTubeRecsModalBodyBase: React.FC<{ data: YouTubeRecData }> = ({ data }) => (
   <article className="space-y-4 p-4">
     {data.items.map((item) => (
       <Link
@@ -96,6 +78,11 @@ export const YouTubeRecsModalBody: React.FC = () => {
     ))}
   </article>
   );
-};
+);
+
+export const YouTubeRecsModalBody = withWidgetData<YouTubeRecData>("youtube", {
+  loadingHeight: "h-40",
+  errorPadding: "p-4",
+})(YouTubeRecsModalBodyBase);
 
 export default YouTubeRecsCard;

@@ -2,25 +2,14 @@
 // src/components/widgets/DroneNewsWidget.tsx
 import React from "react";
 import type { DroneNewsItem, DroneNewsData } from "@/types/drone";
-import { useWidgetData } from "@/lib/useWidgetData";
+import { withWidgetData } from "./withWidgetData";
 import Link from "next/link";
 import Image from "next/image";
 import { format } from "date-fns";
-import Skeleton from "@/components/Skeleton";
 
 
 /** ─── DroneNewsCard (grid-cell preview) ─────────────────── */
-export const DroneNewsCard: React.FC = () => {
-  const { data, loading, error } = useWidgetData<DroneNewsData>("drones");
-  if (loading)
-    return (
-      <div className="relative h-24">
-        <Skeleton />
-      </div>
-    );
-  if (error) return <div className="p-2 text-sm">Failed to load</div>;
-  if (!data) return null;
-  // Show up to 3 items in the small widget
+const DroneNewsCardBase: React.FC<{ data: DroneNewsData }> = ({ data }) => {
   const preview: DroneNewsItem[] = data.slice(0, 3);
 
   return (
@@ -59,18 +48,12 @@ export const DroneNewsCard: React.FC = () => {
   );
 };
 
+export const DroneNewsCard = withWidgetData<DroneNewsData>("drones")(
+  DroneNewsCardBase
+);
+
 /** ─── DroneNewsModalBody (full list in modal) ───────────── */
-export const DroneNewsModalBody: React.FC = () => {
-  const { data, loading, error } = useWidgetData<DroneNewsData>("drones");
-  if (loading)
-    return (
-      <div className="relative h-40">
-        <Skeleton />
-      </div>
-    );
-  if (error) return <div className="p-4 text-sm">Failed to load</div>;
-  if (!data) return null;
-  return (
+const DroneNewsModalBodyBase: React.FC<{ data: DroneNewsData }> = ({ data }) => (
   <article className="space-y-4 p-4">
     {data.map((item) => (
       <div key={item.url} className="flex items-start space-x-4">
@@ -102,7 +85,11 @@ export const DroneNewsModalBody: React.FC = () => {
       </div>
     ))}
   </article>
-  );
-};
+);
+
+export const DroneNewsModalBody = withWidgetData<DroneNewsData>("drones", {
+  loadingHeight: "h-40",
+  errorPadding: "p-4",
+})(DroneNewsModalBodyBase);
 
 export default DroneNewsCard;

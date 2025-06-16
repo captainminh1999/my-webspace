@@ -3,7 +3,7 @@
 import React from "react";
 import Image from "next/image";
 import WidgetSection from "@/components/WidgetSection";
-import Skeleton from "@/components/Skeleton";
+import { withWidgetData } from "./withWidgetData";
 
 interface Apod {
   url: string;
@@ -15,7 +15,6 @@ interface Apod {
 }
 
 import type { MarsPhotoData, EpicData, MarsWeatherData } from "@/types/spaceExtra";
-import { useWidgetData } from "@/lib/useWidgetData";
 
 interface SpaceWidgetData {
   space: Apod;
@@ -27,16 +26,7 @@ interface SpaceWidgetData {
 /**
  * Small preview for the dashboard grid – shows thumbnail with cover fit.
  */
-export const SpaceCard: React.FC = () => {
-  const { data, loading, error } = useWidgetData<SpaceWidgetData>("space");
-  if (loading)
-    return (
-      <div className="relative h-24">
-        <Skeleton />
-      </div>
-    );
-  if (error) return <div className="p-2 text-sm">Failed to load</div>;
-  if (!data) return null;
+const SpaceCardBase: React.FC<{ data: SpaceWidgetData }> = ({ data }) => {
   const { space } = data;
   const thumb = space.thumbnail_url ?? space.url;
   return (
@@ -58,19 +48,12 @@ export const SpaceCard: React.FC = () => {
   );
 };
 
+export const SpaceCard = withWidgetData<SpaceWidgetData>("space")(SpaceCardBase);
+
 /**
  * Detailed content inside the modal.
  */
-export const SpaceModalBody: React.FC = () => {
-  const { data, loading, error } = useWidgetData<SpaceWidgetData>("space");
-  if (loading)
-    return (
-      <div className="relative h-40">
-        <Skeleton />
-      </div>
-    );
-  if (error) return <div className="p-4 text-sm">Failed to load</div>;
-  if (!data) return null;
+const SpaceModalBodyBase: React.FC<{ data: SpaceWidgetData }> = ({ data }) => {
   const { space, mars, epic, marsWeather } = data;
   const epicUrl = epic.url;
 
@@ -139,3 +122,8 @@ export const SpaceModalBody: React.FC = () => {
     </article>
   );
 };
+
+export const SpaceModalBody = withWidgetData<SpaceWidgetData>("space", {
+  loadingHeight: "h-40",
+  errorPadding: "p-4",
+})(SpaceModalBodyBase);

@@ -2,19 +2,9 @@
 // src/components/widgets/TechWidget.tsx
 import type { TechStory } from "@/types/tech";
 import WidgetSection from "@/components/WidgetSection";
-import { useWidgetData } from "@/lib/useWidgetData";
-import Skeleton from "@/components/Skeleton";
+import { withWidgetData } from "./withWidgetData";
 
-export function TechCard() {
-  const { data, loading, error } = useWidgetData<TechStory[]>("tech");
-  if (loading)
-    return (
-      <div className="relative h-24">
-        <Skeleton />
-      </div>
-    );
-  if (error) return <div className="p-2 text-sm">Failed to load</div>;
-  if (!data) return null;
+const TechCardBase: React.FC<{ data: TechStory[] }> = ({ data }) => {
   const stories = data.slice(0, 5);
 
   return (
@@ -39,20 +29,12 @@ export function TechCard() {
       ))}
     </article>
   );
-}
+};
 
-export function TechModalBody() {
-  const { data: all, loading, error } = useWidgetData<TechStory[]>("tech");
-  if (loading)
-    return (
-      <div className="relative h-40">
-        <Skeleton />
-      </div>
-    );
-  if (error) return <div className="p-4 text-sm">Failed to load</div>;
-  if (!all) return null;
-  return (
-    <article className="p-4 space-y-2">
+export const TechCard = withWidgetData<TechStory[]>("tech")(TechCardBase);
+
+const TechModalBodyBase: React.FC<{ data: TechStory[] }> = ({ data: all }) => (
+  <article className="p-4 space-y-2">
       {all.map((s) => (
         <a key={s.id} href={s.url} target="_blank" rel="noopener noreferrer" className="block">
           <WidgetSection className="space-y-1 p-0 hover:bg-gray-100 dark:hover:bg-gray-700">
@@ -62,5 +44,9 @@ export function TechModalBody() {
         </a>
       ))}
     </article>
-  );
-}
+);
+
+export const TechModalBody = withWidgetData<TechStory[]>("tech", {
+  loadingHeight: "h-40",
+  errorPadding: "p-4",
+})(TechModalBodyBase);

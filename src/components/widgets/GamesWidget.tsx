@@ -3,24 +3,14 @@
 import React from "react";
 import type { GameData, GameItem } from "@/types/games";
 import WidgetSection from "@/components/WidgetSection";
-import { useWidgetData } from "@/lib/useWidgetData";
+import { withWidgetData } from "./withWidgetData";
 import Link from "next/link";
 import Image from "next/image";
 import { format } from "date-fns";
-import Skeleton from "@/components/Skeleton";
 
 
 // ─── 1. Grid Cell: show top 5 games ─────────────────────
-export const GamesCard: React.FC = () => {
-  const { data, loading, error } = useWidgetData<GameData>("games");
-  if (loading)
-    return (
-      <div className="relative h-24">
-        <Skeleton />
-      </div>
-    );
-  if (error) return <div className="p-2 text-sm">Failed to load</div>;
-  if (!data) return null;
+const GamesCardBase: React.FC<{ data: GameData }> = ({ data }) => {
   const preview: GameItem[] = data.slice(0, 5);
 
   return (
@@ -55,18 +45,10 @@ export const GamesCard: React.FC = () => {
   );
 };
 
+export const GamesCard = withWidgetData<GameData>("games")(GamesCardBase);
+
 // ─── 2. Modal Body: list all 5 games ──────────────────
-export const GamesModalBody: React.FC = () => {
-  const { data, loading, error } = useWidgetData<GameData>("games");
-  if (loading)
-    return (
-      <div className="relative h-40">
-        <Skeleton />
-      </div>
-    );
-  if (error) return <div className="p-4 text-sm">Failed to load</div>;
-  if (!data) return null;
-  return (
+const GamesModalBodyBase: React.FC<{ data: GameData }> = ({ data }) => (
   <article className="space-y-4 p-4">
     {data.map((game) => (
       <Link
@@ -97,7 +79,11 @@ export const GamesModalBody: React.FC = () => {
       </Link>
     ))}
   </article>
-  );
-};
+);
+
+export const GamesModalBody = withWidgetData<GameData>("games", {
+  loadingHeight: "h-40",
+  errorPadding: "p-4",
+})(GamesModalBodyBase);
 
 export default GamesCard;

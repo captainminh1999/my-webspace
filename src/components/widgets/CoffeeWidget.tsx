@@ -1,23 +1,13 @@
 "use client";
 import React from "react";
 import type { CoffeeData, CoffeeArticle } from "@/types/coffee";
-import { useWidgetData } from "@/lib/useWidgetData";
+import { withWidgetData } from "./withWidgetData";
 import Link from "next/link";
 import Image from "next/image";
 import { format } from "date-fns";
 import WidgetSection from "@/components/WidgetSection";
-import Skeleton from "@/components/Skeleton";
 
-export const CoffeeCard: React.FC = () => {
-  const { data, loading, error } = useWidgetData<CoffeeData>("coffee");
-  if (loading)
-    return (
-      <div className="relative h-24">
-        <Skeleton />
-      </div>
-    );
-  if (error) return <div className="p-2 text-sm">Failed to load</div>;
-  if (!data) return null;
+const CoffeeCardBase: React.FC<{ data: CoffeeData }> = ({ data }) => {
   const preview: CoffeeArticle[] = data.slice(0, 3);
 
   return (
@@ -56,17 +46,9 @@ export const CoffeeCard: React.FC = () => {
   );
 };
 
-export const CoffeeModalBody: React.FC = () => {
-  const { data, loading, error } = useWidgetData<CoffeeData>("coffee");
-  if (loading)
-    return (
-      <div className="relative h-40">
-        <Skeleton />
-      </div>
-    );
-  if (error) return <div className="p-4 text-sm">Failed to load</div>;
-  if (!data) return null;
-  return (
+export const CoffeeCard = withWidgetData<CoffeeData>("coffee")(CoffeeCardBase);
+
+const CoffeeModalBodyBase: React.FC<{ data: CoffeeData }> = ({ data }) => (
   <article className="space-y-4 p-4">
     {data.map((item) => (
       <Link
@@ -99,7 +81,11 @@ export const CoffeeModalBody: React.FC = () => {
       </Link>
     ))}
   </article>
-  );
-};
+);
+
+export const CoffeeModalBody = withWidgetData<CoffeeData>("coffee", {
+  loadingHeight: "h-40",
+  errorPadding: "p-4",
+})(CoffeeModalBodyBase);
 
 export default CoffeeCard;
