@@ -46,6 +46,12 @@ MONGODB_DB=cv
 UPLOAD_SECRET_KEY=your-secret
 ```
 
+## Static Asset Caching
+
+`netlify.toml` configures cache headers so that files under `/_next/static/*` and
+`/public/*` are served with a long `Cache-Control` policy. This allows browsers
+to cache these assets for up to one year.
+
 ## Learn More
 
 To learn more about Next.js, take a look at the following resources:
