@@ -3,17 +3,15 @@
 import React, { useEffect, useState } from "react";
 import WidgetSection from "@/components/WidgetSection";
 import type { WeatherData } from "@/types/weather";
-import { useWidgetData } from "@/lib/useWidgetData";
+import { withWidgetData } from "./withWidgetData";
 import { format } from "date-fns";
 import Image from "next/image";
-import Skeleton from "@/components/Skeleton";
 
 
 /* -------------------------------------------------------------
  * Small dashboard cell – shows icon + current temp + updated time
  * ------------------------------------------------------------- */
-export const WeatherCard: React.FC = () => {
-  const { data, loading, error } = useWidgetData<WeatherData>("weather");
+const WeatherCardBase: React.FC<{ data: WeatherData }> = ({ data }) => {
   const [now, setNow] = useState<Date>(() => new Date());
 
   useEffect(() => {
@@ -21,14 +19,6 @@ export const WeatherCard: React.FC = () => {
     return () => clearInterval(id);
   }, []);
 
-  if (loading)
-    return (
-      <div className="relative h-24">
-        <Skeleton />
-      </div>
-    );
-  if (error) return <div className="p-2 text-sm">Failed to load</div>;
-  if (!data) return null;
   const currentTemp = data.current.temp;
   const iconUrl = `https://openweathermap.org/img/wn/${data.current.icon}.png`;
 
@@ -57,20 +47,12 @@ export const WeatherCard: React.FC = () => {
 );
 };
 
+export const WeatherCard = withWidgetData<WeatherData>("weather")(WeatherCardBase);
+
 /* -------------------------------------------------------------
  * Modal body – next‑12‑hour strip + 7‑day table
  * ------------------------------------------------------------- */
-export const WeatherModalBody: React.FC = () => {
-  const { data, loading, error } = useWidgetData<WeatherData>("weather");
-  if (loading)
-    return (
-      <div className="relative h-40">
-        <Skeleton />
-      </div>
-    );
-  if (error) return <div className="p-4 text-sm">Failed to load</div>;
-  if (!data) return null;
-  return (
+const WeatherModalBodyBase: React.FC<{ data: WeatherData }> = ({ data }) => (
   <article className="space-y-6 p-4">
     {/* 12‑hour forecast */}
     <WidgetSection className="grid grid-cols-4 gap-6 overflow-x-auto pb-4">
@@ -115,7 +97,11 @@ export const WeatherModalBody: React.FC = () => {
       </table>
     </WidgetSection>
   </article>
-  );
-};
+);
+
+export const WeatherModalBody = withWidgetData<WeatherData>("weather", {
+  loadingHeight: "h-40",
+  errorPadding: "p-4",
+})(WeatherModalBodyBase);
 
 export default WeatherCard;

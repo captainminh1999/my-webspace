@@ -2,64 +2,44 @@
 // src/components/widgets/PhotographyWidget.tsx
 import React from "react";
 import type { PhotographyData } from "@/types/photography";
-import { useWidgetData } from "@/lib/useWidgetData";
+import { withWidgetData } from "./withWidgetData";
 import Image from "next/image";
 import Link from "next/link";
 import { format } from "date-fns";
-import Skeleton from "@/components/Skeleton";
 
 
 /** ─────────────── Photo Card (grid cell) ────────────────── */
-export const PhotographyCard: React.FC = () => {
-  const { data: photo, loading, error } = useWidgetData<PhotographyData>("camera");
-  if (loading)
-    return (
-      <div className="relative h-24">
-        <Skeleton />
-      </div>
-    );
-  if (error) return <div className="p-2 text-sm">Failed to load</div>;
-  if (!photo) return null;
+const PhotographyCardBase: React.FC<{ data: PhotographyData }> = ({ data: photo }) => (
   // We show the thumbnail, plus a small credit line underneath
-  return (
-    <div className="h-full flex flex-col items-center justify-center p-2 space-y-2">
-      <Image
-        src={photo.thumbnail}
-        alt={photo.alt || "Unsplash photo"}
-        width={300}
-        height={300}
-        sizes="300px"
-        className="object-cover rounded-lg shadow-sm"
-      />
-      <p className="text-[10px] text-gray-600 dark:text-gray-400">
-        Photo by{" "}
-        <Link
-          href={photo.profile}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="font-semibold hover:underline text-black dark:text-white"
-        >
-          {photo.photographer}
-        </Link>{" "}
-        on Unsplash
-      </p>
-    </div>
-  );
-};
+  <div className="h-full flex flex-col items-center justify-center p-2 space-y-2">
+    <Image
+      src={photo.thumbnail}
+      alt={photo.alt || "Unsplash photo"}
+      width={300}
+      height={300}
+      sizes="300px"
+      className="object-cover rounded-lg shadow-sm"
+    />
+    <p className="text-[10px] text-gray-600 dark:text-gray-400">
+      Photo by{" "}
+      <Link
+        href={photo.profile}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="font-semibold hover:underline text-black dark:text-white"
+      >
+        {photo.photographer}
+      </Link>{" "}
+      on Unsplash
+    </p>
+  </div>
+);
+
+export const PhotographyCard = withWidgetData<PhotographyData>("camera")(PhotographyCardBase);
 
 /** ──────────── Photography Modal Body ───────────────────── */
-export const PhotographyModalBody: React.FC = () => {
-  const { data: photo, loading, error } = useWidgetData<PhotographyData>("camera");
-  if (loading)
-    return (
-      <div className="relative h-40">
-        <Skeleton />
-      </div>
-    );
-  if (error) return <div className="p-4 text-sm">Failed to load</div>;
-  if (!photo) return null;
-  return (
-    <article className="px-4 py-6 space-y-4">
+const PhotographyModalBodyBase: React.FC<{ data: PhotographyData }> = ({ data: photo }) => (
+  <article className="px-4 py-6 space-y-4">
       <div className="w-full">
         <Image
           src={photo.full}
@@ -93,7 +73,11 @@ export const PhotographyModalBody: React.FC = () => {
         </p>
       </div>
     </article>
-  );
-};
+);
+
+export const PhotographyModalBody = withWidgetData<PhotographyData>("camera", {
+  loadingHeight: "h-40",
+  errorPadding: "p-4",
+})(PhotographyModalBodyBase);
 
 export default PhotographyCard;

@@ -3,8 +3,7 @@
 import React from 'react';
 
 export const revalidate = 60;
-import Link from 'next/link';
-import { ArrowLeft } from 'lucide-react'; // For back button
+import SectionPageLayout from '@/components/SectionPageLayout';
 import type { Metadata } from 'next';
 
 // Import shared types
@@ -37,23 +36,7 @@ export default async function AllEducationPage() {
   }
 
   return (
-    <main className="min-h-screen bg-gray-50 dark:bg-gray-950 py-10 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-3xl mx-auto">
-        
-        {/* Back to Main CV Link */}
-        <div className="mb-8">
-          <Link href="/about-me" className="inline-flex items-center text-black dark:text-white hover:underline transition-colors duration-150 group">
-            <ArrowLeft size={20} className="mr-2 transition-transform duration-150 group-hover:-translate-x-1" />
-            Back to Main CV
-          </Link>
-        </div>
-
-        {/* Section Content */}
-        <section className="bg-white dark:bg-gray-800 p-6 sm:p-8 rounded-xl shadow-xl">
-          <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white mb-8 pb-4 border-b-2 border-indigo-500">
-            Education
-          </h1>
-          
+    <SectionPageLayout title="Education">
           {educationData.length > 0 ? (
             <div className="space-y-8">
               {educationData.map((edu, index) => (
@@ -87,8 +70,6 @@ export default async function AllEducationPage() {
           ) : (
             <p className="text-gray-600 dark:text-gray-400">No education data available.</p>
           )}
-        </section>
-      </div>
-    </main>
+        </SectionPageLayout>
   );
 }
