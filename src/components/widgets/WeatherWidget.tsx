@@ -37,7 +37,7 @@ export const WeatherCard: React.FC = () => {
   return (
   <div className="flex items-center justify-center gap-6 py-2 mx-auto">
     <div className="flex items-center space-x-1">
-      <Image src={iconUrl} alt="" width={50} height={50} unoptimized />
+      <Image src={iconUrl} alt="" width={50} height={50} sizes="50px" />
       <div className="flex flex-col leading-tight">
         <span className="text-lg font-semibold">{Math.round(currentTemp)}°C</span>
         <span className="text-[10px] text-gray-500 dark:text-gray-400">
@@ -70,7 +70,7 @@ export const WeatherModalBody: React.FC = () => {
           </p>
           <Image src={`https://openweathermap.org/img/wn/${h.icon}.png`}
             alt=""
-            width={45} height={45} unoptimized />
+            width={45} height={45} sizes="45px" />
           <p className="text-xl font-bold mt-0">
             {Math.round(h.temp)}°
           </p>
@@ -90,7 +90,7 @@ export const WeatherModalBody: React.FC = () => {
             <td className="py-1">
               <Image src={`https://openweathermap.org/img/wn/${d.icon}.png`}
                 alt=""
-                width={28} height={28} unoptimized />
+                width={28} height={28} sizes="28px" />
             </td>
             <td className="py-1 text-right text-md font-semibold text-red-500">
               {Math.round(d.max)}°

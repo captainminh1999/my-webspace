@@ -43,7 +43,6 @@ export const SpaceCard: React.FC = () => {
         sizes="(max-width: 768px) 100vw, 33vw"
         className="object-cover rounded"
         priority
-        unoptimized
       />
     </div>
     <p className="text-[10px] text-gray-600 dark:text-gray-400 text-center line-clamp-2">
@@ -74,8 +73,8 @@ export const SpaceModalBody: React.FC = () => {
           alt={space.title}
           width={800}
           height={450}
+          sizes="(max-width: 800px) 100vw, 800px"
           className="w-full rounded"
-          unoptimized
         />
         <p className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-line">
           {space.explanation}
@@ -102,7 +101,7 @@ export const SpaceModalBody: React.FC = () => {
           <h4 className="font-semibold">Mars Rover Photo</h4>
           {mars.photos.map((p) => (
             <div key={p.id} className="space-y-1">
-              <Image src={p.img_src} alt={p.camera} width={800} height={450} className="w-full rounded" unoptimized />
+              <Image src={p.img_src} alt={p.camera} width={800} height={450} sizes="(max-width: 800px) 100vw, 800px" className="w-full rounded" />
               <p className="text-sm text-gray-700 dark:text-gray-300">
                 {p.rover} – {p.camera}
               </p>
@@ -114,7 +113,7 @@ export const SpaceModalBody: React.FC = () => {
       {/* EPIC Earth image */}
       <WidgetSection className="space-y-2">
         <h4 className="font-semibold">Earth from EPIC</h4>
-        <Image src={epicUrl} alt="EPIC Earth" width={512} height={512} className="w-full rounded" unoptimized />
+        <Image src={epicUrl} alt="EPIC Earth" width={512} height={512} sizes="(max-width: 512px) 100vw, 512px" className="w-full rounded" />
         <p className="text-sm text-gray-700 dark:text-gray-300">{epic.caption}</p>
         <p className="text-xs text-right italic text-gray-500">{epic.date.split(" ")[0]}</p>
       </WidgetSection>

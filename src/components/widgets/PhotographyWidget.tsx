@@ -22,8 +22,8 @@ export const PhotographyCard: React.FC = () => {
         alt={photo.alt || "Unsplash photo"}
         width={300}
         height={300}
+        sizes="300px"
         className="object-cover rounded-lg shadow-sm"
-        unoptimized
       />
       <p className="text-[10px] text-gray-600 dark:text-gray-400">
         Photo by{" "}
@@ -55,8 +55,8 @@ export const PhotographyModalBody: React.FC = () => {
           alt={photo.alt || "Unsplash photo"}
           width={1000}
           height={600}
+          sizes="(max-width: 1000px) 100vw, 1000px"
           className="w-full h-auto rounded-xl shadow-lg"
-          unoptimized
         />
       </div>
       <div className="prose prose-lg dark:prose-invert">
