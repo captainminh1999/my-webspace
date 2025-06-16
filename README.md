@@ -51,6 +51,10 @@ UPLOAD_SECRET_KEY=your-secret
 `netlify.toml` configures cache headers so that files under `/_next/static/*` and
 `/public/*` are served with a long `Cache-Control` policy. This allows browsers
 to cache these assets for up to one year.
+## Page and API Caching
+
+Pages export `revalidate = 60` so Next.js serves cached HTML for a minute. Netlify function responses also include `Cache-Control: public, max-age=60`, enabling browser caching and back/forward cache support.
+
 
 ## Learn More
 

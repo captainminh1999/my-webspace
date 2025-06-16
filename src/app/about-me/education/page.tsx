@@ -2,7 +2,7 @@
 
 import React from 'react';
 
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react'; // For back button
 import type { Metadata } from 'next';

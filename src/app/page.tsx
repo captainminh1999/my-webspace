@@ -1,7 +1,7 @@
 // src/app/page.tsx  – server component (no "use client")
 import DashboardView from "./DashboardView";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
 
 import { Suspense } from "react";
 

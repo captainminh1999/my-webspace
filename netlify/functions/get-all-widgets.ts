@@ -7,7 +7,7 @@ const handler: Handler = async (event) => {
     return {
       statusCode: 405,
       body: JSON.stringify({ message: "Method Not Allowed" }),
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", "Cache-Control": "public, max-age=60" },
     };
   }
 
@@ -24,14 +24,14 @@ const handler: Handler = async (event) => {
     return {
       statusCode: 200,
       body: JSON.stringify(result),
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", "Cache-Control": "public, max-age=60" },
     };
   } catch (err: any) {
     console.error("Error fetching widgets", err);
     return {
       statusCode: 500,
       body: JSON.stringify({ message: "Database error", error: err.message }),
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", "Cache-Control": "public, max-age=60" },
     };
   }
 };

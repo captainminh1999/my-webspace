@@ -13,7 +13,7 @@ const handler: Handler = async (event: HandlerEvent, context: HandlerContext) =>
     return { 
       statusCode: 405, 
       body: JSON.stringify({ message: "Method Not Allowed" }),
-      headers: { 'Content-Type': 'application/json' }
+      headers: { 'Content-Type': 'application/json', 'Cache-Control': 'public, max-age=60' }
     };
   }
 
@@ -22,7 +22,7 @@ const handler: Handler = async (event: HandlerEvent, context: HandlerContext) =>
     return { 
       statusCode: 500, 
       body: JSON.stringify({ message: "Server configuration error: Missing Netlify API token." }),
-      headers: { 'Content-Type': 'application/json' }
+      headers: { 'Content-Type': 'application/json', 'Cache-Control': 'public, max-age=60' }
     };
   }
 
@@ -31,7 +31,7 @@ const handler: Handler = async (event: HandlerEvent, context: HandlerContext) =>
     return { 
       statusCode: 500, 
       body: JSON.stringify({ message: "Server configuration error: Missing Netlify Site ID." }),
-      headers: { 'Content-Type': 'application/json' }
+      headers: { 'Content-Type': 'application/json', 'Cache-Control': 'public, max-age=60' }
     };
   }
 
@@ -42,7 +42,7 @@ const handler: Handler = async (event: HandlerEvent, context: HandlerContext) =>
     const response = await fetch(url, {
       headers: {
         Authorization: `Bearer ${NETLIFY_API_PAT}`,
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json', 'Cache-Control': 'public, max-age=60'
       },
     });
 
@@ -52,7 +52,7 @@ const handler: Handler = async (event: HandlerEvent, context: HandlerContext) =>
       return { 
         statusCode: response.status, 
         body: JSON.stringify({ message: "Failed to fetch deploy status from Netlify.", errorDetails: errorText }),
-        headers: { 'Content-Type': 'application/json' }
+        headers: { 'Content-Type': 'application/json', 'Cache-Control': 'public, max-age=60' }
       };
     }
 
@@ -70,13 +70,13 @@ const handler: Handler = async (event: HandlerEvent, context: HandlerContext) =>
           commitRef: latestDeploy.commit_ref, 
           context: latestDeploy.context, // e.g., "production"
         }),
-        headers: { 'Content-Type': 'application/json' }
+        headers: { 'Content-Type': 'application/json', 'Cache-Control': 'public, max-age=60' }
       };
     } else {
       return { 
         statusCode: 404, 
         body: JSON.stringify({ message: "No deploys found for this site." }),
-        headers: { 'Content-Type': 'application/json' }
+        headers: { 'Content-Type': 'application/json', 'Cache-Control': 'public, max-age=60' }
       };
     }
   } catch (error: any) {
@@ -84,7 +84,7 @@ const handler: Handler = async (event: HandlerEvent, context: HandlerContext) =>
     return { 
       statusCode: 500, 
       body: JSON.stringify({ message: "Internal server error while fetching deploy status.", error: error.message }),
-      headers: { 'Content-Type': 'application/json' }
+      headers: { 'Content-Type': 'application/json', 'Cache-Control': 'public, max-age=60' }
     };
   }
 };
