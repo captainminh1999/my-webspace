@@ -1,6 +1,7 @@
 // src/app/layout.tsx
 import "./globals.css"; // Keep this for Tailwind and other global styles
 import type { Metadata, Viewport } from "next";
+import Script from "next/script";
 // Use system fonts to avoid build-time downloads
 
 import { getCvSection } from '@/lib/getCvSection';
@@ -44,6 +45,21 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <Script
+          src="https://www.googletagmanager.com/gtag/js?id=G-N8S80ZDYP0"
+          strategy="afterInteractive"
+        />
+        <Script id="google-tag" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+
+            gtag('config', 'G-N8S80ZDYP0');
+          `}
+        </Script>
+      </head>
       <body className="font-sans bg-background text-foreground">
         {children}
       </body>
