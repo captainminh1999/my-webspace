@@ -7,12 +7,18 @@ import { useWidgetData } from "@/lib/useWidgetData";
 import Link from "next/link";
 import Image from "next/image";
 import { format } from "date-fns";
+import Skeleton from "@/components/Skeleton";
 
 
 // ─── 1. Grid Cell: show top 5 games ─────────────────────
 export const GamesCard: React.FC = () => {
   const { data, loading, error } = useWidgetData<GameData>("games");
-  if (loading) return <div className="p-2 text-sm">Loading…</div>;
+  if (loading)
+    return (
+      <div className="relative h-24">
+        <Skeleton />
+      </div>
+    );
   if (error) return <div className="p-2 text-sm">Failed to load</div>;
   if (!data) return null;
   const preview: GameItem[] = data.slice(0, 5);
@@ -52,7 +58,12 @@ export const GamesCard: React.FC = () => {
 // ─── 2. Modal Body: list all 5 games ──────────────────
 export const GamesModalBody: React.FC = () => {
   const { data, loading, error } = useWidgetData<GameData>("games");
-  if (loading) return <div className="p-4 text-sm">Loading…</div>;
+  if (loading)
+    return (
+      <div className="relative h-40">
+        <Skeleton />
+      </div>
+    );
   if (error) return <div className="p-4 text-sm">Failed to load</div>;
   if (!data) return null;
   return (

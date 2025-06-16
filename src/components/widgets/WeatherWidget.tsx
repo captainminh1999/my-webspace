@@ -6,6 +6,7 @@ import type { WeatherData } from "@/types/weather";
 import { useWidgetData } from "@/lib/useWidgetData";
 import { format } from "date-fns";
 import Image from "next/image";
+import Skeleton from "@/components/Skeleton";
 
 
 /* -------------------------------------------------------------
@@ -20,7 +21,12 @@ export const WeatherCard: React.FC = () => {
     return () => clearInterval(id);
   }, []);
 
-  if (loading) return <div className="p-2 text-sm">Loading…</div>;
+  if (loading)
+    return (
+      <div className="relative h-24">
+        <Skeleton />
+      </div>
+    );
   if (error) return <div className="p-2 text-sm">Failed to load</div>;
   if (!data) return null;
   const currentTemp = data.current.temp;
@@ -56,7 +62,12 @@ export const WeatherCard: React.FC = () => {
  * ------------------------------------------------------------- */
 export const WeatherModalBody: React.FC = () => {
   const { data, loading, error } = useWidgetData<WeatherData>("weather");
-  if (loading) return <div className="p-4 text-sm">Loading…</div>;
+  if (loading)
+    return (
+      <div className="relative h-40">
+        <Skeleton />
+      </div>
+    );
   if (error) return <div className="p-4 text-sm">Failed to load</div>;
   if (!data) return null;
   return (

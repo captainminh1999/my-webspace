@@ -3,10 +3,16 @@
 import type { TechStory } from "@/types/tech";
 import WidgetSection from "@/components/WidgetSection";
 import { useWidgetData } from "@/lib/useWidgetData";
+import Skeleton from "@/components/Skeleton";
 
 export function TechCard() {
   const { data, loading, error } = useWidgetData<TechStory[]>("tech");
-  if (loading) return <div className="p-2 text-sm">Loading…</div>;
+  if (loading)
+    return (
+      <div className="relative h-24">
+        <Skeleton />
+      </div>
+    );
   if (error) return <div className="p-2 text-sm">Failed to load</div>;
   if (!data) return null;
   const stories = data.slice(0, 5);
@@ -37,7 +43,12 @@ export function TechCard() {
 
 export function TechModalBody() {
   const { data: all, loading, error } = useWidgetData<TechStory[]>("tech");
-  if (loading) return <div className="p-4 text-sm">Loading…</div>;
+  if (loading)
+    return (
+      <div className="relative h-40">
+        <Skeleton />
+      </div>
+    );
   if (error) return <div className="p-4 text-sm">Failed to load</div>;
   if (!all) return null;
   return (

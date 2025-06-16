@@ -3,6 +3,7 @@
 import React from "react";
 import Image from "next/image";
 import WidgetSection from "@/components/WidgetSection";
+import Skeleton from "@/components/Skeleton";
 
 interface Apod {
   url: string;
@@ -28,7 +29,12 @@ interface SpaceWidgetData {
  */
 export const SpaceCard: React.FC = () => {
   const { data, loading, error } = useWidgetData<SpaceWidgetData>("space");
-  if (loading) return <div className="p-2 text-sm">Loading…</div>;
+  if (loading)
+    return (
+      <div className="relative h-24">
+        <Skeleton />
+      </div>
+    );
   if (error) return <div className="p-2 text-sm">Failed to load</div>;
   if (!data) return null;
   const { space } = data;
@@ -57,7 +63,12 @@ export const SpaceCard: React.FC = () => {
  */
 export const SpaceModalBody: React.FC = () => {
   const { data, loading, error } = useWidgetData<SpaceWidgetData>("space");
-  if (loading) return <div className="p-4 text-sm">Loading…</div>;
+  if (loading)
+    return (
+      <div className="relative h-40">
+        <Skeleton />
+      </div>
+    );
   if (error) return <div className="p-4 text-sm">Failed to load</div>;
   if (!data) return null;
   const { space, mars, epic, marsWeather } = data;

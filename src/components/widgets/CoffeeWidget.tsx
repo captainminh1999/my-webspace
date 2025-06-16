@@ -6,10 +6,16 @@ import Link from "next/link";
 import Image from "next/image";
 import { format } from "date-fns";
 import WidgetSection from "@/components/WidgetSection";
+import Skeleton from "@/components/Skeleton";
 
 export const CoffeeCard: React.FC = () => {
   const { data, loading, error } = useWidgetData<CoffeeData>("coffee");
-  if (loading) return <div className="p-2 text-sm">Loading…</div>;
+  if (loading)
+    return (
+      <div className="relative h-24">
+        <Skeleton />
+      </div>
+    );
   if (error) return <div className="p-2 text-sm">Failed to load</div>;
   if (!data) return null;
   const preview: CoffeeArticle[] = data.slice(0, 3);
@@ -52,7 +58,12 @@ export const CoffeeCard: React.FC = () => {
 
 export const CoffeeModalBody: React.FC = () => {
   const { data, loading, error } = useWidgetData<CoffeeData>("coffee");
-  if (loading) return <div className="p-4 text-sm">Loading…</div>;
+  if (loading)
+    return (
+      <div className="relative h-40">
+        <Skeleton />
+      </div>
+    );
   if (error) return <div className="p-4 text-sm">Failed to load</div>;
   if (!data) return null;
   return (

@@ -6,12 +6,18 @@ import { useWidgetData } from "@/lib/useWidgetData";
 import Link from "next/link";
 import Image from "next/image";
 import { format } from "date-fns";
+import Skeleton from "@/components/Skeleton";
 
 
 /** ─── DroneNewsCard (grid-cell preview) ─────────────────── */
 export const DroneNewsCard: React.FC = () => {
   const { data, loading, error } = useWidgetData<DroneNewsData>("drones");
-  if (loading) return <div className="p-2 text-sm">Loading…</div>;
+  if (loading)
+    return (
+      <div className="relative h-24">
+        <Skeleton />
+      </div>
+    );
   if (error) return <div className="p-2 text-sm">Failed to load</div>;
   if (!data) return null;
   // Show up to 3 items in the small widget
@@ -56,7 +62,12 @@ export const DroneNewsCard: React.FC = () => {
 /** ─── DroneNewsModalBody (full list in modal) ───────────── */
 export const DroneNewsModalBody: React.FC = () => {
   const { data, loading, error } = useWidgetData<DroneNewsData>("drones");
-  if (loading) return <div className="p-4 text-sm">Loading…</div>;
+  if (loading)
+    return (
+      <div className="relative h-40">
+        <Skeleton />
+      </div>
+    );
   if (error) return <div className="p-4 text-sm">Failed to load</div>;
   if (!data) return null;
   return (

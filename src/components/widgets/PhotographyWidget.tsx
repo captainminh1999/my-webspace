@@ -6,12 +6,18 @@ import { useWidgetData } from "@/lib/useWidgetData";
 import Image from "next/image";
 import Link from "next/link";
 import { format } from "date-fns";
+import Skeleton from "@/components/Skeleton";
 
 
 /** ─────────────── Photo Card (grid cell) ────────────────── */
 export const PhotographyCard: React.FC = () => {
   const { data: photo, loading, error } = useWidgetData<PhotographyData>("camera");
-  if (loading) return <div className="p-2 text-sm">Loading…</div>;
+  if (loading)
+    return (
+      <div className="relative h-24">
+        <Skeleton />
+      </div>
+    );
   if (error) return <div className="p-2 text-sm">Failed to load</div>;
   if (!photo) return null;
   // We show the thumbnail, plus a small credit line underneath
@@ -44,7 +50,12 @@ export const PhotographyCard: React.FC = () => {
 /** ──────────── Photography Modal Body ───────────────────── */
 export const PhotographyModalBody: React.FC = () => {
   const { data: photo, loading, error } = useWidgetData<PhotographyData>("camera");
-  if (loading) return <div className="p-4 text-sm">Loading…</div>;
+  if (loading)
+    return (
+      <div className="relative h-40">
+        <Skeleton />
+      </div>
+    );
   if (error) return <div className="p-4 text-sm">Failed to load</div>;
   if (!photo) return null;
   return (
