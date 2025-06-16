@@ -1,6 +1,6 @@
 // src/components/ModalFrame.tsx
 import React from "react";
-import { AnimatePresence, motion } from "framer-motion";
+import { LazyMotion, AnimatePresence, domAnimation, m } from "framer-motion";
 import { X } from "lucide-react"; // icon library already in project
 
 interface ModalFrameProps {
@@ -19,11 +19,12 @@ interface ModalFrameProps {
 const ModalFrame: React.FC<ModalFrameProps> = ({ isOpen, title, children, onClose }) => {
 
   return (
-    <AnimatePresence>
-      {isOpen && (
-        <>
-        {/* Backdrop */}
-          <motion.div
+    <LazyMotion features={domAnimation}>
+      <AnimatePresence>
+        {isOpen && (
+          <>
+          {/* Backdrop */}
+            <m.div
             key="backdrop"
             className="fixed inset-0 z-40 bg-black/60 backdrop-blur"
             initial={{ opacity: 0 }}
@@ -37,7 +38,7 @@ const ModalFrame: React.FC<ModalFrameProps> = ({ isOpen, title, children, onClos
             className="fixed inset-0 z-50 overflow-y-auto max-h-screen p-4"
             onClick={onClose}
           >
-            <motion.article
+            <m.article
               onClick={(e) => e.stopPropagation()}
               className="relative bg-white dark:bg-gray-800 w-full max-w-6xl mx-auto rounded-2xl shadow-lg pointer-events-auto"
               initial={{ opacity: 0 }}
@@ -61,11 +62,12 @@ const ModalFrame: React.FC<ModalFrameProps> = ({ isOpen, title, children, onClos
                 {/* content body */}
                 {children}
               </div>
-            </motion.article>
+            </m.article>
             </div>
         </>
-      )}
-    </AnimatePresence>
+        )}
+      </AnimatePresence>
+    </LazyMotion>
   );
 };
 
