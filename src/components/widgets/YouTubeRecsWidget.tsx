@@ -77,7 +77,6 @@ const YouTubeRecsModalBodyBase: React.FC<{ data: YouTubeRecData }> = ({ data }) 
       </Link>
     ))}
   </article>
-  );
 );
 
 export const YouTubeRecsModalBody = withWidgetData<YouTubeRecData>("youtube", {

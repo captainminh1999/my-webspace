@@ -97,7 +97,6 @@ const WeatherModalBodyBase: React.FC<{ data: WeatherData }> = ({ data }) => (
       </table>
     </WidgetSection>
   </article>
-  );
 );
 
 export const WeatherModalBody = withWidgetData<WeatherData>("weather", {

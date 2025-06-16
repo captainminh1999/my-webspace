@@ -36,30 +36,6 @@ const PhotographyCardBase: React.FC<{ data: PhotographyData }> = ({ data: photo 
 );
 
 export const PhotographyCard = withWidgetData<PhotographyData>("camera")(PhotographyCardBase);
-    <div className="h-full flex flex-col items-center justify-center p-2 space-y-2">
-      <Image
-        src={photo.thumbnail}
-        alt={photo.alt || "Unsplash photo"}
-        width={300}
-        height={300}
-        sizes="300px"
-        className="object-cover rounded-lg shadow-sm"
-      />
-      <p className="text-[10px] text-gray-600 dark:text-gray-400">
-        Photo by{" "}
-        <Link
-          href={photo.profile}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="font-semibold hover:underline text-black dark:text-white"
-        >
-          {photo.photographer}
-        </Link>{" "}
-        on Unsplash
-      </p>
-    </div>
-  );
-};
 
 /** ──────────── Photography Modal Body ───────────────────── */
 const PhotographyModalBodyBase: React.FC<{ data: PhotographyData }> = ({ data: photo }) => (
