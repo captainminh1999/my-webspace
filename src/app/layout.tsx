@@ -46,6 +46,8 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
+        {/* Preconnect to GTM to speed up tag script loading */}
+        <link rel="preconnect" href="https://www.googletagmanager.com" />
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=G-N8S80ZDYP0"
           strategy="afterInteractive"
