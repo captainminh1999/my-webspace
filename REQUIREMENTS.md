@@ -57,6 +57,8 @@ This document lists all the necessary packages and dependencies for the Interact
 npm install
 ```
 
+For detailed dependency installation instructions, see [DEPENDENCIES.md](DEPENDENCIES.md).
+
 ### Install production dependencies only:
 ```bash
 npm install --production
