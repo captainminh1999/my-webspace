@@ -46,6 +46,15 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
+        {/* Preload hero image for LCP optimization */}
+        <link
+          rel="preload"
+          as="image"
+          href="https://images.unsplash.com/photo-1465101162946-4377e57745c3?auto=format&fit=crop&w=1600&q=85&fm=webp"
+          fetchPriority="high"
+        />
+        {/* Preconnect to image hosts */}
+        <link rel="preconnect" href="https://images.unsplash.com" />
         {/* Preconnect to GTM to speed up tag script loading */}
         <link rel="preconnect" href="https://www.googletagmanager.com" />
         <Script

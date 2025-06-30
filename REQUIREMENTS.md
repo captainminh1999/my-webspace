@@ -92,3 +92,34 @@ npm install --save-dev
 - TypeScript is configured for strict type checking
 - ESLint is configured with Next.js best practices
 - Netlify Functions are used for serverless API endpoints
+
+## Performance Optimizations
+
+### LCP (Largest Contentful Paint) Optimizations
+The project includes several optimizations to improve Core Web Vitals:
+
+1. **Hero Image Optimization**:
+   - Image preloading with `fetchpriority="high"`
+   - WebP format with quality optimization
+   - Responsive sizing with proper `sizes` attribute
+   - Placeholder background during loading
+
+2. **Next.js Image Configuration**:
+   - Modern image formats (AVIF, WebP) enabled
+   - Long-term caching (1 year) for better performance
+   - Optimized device sizes and image sizes
+
+3. **Loading Strategy**:
+   - Suspense boundaries for better loading UX
+   - Skeleton screens for perceived performance
+   - Resource preconnection to external image hosts
+
+4. **CSS Optimizations**:
+   - Smooth transitions for better user experience
+   - Optimized animations with hardware acceleration
+   - Dark mode support for skeleton components
+
+### Expected Performance Improvements
+- LCP reduced from 4.3s to target of <2.5s
+- Load Delay reduction from 2.8s to ~800ms
+- Improved perceived performance with skeleton loading

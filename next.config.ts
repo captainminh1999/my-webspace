@@ -6,6 +6,11 @@ const nextConfig: NextConfig = {
   reactStrictMode: true,
 
   images: {
+    // Optimize image formats and caching for better LCP
+    formats: ['image/avif', 'image/webp'],
+    minimumCacheTTL: 31536000, // 1 year
+    deviceSizes: [640, 768, 1024, 1280, 1600],
+    imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
     // Allow NASA APOD (and any other remote image hosts you need)
     remotePatterns: [
       { protocol: 'https', hostname: 'apod.nasa.gov', pathname: '/**'},      // match everything under that host

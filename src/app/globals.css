@@ -68,3 +68,38 @@ body {
 a {
   @apply text-black dark:text-white;
 }
+
+/* Hero image placeholder and loading optimization */
+.hero-image {
+  background-color: #f3f4f6;
+  background-image: linear-gradient(45deg, #e5e7eb 25%, transparent 25%),
+                    linear-gradient(-45deg, #e5e7eb 25%, transparent 25%);
+  background-size: 20px 20px;
+  background-position: 0 0, 10px 10px;
+}
+
+.hero-image img {
+  transition: opacity 0.3s ease;
+}
+
+@media (prefers-color-scheme: dark) {
+  .hero-image {
+    background-color: #374151;
+    background-image: linear-gradient(45deg, #4b5563 25%, transparent 25%),
+                      linear-gradient(-45deg, #4b5563 25%, transparent 25%);
+  }
+}
+
+/* Shimmer animation for skeleton loading */
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.animate-shimmer {
+  animation: shimmer 2s infinite;
+}
