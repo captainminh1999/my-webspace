@@ -21,7 +21,7 @@ function Rows({ stories, all }: { stories: Story[]; all: Story[] }) {
             {typeof s.score === "number" && (
               <div className="mt-1 flex items-center gap-2">
                 <span className="h-0.5 flex-1 bg-rule rounded-full overflow-hidden">
-                  <span className="block h-full bg-ink-3 grow" style={{ width: `${(s.score / max) * 100}%`, animationDelay: `${i * 40}ms` }} />
+                  <span className="block h-full bg-ink-3 grow-x" style={{ width: `${(s.score / max) * 100}%`, animationDelay: `${i * 40}ms` }} />
                 </span>
                 <span className="font-mono text-source text-ink-3 w-12 text-right"><span aria-hidden>▲</span> {s.score}</span>
               </div>
@@ -41,7 +41,7 @@ export function TechCard({ data }: { data: Story[] }) {
 export function TechFull({ data }: { data: Story[] }) {
   if (!data.length) return <p className="font-mono text-dense text-ink-3">No items</p>;
   return (
-    <div className="max-w-2xl">
+    <div>
       <Rows stories={data} all={data} />
       <p className="font-mono text-source text-ink-3 mt-6">Source: Hacker News front page · hacker-news.firebaseio.com</p>
     </div>

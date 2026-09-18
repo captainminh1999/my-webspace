@@ -1,6 +1,8 @@
 # Design direction for nhatminh.dev
 
 > **Shipped 2026-09-19.** Build-order steps 0–7 are live on `main`; the token sheet, fonts, masthead, card anatomy, freshness contract, motion policy (with the addendum's draw-once/replay-on-hover rule) and the CV treatment below are what the site now runs. Lighthouse mobile went 49 → 87 on the first deploy. Deviations from the text: the stamp column is a *minimum* width (a STALE stamp is wider than 7.5 rem); the card header hides the stamp's absolute time and the "Open ↗" affordance below `md` so titles never truncate; stale cards dim only images and diagrams, not text, to keep contrast; hourly labels are two-digit 24-hour so twelve cells fit a phone; the hover replay is implemented as a second animation added on hover, so nothing restarts on leave.
+>
+> **Revised 2026-09-19 (owner review).** The stamp shows the relative age only (`14 MIN AGO`); the absolute Sydney time is its tooltip; the Weather card shows the dot alone. Cards in a row share a height, and one element per card absorbs the difference (the Weather sparkline, the Space and Photography images, the Profile summary). Widget dialogs are sized to their content (44.5 rem for lists, 50.5 rem for images) instead of a fixed 60 rem. The ticker runs on mount, on every minute boundary and when the tab returns, because the HTML arrives from the ISR cache already minutes old; it lives in the masthead so the CV pages tick too.
 
 ## The recommendation
 
@@ -42,7 +44,7 @@ Each graft is compatible with Ledger's grammar; nothing here changes the token s
 
 1. **The live temperature as the page's biggest number** (from Rasterblatt). Ledger's Weather card had a 56px numeral; it becomes 72px at lg (56px on mobile) with a 12-cell hourly row of tabular mono figures under the sparkline. It is server-rendered text that changes hourly, which is the honest expression of "live dashboard" and the cheapest possible above-the-fold paint. Rasterblatt's 96px was for a hero without a masthead; with a masthead above it, 72px is the right weight.
 2. **The gap-1px hairline grid** (from Rasterblatt). Kept for every inner grid: the YouTube 3x3 thumbnail grid, the Games cover strip, the 7-day weather table, the CV Licences/Honors/Languages tables and the Experience ledger rows. Rules are drawn by the grid gap on a `--rule` background, so they reflow at every breakpoint with no border logic. The outer widget grid keeps Ledger's bordered cards and 16/24px gutters, because colourful thumbnails on a dark ground need breathing room that a 1px lattice does not give.
-3. **Absolute-plus-relative stamp, fixed width** (from Contact Sheet's date-back stamp and Rasterblatt's FT-style stamp). Ledger's stamp read "14 MIN AGO"; it now reads `07:46 · 14 MIN` (under 24h) or `14 SEP · 4 D` (older), set in Plex Mono rather than Doto, in a fixed 7.5rem column so ages of different length never shift the header. The absolute time makes the year-stale failure legible even to someone who does not read colour.
+3. **Absolute-plus-relative stamp, fixed width** (from Contact Sheet's date-back stamp and Rasterblatt's FT-style stamp). Ledger's stamp read "14 MIN AGO"; the first build showed `07:46 · 14 MIN` (under 24h) or `14 SEP · 4 D` (older), set in Plex Mono rather than Doto, in a fixed 7.5rem column so ages of different length never shift the header. *Revised 2026-09-19:* the owner found the clock time confusing next to the age, so the stamp is the age alone again (`14 MIN AGO`, `4 D AGO`) and the absolute Sydney time is the tooltip; a stale feed still says `STALE ·` first and older than a day reads in days, which keeps the year-stale failure legible without colour. The Weather card, whose age is obvious from its content, shows only the dot (the age stays in the accessible name).
 4. **"Latest item" as a distinct source state** (from Deep Field). When a feed has no `fetchedAt` but its newest item has a date, the stamp says `LATEST 1 D` in `--ink-3` instead of `AGE UNKNOWN`. Only feeds with nothing readable get `AGE UNKNOWN`. This keeps seven cards from looking broken during the weeks before every cron writes `fetchedAt`.
 5. **Aggregate count on small screens** (from Contact Sheet's sheet-header status line). Ledger's masthead strip lists all nine feeds inline, which is too long for a 375px phone. Below `md` the strip collapses to `9 FEEDS · 8 FRESH · 1 STALE` inside a native `<details>` that expands to the full list. No JS.
 6. **Hollow dot for aging** (from Deep Field). Fresh is a filled dot, aging a 1px ring, stale a filled dot with the 2px card rule. Colour is no longer the only cue.
@@ -224,7 +226,7 @@ Scale (px, line-height): 11/16 source · 12/16 kicker and stamp · 13/18 dense r
 
 ## Layout
 
-Container `max-w-page` (1320px), side margin 16px on mobile, 24px at md, centred above 1368px. Tailwind default breakpoints; the `useResponsiveLayout` hook, `ORIGINAL_LAYOUTS` and the resize listener in `dashboard-grid.tsx` go away in favour of `md:col-span-*` / `lg:col-span-*` classes on each card. `grid-auto-rows: auto; align-items: start` so a tall list never stretches its neighbours.
+Container `max-w-page` (1320px), side margin 16px on mobile, 24px at md, centred above 1368px. Tailwind default breakpoints; the `useResponsiveLayout` hook, `ORIGINAL_LAYOUTS` and the resize listener in `dashboard-grid.tsx` go away in favour of `md:col-span-*` / `lg:col-span-*` classes on each card. `grid-auto-rows: auto`; rows stretch (the grid default — revised 2026-09-19, the first build used `align-items: start` and the ragged row bottoms read as a mistake on wide screens), so each card body is a flex column in which one element absorbs the difference: the Weather sparkline (`flex-basis` 40px, grows), the Space and Photography image frames (`aspect-ratio` plus `flex-grow`), the Profile summary with the CV link on `mt-auto`; list cards simply end above their footer.
 
 **Masthead** (server component, replaces HeroImage and HeroSkeleton). Full-width band with a 1px `--rule-strong` bottom rule, 24px vertical padding.
 - Left: stamp `DAILY DASH · NHATMINH.DEV` with a 6px `--accent` square before it; the dateline in Fraunces 40px `Thursday 18 September 2026`; a mono line `SYDNEY · 07:46 AEST` rendered at request time.
@@ -244,7 +246,7 @@ Container `max-w-page` (1320px), side margin 16px on mobile, 24px at md, centred
 
 **On mobile (1 column), DOM order = visual order:** Weather, Hacker News, Space, Profile, Photography, Coffee, Drones, Games, YouTube (thumbs 120px beside titles). Hacker News sits second on purpose so the first viewport on a Moto G is text only and the LCP is a text node; Space is one swipe down. If the owner prefers Space second on phones, it is a single `order` class, and the Lighthouse run in the checklist decides whether the APOD as LCP stays under 2.5s.
 
-**Card open:** clicking a card header opens the widget's full view in a native `<dialog>` (max-width 960px, `--surface`, 1px `--rule`, 6px radius) addressed by `?w=id` so deep links still work. The dialog controller is the only client island in the grid besides the theme toggle and the freshness ticker.
+**Card open:** clicking a card header opens the widget's full view in a native `<dialog>` (sized to its content: 44.5 rem for lists and the weather, 50.5 rem for the Space and Photography views, never wider than the viewport minus 2 rem; `--surface`, 1px `--rule`, 6px radius) addressed by `?w=id` so deep links still work. The dialog controller is the only client island in the grid besides the theme toggle and the freshness ticker.
 
 **About-me pages** use no grid and no cards; see the About-me section.
 
@@ -254,7 +256,7 @@ Container: `bg-surface border border-rule rounded-card overflow-hidden flex flex
 
 Header (40px, `px-4 border-b border-rule flex items-center justify-between`), the whole thing a `<button aria-label="Open Weather">`:
 - Left: kicker in `.stamp` `text-ink-2`, composed as folio + title: `01 WEATHER`, `02 SPACE`, `03 HACKER NEWS`. The folio is `text-ink-3` so the title reads first.
-- Right: the freshness stamp in a fixed `w-stamp` column (dot + `07:46 · 14 MIN`), then `Open ↗` in `.stamp text-ink-3` that turns `text-accent` on card hover.
+- Right: the freshness stamp (dot + `14 MIN AGO`; the Weather card shows the dot alone), then `Open ↗` in `.stamp text-ink-3` that turns `text-accent` on card hover.
 
 Body (`p-4 lg:p-5`): rows of 40-48px separated by 1px `--rule`; title 14px `text-ink line-clamp-2`; meta line mono 12px `text-ink-3` (rank, date, channel); thumbnails in a `--surface-2` frame with 1px `--rule` and 3px radius at fixed sizes (YouTube 96x54, Games 40x54 cover, Coffee/Drones 48x48 if the feed has one, else a mono index; Hacker News none). Full colour at rest; nothing grayscaled.
 
@@ -283,7 +285,7 @@ Skeletons are deleted; the cards are server-rendered with data, so there is noth
 </span>
 ```
 
-Text forms: under 24h `HH:MM · 14 MIN` / `HH:MM · 3 H`; 24h and older `14 SEP · 4 D`; content-sourced `LATEST 1 D`; none `AGE UNKNOWN`. Sydney time throughout (`date-fns` plus `Intl` with `Australia/Sydney`). One client island, `FreshnessTicker` (under 1KB), re-derives every visible `<time>` from its `dateTime` and `data-budget` once a minute so a tab left open stays honest; the per-second `setInterval` in `WeatherWidget.tsx` is deleted.
+Text forms: `JUST NOW`, `14 MIN AGO`, `3 H AGO`, `4 D AGO`; content-sourced `LATEST 1 D`; none `AGE UNKNOWN`; the masthead strip shows the bare age (`3 H`). The absolute time is the stamp's tooltip (`Fetched 19 Sep 2026, 05:32 AEST`). Sydney time throughout (`Intl` with `Australia/Sydney`). One client island, `FreshnessTicker` (under 1KB), re-derives every visible `<time>` from its `dateTime` and `data-budget` and sets the masthead clock: on mount (the page comes from the ISR cache, so its HTML is often minutes old), on every minute boundary, and when the tab returns to the foreground. It renders inside the masthead, so the CV pages tick as well.
 
 **States.**
 - FRESH: filled `--fresh` dot, text `--ink-2`.
@@ -297,7 +299,7 @@ Text forms: under 24h `HH:MM · 14 MIN` / `HH:MM · 3 H`; 24h and older `14 SEP 
 
 Policy: colour moves, nothing else does.
 
-- Moves: `color` and `border-color` on hover/focus (120ms ease-out); the `<dialog>` opacity 0 to 1 over 150ms with `@starting-style` and `allow-discrete`, backdrop from transparent to `--scrim`; the once-a-minute freshness text change (a DOM text swap, no animation). The theme toggle swaps `data-theme` with no transition, to avoid a frame of mixed colours.
+- Moves: `color` and `border-color` on hover/focus (120ms ease-out); the `<dialog>` opacity 0 to 1 over 150ms with `@starting-style` and `allow-discrete`, backdrop from transparent to `--scrim`; the freshness text change on each minute (a DOM text swap, no animation). The theme toggle swaps `data-theme` with no transition, to avoid a frame of mixed colours.
 - Does not move: cards (no scale, translate or shadow growth), the sparkline (static SVG), images (explicit `width`/`height` inside a `--surface-2` frame, so nothing needs a fade), the masthead, CV lists. No staggered entrances, no parallax, no skeleton shimmer.
 - `prefers-reduced-motion` zeroes both transitions via the global rule in the token sheet.
 - JS: `framer-motion` removed from `package.json` (ModalFrame is its only consumer; the LazyMotion chunk is ~30KB gzipped and becomes ~40 lines of dialog code). `lucide-react` reduced to zero on the home route (arrow, close and external-link glyphs become three inline SVG paths) and to at most three icons on the CV pages, or removed entirely by turning `formatters.ts`'s social icons into inline SVGs. Client islands on `/`: `ThemeToggle` (~0.6KB), `FreshnessTicker` (<1KB), `WidgetDialog` (loads a widget's full view on click via `next/dynamic`; nothing loads before a click). First-load JS target for `/`: under 110KB gzipped, essentially the Next/React runtime.

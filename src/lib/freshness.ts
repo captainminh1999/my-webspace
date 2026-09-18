@@ -4,7 +4,7 @@
 // job that fetched it). Until every job has written that, the age falls
 // back to the newest date inside the content and is labelled LATEST.
 import type { DashboardData, WidgetId } from "@/types/dashboard";
-import { dayMon, hm, relativeAge, toDate } from "./time";
+import { relativeAge, toDate } from "./time";
 
 export type Budget = "hourly" | "daily";
 export type Source = "fetched" | "content" | "none";
@@ -16,7 +16,9 @@ export interface Freshness {
   source: Source;
   budget: Budget;
   state: State;
-  /** Stamp text, e.g. "07:46 · 14 MIN", "14 SEP · 4 D", "LATEST 1 D", "AGE UNKNOWN". */
+  /** The relative age alone, for the masthead strip: "14 MIN", "3 H", "4 D", or "?" when unknown. */
+  age: string;
+  /** Stamp text, e.g. "14 MIN AGO", "JUST NOW", "LATEST 1 D", "AGE UNKNOWN". */
   text: string;
 }
 
@@ -74,12 +76,12 @@ export function stateFor(at: Date | null, budget: Budget, now: Date): State {
   return "stale";
 }
 
+/** Same rule as the client ticker (FreshnessTicker.tsx) — keep the two in step. */
 export function stampText(at: Date | null, source: Source, now: Date): string {
   if (!at || source === "none") return "AGE UNKNOWN";
   const rel = relativeAge(at, now);
   if (source === "content") return `LATEST ${rel}`;
-  const under24h = now.getTime() - at.getTime() < 86400e3;
-  return `${under24h ? hm(at) : dayMon(at).toUpperCase()} · ${rel}`;
+  return rel === "NOW" ? "JUST NOW" : `${rel} AGO`;
 }
 
 export function freshnessFor(data: DashboardData, id: WidgetId, now: Date): Freshness {
@@ -92,7 +94,7 @@ export function freshnessFor(data: DashboardData, id: WidgetId, now: Date): Fres
     source = at ? "content" : "none";
   }
   const state = source === "none" ? "unknown" : stateFor(at, budget, now);
-  return { id, at, source, budget, state, text: stampText(at, source, now) };
+  return { id, at, source, budget, state, age: at ? relativeAge(at, now) : "?", text: stampText(at, source, now) };
 }
 
 export function allFreshness(data: DashboardData, now: Date): Record<WidgetId, Freshness> {

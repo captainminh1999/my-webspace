@@ -6,10 +6,13 @@ export function Sparkline({
   values,
   height = 40,
   className = "",
+  stretch = false,
 }: {
   values: number[];
+  /** The drawn height; with `stretch` it is the minimum and the chart grows with its flex column. */
   height?: number;
   className?: string;
+  stretch?: boolean;
 }) {
   if (values.length < 2) return null;
   const W = 100;
@@ -27,8 +30,8 @@ export function Sparkline({
     <svg
       viewBox={`0 0 ${W} ${height}`}
       preserveAspectRatio="none"
-      className={`w-full block ${className}`}
-      style={{ height }}
+      className={`w-full block ${stretch ? "grow shrink-0" : ""} ${className}`}
+      style={stretch ? { flexBasis: height, minHeight: height } : { height }}
       aria-hidden
     >
       <path d={area} fill="var(--accent)" fillOpacity={0.1} className="fade" />
@@ -60,7 +63,7 @@ export function TimeTicks({ dates, days, now, label }: { dates: Date[]; days: nu
   return (
     <div className="mt-3">
       <svg viewBox={`0 0 ${W} 8`} preserveAspectRatio="none" className="w-full block h-2" aria-hidden>
-        <line x1={0} y1={7.5} x2={W} y2={7.5} stroke="var(--rule-strong)" strokeWidth={1} vectorEffect="non-scaling-stroke" className="grow" />
+        <line x1={0} y1={7.5} x2={W} y2={7.5} stroke="var(--rule-strong)" strokeWidth={1} vectorEffect="non-scaling-stroke" className="grow-x" />
         {xs.map((x, i) => (
           <line
             key={i}

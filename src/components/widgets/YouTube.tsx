@@ -65,7 +65,7 @@ export function YouTubeFull({ data, now }: { data: YouTubeRecData | null; now: D
   const items = (data?.items ?? []).filter((v) => v.videoId && v.videoId !== "null");
   if (!items.length) return <p className="font-mono text-dense text-ink-3">No items</p>;
   return (
-    <div className="max-w-2xl">
+    <div>
       <ul className="divide-y divide-rule">
         {items.map((v) => (
           <Row key={v.videoId} v={v} now={now} />

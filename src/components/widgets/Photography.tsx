@@ -5,7 +5,7 @@ import { monthDay, toDate } from "@/lib/time";
 export function PhotographyCard({ data }: { data: PhotographyData | null }) {
   if (!data) return <p className="font-mono text-dense text-ink-3">No items</p>;
   return (
-    <div className="relative aspect-[4/3] overflow-hidden rounded-thumb bg-surface-2 border border-rule">
+    <div className="relative aspect-[4/3] grow overflow-hidden rounded-thumb bg-surface-2 border border-rule">
       <Image
         src={data.thumbnail}
         alt={data.alt || "Photograph from Unsplash"}
@@ -22,7 +22,7 @@ export function PhotographyFull({ data }: { data: PhotographyData | null }) {
   if (!data) return <p className="font-mono text-dense text-ink-3">No items</p>;
   const d = toDate(data.createdAt);
   return (
-    <div className="max-w-3xl">
+    <div>
       <div className="relative aspect-[3/2] overflow-hidden rounded-thumb bg-surface-2 border border-rule">
         <Image src={data.full} alt={data.alt || "Photograph from Unsplash"} fill sizes="(max-width: 960px) 100vw, 900px" quality={80} className="object-contain" />
       </div>

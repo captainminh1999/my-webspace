@@ -6,7 +6,6 @@ import { allFreshness } from "@/lib/freshness";
 import Masthead from "@/components/dashboard/Masthead";
 import { Card, WidgetDialog } from "@/components/dashboard/Card";
 import DialogController from "@/components/dashboard/DialogController";
-import FreshnessTicker from "@/components/dashboard/FreshnessTicker";
 import { WeatherCard, WeatherFull } from "@/components/widgets/Weather";
 import { SpaceCard, SpaceFull } from "@/components/widgets/Space";
 import { TechCard, TechFull } from "@/components/widgets/Tech";
@@ -28,7 +27,7 @@ export default async function Page() {
   // DOM order is the phone order (text first, so the LCP is text); md+ reorders with `order-*`.
   const cards = [
     {
-      id: "weather", folio: "01", title: "WEATHER", span: "md:col-span-3 lg:col-span-4 md:order-1",
+      id: "weather", folio: "01", title: "WEATHER", span: "md:col-span-3 lg:col-span-4 md:order-1", stamp: "dot",
       footer: data.weather ? <span>Source: OpenWeather</span> : null,
       card: data.weather ? <WeatherCard data={data.weather} /> : NO_ITEMS,
       full: data.weather ? <WeatherFull data={data.weather} /> : NO_ITEMS,
@@ -39,7 +38,7 @@ export default async function Page() {
       card: <TechCard data={data.tech} />, full: <TechFull data={data.tech} />,
     },
     {
-      id: "space", folio: "02", title: "SPACE", span: "md:col-span-3 lg:col-span-8 md:order-2",
+      id: "space", folio: "02", title: "SPACE", span: "md:col-span-3 lg:col-span-8 md:order-2", width: "wide",
       footer: <span>Source: NASA APOD · EPIC</span>,
       card: <SpaceCard data={data.space} />, full: <SpaceFull data={data.space} />,
     },
@@ -48,7 +47,7 @@ export default async function Page() {
       card: <ProfileCard data={data.profile} />, full: null,
     },
     {
-      id: "camera", folio: "04", title: "PHOTOGRAPHY", span: "md:col-span-3 lg:col-span-4 md:order-4",
+      id: "camera", folio: "04", title: "PHOTOGRAPHY", span: "md:col-span-3 lg:col-span-4 md:order-4", width: "wide",
       footer: data.camera ? (
         <span className="truncate">
           Photo by{" "}
@@ -86,7 +85,8 @@ export default async function Page() {
     <>
       <Masthead now={now} freshness={f} />
       <main className="mx-auto max-w-page px-4 md:px-6 py-6 md:py-8">
-        <div className="grid grid-cols-1 md:grid-cols-6 lg:grid-cols-12 gap-4 md:gap-6 items-start">
+        {/* Rows are equal height (grid default); each body lets one element absorb the difference. */}
+        <div className="grid grid-cols-1 md:grid-cols-6 lg:grid-cols-12 gap-4 md:gap-6">
           {cards.map((c) => (
             <Card
               key={c.id}
@@ -96,6 +96,7 @@ export default async function Page() {
               freshness={c.id in f ? f[c.id as keyof typeof f] : undefined}
               footer={"footer" in c ? c.footer : undefined}
               opens={"opens" in c ? c.opens : true}
+              stamp={"stamp" in c ? c.stamp : "text"}
               className={c.span}
             >
               {c.card}
@@ -106,13 +107,20 @@ export default async function Page() {
       {cards.map(
         (c) =>
           c.full && (
-            <WidgetDialog key={c.id} id={c.id} folio={c.folio} title={c.title} freshness={c.id in f ? f[c.id as keyof typeof f] : undefined}>
+            <WidgetDialog
+              key={c.id}
+              id={c.id}
+              folio={c.folio}
+              title={c.title}
+              freshness={c.id in f ? f[c.id as keyof typeof f] : undefined}
+              stamp={"stamp" in c ? c.stamp : "text"}
+              width={"width" in c ? c.width : "narrow"}
+            >
               {c.full}
             </WidgetDialog>
           ),
       )}
       <DialogController />
-      <FreshnessTicker />
     </>
   );
 }

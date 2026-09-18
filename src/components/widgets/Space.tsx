@@ -18,8 +18,8 @@ export function SpaceCard({ data }: { data: SpaceData | null }) {
   }
   const epicDate = toDate(epic?.date?.replace(" ", "T") ?? null);
   return (
-    <div className="flex flex-col gap-4">
-      <div className="relative aspect-video overflow-hidden rounded-thumb bg-surface-2 border border-rule">
+    <div className="flex flex-col gap-4 grow">
+      <div className="relative aspect-video grow overflow-hidden rounded-thumb bg-surface-2 border border-rule">
         <Image
           src={lead}
           alt={apod?.title ?? "Earth from NASA's EPIC camera"}
@@ -53,7 +53,7 @@ export function SpaceFull({ data }: { data: SpaceData | null }) {
   const epic = data?.epic ?? null;
   const lead = apodImage(apod);
   return (
-    <div className="flex flex-col gap-8 max-w-3xl">
+    <div className="flex flex-col gap-8">
       {apod && (
         <section>
           <p className="stamp text-ink-3">Astronomy picture of the day · {apod.date}</p>

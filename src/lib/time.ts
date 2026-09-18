@@ -13,6 +13,7 @@ const F = {
   hour24: fmt({ hour: "2-digit", hourCycle: "h23" }),
   mon: fmt({ month: "short" }, "en-US"),
   day: fmt({ day: "numeric" }),
+  year: fmt({ year: "numeric" }),
   tzName: fmt({ timeZoneName: "short" }),
 };
 
@@ -40,6 +41,8 @@ export const tzAbbrev = (d: Date) => {
   return part?.value ?? "AEST";
 };
 export const monthDay = dayMon;
+/** "19 Sep 2026, 05:32 AEST" — the stamp's tooltip, so the absolute time is one hover away. */
+export const longStamp = (d: Date) => `${dayMon(d)} ${F.year.format(d)}, ${hm(d)} ${tzAbbrev(d)}`;
 
 /** Relative age in the stamp register: "14 MIN", "3 H", "4 D". */
 export function relativeAge(from: Date, now: Date): string {

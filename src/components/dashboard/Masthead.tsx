@@ -4,6 +4,7 @@ import type { WidgetId } from "@/types/dashboard";
 import { dateline, hm, tzAbbrev } from "@/lib/time";
 import { Stamp } from "./Stamp";
 import ThemeToggle from "./ThemeToggle";
+import FreshnessTicker from "./FreshnessTicker";
 
 const LABEL: Record<WidgetId, string> = {
   weather: "WEATHER",
@@ -72,7 +73,7 @@ export default function Masthead({ now, freshness, variant = "dash", title }: Pr
                       {LABEL[f.id]}{" "}
                       {f.at ? (
                         <time dateTime={f.at.toISOString()} data-budget={f.budget} data-source={f.source} data-short="" className="text-ink-3">
-                          {f.text.replace(/^.*· /, "")}
+                          {f.age}
                         </time>
                       ) : (
                         <span className="text-ink-3">?</span>
@@ -117,6 +118,7 @@ export default function Masthead({ now, freshness, variant = "dash", title }: Pr
           </div>
         </div>
       </div>
+      <FreshnessTicker />
     </header>
   );
 }

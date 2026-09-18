@@ -39,7 +39,7 @@ function Daily({ data }: { data: WeatherData }) {
             <WeatherGlyph code={d.icon} size={16} decorative className="text-ink-3" />
             <span className="relative h-0.5 bg-rule rounded-full">
               <span
-                className="absolute top-0 h-0.5 rounded-full grow"
+                className="absolute top-0 h-0.5 rounded-full grow-x"
                 style={{
                   left: `${left}%`,
                   width: `${Math.max(width, 2)}%`,
@@ -62,7 +62,7 @@ export function WeatherCard({ data }: { data: WeatherData }) {
   if (typeof data?.current?.temp !== "number") return <p className="font-mono text-dense text-ink-3">No items</p>;
   const { word } = glyphFor(data.current.icon);
   return (
-    <div>
+    <div className="flex flex-col grow">
       <div className="flex items-start justify-between gap-4">
         <div>
           <p className="font-display font-medium text-ink text-[3.5rem] leading-none lg:text-numeral tracking-tight">
@@ -74,7 +74,7 @@ export function WeatherCard({ data }: { data: WeatherData }) {
         </div>
         <WeatherGlyph code={data.current.icon} size={40} decorative className="text-ink-2 shrink-0 mt-1" />
       </div>
-      <Sparkline values={(data.hourly ?? []).slice(0, 12).map((h) => h.temp)} className="mt-4" />
+      <Sparkline values={(data.hourly ?? []).slice(0, 12).map((h) => h.temp)} className="mt-4" stretch />
       <Hourly data={data} cells={12} />
       <Daily data={data} />
     </div>
@@ -86,7 +86,7 @@ export function WeatherFull({ data }: { data: WeatherData }) {
   if (typeof data?.current?.temp !== "number") return <p className="font-mono text-dense text-ink-3">No items</p>;
   const { word } = glyphFor(data.current.icon);
   return (
-    <div className="max-w-2xl">
+    <div>
       <div className="flex items-start justify-between gap-6">
         <div>
           <p className="font-display font-medium text-ink text-numeral">{r(data.current.temp)}°</p>

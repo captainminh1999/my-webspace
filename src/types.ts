@@ -9,7 +9,8 @@ export interface ProfileData {
   address?: string | null;
   birthDate?: string | null; // Hidden
   headline: string;
-  // summary is handled by AboutData
+  /** The LinkedIn summary as exported; the CV's About section is the curated AboutData. */
+  summary?: string | null;
   industry?: string | null;   // Hidden
   zipCode?: string | number | null;
   geoLocation?: string | null;

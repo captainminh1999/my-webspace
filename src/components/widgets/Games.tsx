@@ -40,7 +40,7 @@ export function GamesCard({ data, now }: { data: GameItem[]; now: Date }) {
 export function GamesFull({ data, now }: { data: GameItem[]; now: Date }) {
   if (!data.length) return <p className="font-mono text-dense text-ink-3">No items</p>;
   return (
-    <div className="max-w-2xl">
+    <div>
       <ul className="divide-y divide-rule">
         {data.map((g) => {
           const d = toDate(g.released);
