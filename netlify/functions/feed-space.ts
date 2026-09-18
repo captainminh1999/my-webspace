@@ -6,5 +6,5 @@ import { space } from "./feeds/sources";
 const handler = async () => runFeed("space", space);
 export default handler;
 
-// TEMPORARY (2026-09-19): one extra run at 22:24 UTC to test the new NASA_KEY; goes back to "0 8 * * *" in the next commit.
-export const config: Config = { schedule: "24 22 * * *" };
+// TEMPORARY (2026-09-19): one extra run at 22:31 UTC to test NASA_KEY (normal: "0 8 * * *"); restored in the next commit.
+export const config: Config = { schedule: "31 22 * * *" };

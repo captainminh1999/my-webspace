@@ -6,4 +6,5 @@ import { weather } from "./feeds/sources";
 const handler = async () => runFeed("weather", weather);
 export default handler;
 
-export const config: Config = { schedule: "10 * * * *" };
+// TEMPORARY (2026-09-19): one extra run at 22:33 UTC to test WEATHER_KEY (normal: "10 * * * *"); restored in the next commit.
+export const config: Config = { schedule: "33 22 * * *" };
