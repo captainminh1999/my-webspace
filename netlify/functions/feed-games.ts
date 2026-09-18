@@ -6,5 +6,4 @@ import { games } from "./feeds/sources";
 const handler = async () => runFeed("games", games);
 export default handler;
 
-// TEMPORARY (2026-09-19): one extra run at 22:32 UTC to test RAWG_KEY (normal: "0 4 * * *"); restored in the next commit.
-export const config: Config = { schedule: "32 22 * * *" };
+export const config: Config = { schedule: "0 4 * * *" };
