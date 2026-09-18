@@ -1,5 +1,7 @@
 # Design direction for nhatminh.dev
 
+> **Shipped 2026-09-19.** Build-order steps 0–7 are live on `main`; the token sheet, fonts, masthead, card anatomy, freshness contract, motion policy (with the addendum's draw-once/replay-on-hover rule) and the CV treatment below are what the site now runs. Lighthouse mobile went 49 → 87 on the first deploy. Deviations from the text: the stamp column is a *minimum* width (a STALE stamp is wider than 7.5 rem); the card header hides the stamp's absolute time and the "Open ↗" affordance below `md` so titles never truncate; stale cards dim only images and diagrams, not text, to keep contrast; hourly labels are two-digit 24-hour so twelve cells fit a phone; the hover replay is implemented as a second animation added on hover, so nothing restarts on leave.
+
 ## The recommendation
 
 Build **Ledger, night edition**: the editorial data-page direction (leaderboard leader), shipped **dark by default** with the light "paper" theme as the opt-in, and with four ideas grafted in from the losing proposals.
