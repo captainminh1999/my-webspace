@@ -1,0 +1,433 @@
+# my-webspace — Architecture
+
+Repository: `/Users/minhnguyen/My Github/my-webspace` (branch `main`, in sync with `origin/main`, HEAD `4cbba2f`, working tree clean) · Live site: https://nhatminh.dev · Stack: Next.js 15 App Router (lockfile 15.5.12, `package.json:21` says `^15.3.4`), React 19, Tailwind v4.1.8, Netlify Functions (classic `Handler` API), MongoDB (db `MONGODB_DB || "cv"`), GitHub Actions cron ingestion.
+
+**Status as of 2026-09-18 (evening), verified live — read this first.**
+- All eight cron workflows had been **auto-disabled by GitHub** (60-day inactivity rule) since 2025-08-30; every widget fed year-old data until they were re-enabled and dispatched today. Seven succeeded on the first run; NASA needed commit `4cbba2f` (below). All eight feeds are now current in MongoDB. The auto-disable will recur if the repo goes quiet for 60 days — the backlog moves ingestion to Netlify Scheduled Functions.
+- `fetch-nasa.yml` had failed on every run since Aug 2025: the Mars Rover Photos API behind `api.nasa.gov/mars-photos` is a dead Heroku app, and `bash -e` stopped the job before the push step. `4cbba2f` drops the Mars rover and InSight (frozen since 2022) steps, keeps APOD + EPIC, and builds the EPIC image URL on the key-free `epic.gsfc.nasa.gov` archive. **The old `NASA_KEY` was public for ~a year via `epic.url`; rotate it.**
+- `ca7c6f1` made the eBay webhook ack-only; the `ebay_account_deletions` collection (411,258 docs / 167 MB of eBay users' identifiers) was dropped. `cv` is now 139 documents / 37 KB across 15 collections.
+- Live Netlify: site `morning-kafes-2604`, production branch `main`, `@netlify/plugin-nextjs@5.16.0`, functions on `nodejs22.x`, Lighthouse mobile 49 / a11y 100 / SEO 100. The browser does fire 8 `get-widget` requests on first load (§2a step 8 confirmed in the Network tab).
+- Local toolchain installed today: Homebrew, `node@22` (keg-only, on PATH via `~/.zprofile`), `gh` (logged in), `netlify-cli` (not yet logged in / linked). `npm ci` and `next build` pass with `NEXT_PUBLIC_BASE_URL=https://nhatminh.dev` in `.env`.
+
+All `file:line` references are relative to the repo root. Facts marked **(verified from build)** were read from the `.next/` output that exists in the checkout (`node_modules/` and `.next/` are both present, BUILD_ID `d1mxSUj3b-IskOqFGCdxF`).
+
+---
+
+## 1. System overview
+
+```
+                 ┌────────────────────────────────────────────────────────────────────┐
+                 │                          GitHub Actions (cron)                       │
+                 │  .github/workflows/fetch-{weather,tech,coffee-news,drone-news,       │
+                 │   games,nasa,photography,youtube-recs}.yml                           │
+                 │  curl API → jq/node trim → scripts/push-to-mongo.ts                   │
+                 └───────────────┬────────────────────────────────────────┬────────────┘
+                                 │ --collection / --singleton             │ HTTPS
+                                 ▼                                        ▼
+   ┌──────────────────────┐   ┌──────────────────────┐   ┌──────────────────────────────┐
+   │      MongoDB "cv"    │   │   External APIs      │   │ OpenWeather · NewsAPI · RAWG  │
+   │ singletons{_id}      │◄──┤ (write side only via │   │ NASA (APOD/EPIC, 4cbba2f)     │
+   │ coffee tech droneNews│   │  Actions)            │   │ Unsplash · Hacker News · YouTube│
+   │ games experience ... │   └──────────────────────┘   └──────────────────────────────┘
+   │ (12 CV sections)     │
+   └──────────┬───────────┘
+              │ connectToDatabase()  (src/lib/mongodb.ts — used ONLY by functions/scripts)
+              ▼
+   ┌──────────────────────────────────────────────┐
+   │ Netlify Functions  /.netlify/functions/*      │
+   │ get-widget · get-all-widgets · get-cv-section │
+   │ get-full-cv · upload-cv-data · get-deploy-    │
+   │ status · ebay-account-deletion-webhook (no DB)│
+   │ (Cache-Control: public, max-age=60 on reads)  │
+   └──────────┬───────────────────▲───────────────┘
+              │ JSON              │ self-HTTP fetch (absolute URL from headers()/env)
+              ▼                   │
+   ┌──────────────────────────────┴───────────────┐        ┌──────────────────────┐
+   │ Next.js SSR (Netlify Next adapter, auto-      │        │  Netlify CDN         │
+   │  provisioned; nothing declared in repo)       │◄──────►│  /_next/static/* 1y  │
+   │ src/app/layout.tsx  generateMetadata→profile  │        │  ISR pages 60s       │
+   │ /            dynamic (headers() in fetch)      │        │  function responses  │
+   │ /about-me/*  ISR revalidate=60                 │        │  Netlify Image CDN   │
+   │ /admin/upload static prerender                 │        │   (next/image)       │
+   └──────────────────────────────────────────────┘        └──────────┬───────────┘
+                                                                      ▼
+   ┌──────────────────────────────────────────────────────────────────────────────┐
+   │ Browser                                                                      │
+   │ DashboardGrid (client) → withWidgetData(id) → useWidgetData → fetchWidgetData│
+   │   → GET /.netlify/functions/get-widget?widget=<id>   (module cache, no TTL)  │
+   │ ?w=<id> modal · UploadForm → POST upload-cv-data · GA4 gtag · next/image     │
+   └──────────────────────────────────────────────────────────────────────────────┘
+```
+
+The site is two halves sharing one root layout and nothing else. The **dashboard** (`/`, "Daily Dash") is a CSS grid of nine widget cards (eight data widgets + a static profile link) whose data lives in MongoDB and is refreshed out-of-band by eight GitHub Actions cron jobs. The **CV** (`/about-me` and eight sub-pages) is fully server-rendered from twelve MongoDB "sections" that are written by an admin CSV upload portal at `/admin/upload`. Nothing under `src/app` talks to MongoDB directly: every page does a **self-HTTP round trip** to the site's own Netlify Functions (`src/lib/getCvSection.ts:7`, `src/lib/getFullCv.ts:7`, `src/lib/widgetData.ts:78,106`), which are the only consumers of `src/lib/mongodb.ts` besides the cron scripts.
+
+Consequences that matter for the redesign: local dev must be `netlify dev` on port 8888 (`.env.example:1`, `package.json:7`; see §9 for what that actually needs on this machine) or every server fetch fails silently into "No … data available"; `/` is rendered per request (not ISR) because `computeBaseUrl()` calls `headers()` (`src/lib/widgetData.ts:57-58`) — **verified from build**: `/` is absent from `.next/prerender-manifest.json` while every `/about-me*` route has `initialRevalidateSeconds: 60` and `/admin/upload` is a static prerender; and there are four independent 60-second caches stacked on top of cron intervals (§8).
+
+---
+
+## 2. Runtime request flows
+
+### 2a. Home page first load (`GET /`)
+
+1. Netlify routes the request to the Next runtime. `src/app/layout.tsx:16-22` `generateMetadata()` → `getCvSection('profile')` (`src/lib/getCvSection.ts:3-13`) → `GET {NEXT_PUBLIC_BASE_URL||URL}/.netlify/functions/get-cv-section?section=profile` → `netlify/functions/get-cv-section.ts:41-50` → `singletons.findOne({_id:'profile'})` → `<title>` `"${firstName} ${lastName} - My Space"` (fallback `"My Space - Interactive CV"`, `layout.tsx:23-32`). Only `firstName`/`lastName` are used here.
+2. `src/app/page.tsx:4-13` (`export const revalidate = 60`) renders `<Suspense><DashboardView/></Suspense>` (Suspense is required because `useSearchParams` is used below).
+3. `src/app/DashboardView.tsx:4-7` (async RSC) awaits `fetchAllWidgetsData()` (`src/lib/widgetData.ts:105-112`) → `computeBaseUrl()` (`widgetData.ts:52-71`) dynamically imports `next/headers`, reads `x-forwarded-proto`/`x-forwarded-host`/`host` → `GET {origin}/.netlify/functions/get-all-widgets`. The `headers()` call is what makes `/` dynamic. There is **no try/catch**: a failed function call errors the whole page (`DashboardView.tsx:5`).
+4. `netlify/functions/get-all-widgets.ts:14-28` → `connectToDatabase()` → loops `ALLOWED_WIDGETS` with **8 sequential `await`s** (`:18-23`) calling `fetchWidget(db,id)` (`netlify/functions/widget-utils.ts:14-60`). The `space` step itself does a `Promise.all` over four `singletons.findOne` calls (`widget-utils.ts:25-31`), so one call = **11 Mongo reads in 8 sequential steps** (collections `coffee`, `tech`, `droneNews`, `games`; singletons `weather`, `space`, `epic`, `marsPhoto`, `marsWeather`, `youtubeRecs`, `photography`). Widgets returning `null` are omitted (`get-all-widgets.ts:19-22`); response gets `Cache-Control: public, max-age=60`.
+5. Back in `widgetData.ts:109-110` the payload is HTML-entity-decoded (`decodeStrings`, `widgetData.ts:23-38`, which recurses arrays/objects and delegates each string to `decodeHtmlEntities`, `:2-21`) and `Object.assign`'d into the RSC bundle's `widgetCache`, then returned as `initialData`.
+6. `src/app/DashboardView.client.tsx:13-26` (`"use client"`) renders `<main class="min-h-screen p-4 bg-gray-100 dark:bg-gray-900">` with `DashboardHeader` ("Daily Dash"), `<Suspense fallback={<HeroSkeleton/>}><HeroImage/></Suspense>` (`:20-22`; the fallback never shows — `HeroImage` does not suspend), and `DashboardGrid`. It calls `hydrateWidgetCache(initialData)` **inside a `useEffect`** (`:14-16`).
+7. `src/app/dashboard-grid.tsx:21-43` `useResponsiveLayout()` starts at `"md"` (`:22`, 3 columns) and only measures `window.innerWidth` in an effect → SSR and first paint are always the md layout. `:69-86` renders a CSS grid from `ORIGINAL_LAYOUTS[layoutKey]` (`src/lib/widgetRegistry.tsx:155-208`), sorting by `(y,x)` (`:73-75`) and setting only `gridColumn` (`:82`, no `gridRow`), so cards flow into rows in sort order (per-breakpoint order in §4).
+8. Each card body is `widget.content`, a `next/dynamic` import (`widgetRegistry.tsx:18-33`, no `loading` option) of `<XCard/>` = `withWidgetData(id)(XCardBase)` (`src/components/widgets/withWidgetData.tsx:15-35`) → `useWidgetData(id)` (`src/lib/useWidgetData.ts:11-42`) seeds state from `getCachedWidget(id)` then, in its own effect, sets `loading:true` and calls `fetchWidgetData(id)` (`widgetData.ts:73-97`). Because child effects run before the parent's `hydrateWidgetCache` effect, and because the RSC and client bundles hold **separate** `widgetCache` module instances, cards typically SSR as `Skeleton`s and each issues `GET /.netlify/functions/get-widget?widget=<id>` on mount (up to 8 extra requests). `cvLink` bypasses all of this and renders the static `ProfileWidget` (`dashboard-grid.tsx:103-110`).
+
+### 2b. A widget refresh / modal open (`?w=<id>`)
+
+1. Card header `div role="button"` or body `<button>` click → `router.push('?w=<id>', {scroll:false})` (`dashboard-grid.tsx:93,115`).
+2. `useSearchParams().get('w')` → `widgets.find(w => w.id === openId)` (`:46-49`); unknown ids render nothing. `cvLink` has `disableModal: true` (`widgetRegistry.tsx:127`) and never opens one.
+3. `ModalFrame` (`dynamic(..., {ssr:false})`, `:15-17`) mounts with `widget.modalContent` = `withWidgetData(id, {loadingHeight:'h-40', errorPadding:'p-4'})(XModalBodyBase)`; it reads the **same cache slot** as the card, so no new request is made on a cache hit.
+4. **There is never a retry.** `fetchWidgetData` checks the cache first: `if (cached instanceof Error) throw cached; if (cached !== undefined) return cached` (`widgetData.ts:74-76`), and a failed fetch stores the Error at `:91`. `useWidgetData` seeds from the cache (`useWidgetData.ts:12-21`) and its effect (`:23-35`) calls `fetchWidgetData`, which rejects immediately from the cache → `error` state → `withWidgetData.tsx:30` renders `Failed to load`. Card and modal share the `id`, so after one failure both show the error with zero further requests until a full reload (module-level `widgetCache`, `widgetData.ts:41`).
+5. While open: Escape listener and `document.body.classList.toggle('overflow-hidden')` (`:55-65`).
+6. Close = `router.back()` (`:53`) — from a deep link like `/?w=space` this leaves the site. The `AnimatePresence` exit animation never plays because the parent unmounts `ModalFrame` outright (`:124-130`, `src/components/ModalFrame.tsx:23-24`).
+7. There is **no user-triggered refresh**: `widgetCache` has no TTL or invalidation API (`widgetData.ts:41-46`). Fresh data arrives only on full reload, bounded by the function's 60 s `Cache-Control`.
+
+### 2c. An about-me section page (`GET /about-me/experience`)
+
+1. Root layout metadata fetch as in 2a step 1.
+2. `src/app/about-me/experience/page.tsx:5` `export const revalidate = 60`; static `metadata` title `"… - My CV"` (`:21-24`).
+3. `getCvSection('experience')` (`src/lib/getCvSection.ts:3-13`) → base URL purely from env (`NEXT_PUBLIC_BASE_URL || https://${VERCEL_URL} || URL || http://localhost:8888`, no `headers()`) → `GET /.netlify/functions/get-cv-section?section=experience`.
+4. `netlify/functions/get-cv-section.ts:4-61`: section must be in the 12-name `ALLOWED_SECTIONS`; `profile`/`about` come from `singletons`, everything else from `db.collection(section).find({})` minus `_id`; missing singleton → **200 with body `null`** (`:49-50`); `Cache-Control: public, max-age=60`.
+5. Page wraps the call in try/catch → `[]` + `"No work experience data available."` (`:27-32`), then renders company → roles → `formatTextWithLineBreaks(responsibilities)` (`src/utils/formatters.ts:67-81`) and `normalizeSkillsArray(role.skills)` (`src/utils/cvData.ts:12-13`).
+6. Only `education` and `languages` use `src/components/SectionPageLayout.tsx`; the other six inline the same shell markup (`experience/page.tsx:35-49`).
+7. `/about-me` itself calls `getFullCv()` once (`src/app/about-me/page.tsx:56`, `get-full-cv.ts:30-62` loops all 12 sections sequentially — including `recommendationsGiven`, which the page never renders, see §6) and caps eight lists at `MAX_ITEMS_MAIN_PAGE = 3` (`:92`), with `ShowAllButton` links. The profile header renders these fields (`page.tsx:77-125`): `firstName`, ` (maidenName)`, ` lastName` via `getFullName()` (fallback `"Your Name"`, `:77-84`) in the `<h1>` (`:110`); `headline` in indigo (`:111`); `address` (`:113`); `geoLocation, zipCode` joined with `", "` only when both present (`:114`); `twitterHandles` as a `https://twitter.com/<handle>` link (`:115`); `websites` (string or `string[]`) through `parseWebsiteString` → indigo pill links with `site.icon || LinkIcon` (`:86-90`, `:116-123`); `instantMessengers` verbatim (`:125`). `birthDate` and `industry` are never rendered (`src/types.ts:11,14`, both commented `// Hidden`); `summary` never reaches the profile doc because upload moves it to `singletons.about.content` (`upload-cv-data.ts:151-152,163`).
+8. The About block and list entries use the client `ExpandableText` (`src/components/ExpandableText.tsx`, props `text`, `lineClamp = 2`, `className`, `:6-12`; its only consumer is `about-me/page.tsx`). Clamping is applied as **inline styles** (`display:-webkit-box`, `webkitLineClamp`, `overflow:hidden`, `:23-27`) by `checkOverflow`, measured with `scrollHeight > clientHeight` (`:37`) after a 50 ms `setTimeout` (`:45-47`) and on `resize` (`:49`). SSR output is therefore unclamped text that collapses after hydration + 50 ms (layout shift). Expansion is one-way — `handleSeeMore` only `setIsExpanded(true)` (`:80-83`, comment "Only expand, no 'see less'") and the button disappears once expanded (`:94`); `aria-expanded="false"` is a hard-coded string that is never updated (`:99`).
+
+**Build-time note:** because these helpers use env URLs, `next build` prerenders the CV pages against the *previously deployed* functions (`process.env.URL` on Netlify); failures are swallowed into empty pages until the first 60 s revalidation.
+
+### 2d. Admin CSV upload (`/admin/upload`)
+
+1. `src/app/admin/upload/page.tsx:22-45` `generateMetadata` → `getCvSection('profile')` → title `"<firstName> <lastName> - Upload Portal"` (single-name fallbacks at `:36,38`, default `"Upload Portal - Admin"` at `:32`); page renders `<UploadPortal/>` unconditionally (`:48-51`) — **no auth gate, no `robots` metadata**, no middleware. **Verified from build**: `/admin/upload` is a static prerender (no `revalidate` export).
+2. `UploadPortal.client.tsx:5-9` → `dynamic(() => import('./UploadForm'), {ssr:false})`.
+3. `UploadForm.tsx`: 12-section dropdown (`:8-21`, including `recommendationsGiven` at `:17`), password-type secret input (state only, `:84`), `.csv` file input; on pick, `Papa.parse(preview:1, header:true)` compares `meta.fields` with `EXPECTED_HEADERS[section]` (`:24-66`, `:147-190`); missing headers reject, extra headers show "will be ignored" (untrue for most sections — the server stores them, `upload-cv-data.ts:150,219`). Two branches are **dead code**: `:161` (`!expected && selectedSection !== "about"`) can never be true because every `cvSections` id has an `EXPECTED_HEADERS` entry, and `:170-175` (`selectedSection === "about" && !EXPECTED_HEADERS["about"]`) is always false because `:31` defines `about: ["Content"]`.
+4. Submit: `FileReader.readAsDataURL` → strip prefix → `POST /.netlify/functions/upload-cv-data` with `{sectionIdentifier, fileName, fileContentBase64, secretKey}` (`:234-252`). The progress bar is a 1 %/s timer, not real progress (`:73,90-108`).
+5. `netlify/functions/upload-cv-data.ts:72-92`: 405 unless POST; 400 on bad JSON; **403 only if `UPLOAD_SECRET_KEY` is set AND mismatches** (`:85-88`, plain `!==`, fails open); 400 if section not allowed. No size/MIME check; `fileName` unused.
+6. `:94-144`: base64 decode as UTF-8 unconditionally (`:96`, no BOM/encoding sniffing — see the mojibake note in §6) → `Papa.parse(header, skipEmptyLines, dynamicTyping, transformHeader=toCamelCase)`; empty cells → `null` except a 16-name `requiredStringFields` list; parse errors only `console.warn`ed; `convertPrimitivesToStrings` coerces everything back to strings.
+7. `:148-220` per-section shaping: `profile` → first row, `summary` split out into `about.content`, `websites` split on `,`/`;`; `skills` → `row.skillName || Object.values(row)[0]` (header is "Name", so always the first column); `experience` → grouped by `companyName` into `{companyName, employmentType, totalDurationAtCompany, location, roles[]}`; `volunteering` → `transformCause`; others raw rows. A direct `about` upload (`:219`) collapses a one-row CSV to `{content}` (header `Content` → `content` via `toCamelCase`, `:29-36`); a multi-row `about` CSV yields an array, which the `$set` at `:233-234` sends to Mongo and Mongo rejects → 500 "Database error" (`:241`).
+8. `:227-240`: `profile`/`about` → `singletons.updateOne({_id}, {$set}, {upsert:true})` (profile writes both docs at `:231-232`, so a profile upload **silently overwrites `about.content`** while leaving any structured `introduction`/`topPrioritiesAndAchievements`/`additionalNotes` fields untouched via `$set`); all other sections → `deleteMany({})` then `insertMany(normaliseArray(docs))` (`:236-239`, primitives wrapped as `{value}`), **non-atomic, no transaction**; empty CSV wipes the section.
+9. Response 200 `{message}`; 500 bodies include `err.message`. Public pages pick the change up after up to ~2 minutes (60 s function cache + 60 s ISR).
+
+---
+
+## 3. Routes & pages
+
+| Route | File | Rendering mode (**verified from `.next/prerender-manifest.json`**) | `revalidate` | Data source |
+|---|---|---|---|---|
+| `/` | `src/app/page.tsx` → `DashboardView.tsx` → `DashboardView.client.tsx` | **Dynamic** (per request; `headers()` in `computeBaseUrl`) | exported 60 but ineffective | `get-all-widgets` (RSC) + `get-widget` (client per card) |
+| `/about-me` | `src/app/about-me/page.tsx` | ISR | 60 | `get-full-cv` (all 12 sections, incl. the never-rendered `recommendationsGiven`) |
+| `/about-me/experience` | `src/app/about-me/experience/page.tsx` | ISR | 60 | `get-cv-section?section=experience` |
+| `/about-me/education` | `…/education/page.tsx` (uses `SectionPageLayout`) | ISR | 60 | `section=education` |
+| `/about-me/licenses` | `…/licenses/page.tsx` | ISR | 60 | `section=licenses` |
+| `/about-me/projects` | `…/projects/page.tsx` | ISR | 60 | `section=projects` |
+| `/about-me/volunteering` | `…/volunteering/page.tsx` | ISR | 60 | `section=volunteering` |
+| `/about-me/recommendations` | `…/recommendations/page.tsx` | ISR | 60 | `section=recommendationsReceived` only (`:26-28`) |
+| `/about-me/honors-awards` | `…/honors-awards/page.tsx` | ISR | 60 | `section=honorsAwards` |
+| `/about-me/languages` | `…/languages/page.tsx` (uses `SectionPageLayout`) | ISR | 60 | `section=languages` |
+| `/admin/upload` | `src/app/admin/upload/page.tsx` + `UploadPortal.client.tsx` + `UploadForm.tsx` | Static prerender (form is client-only, `ssr:false`) | none | `get-cv-section?section=profile` (title only); writes via `upload-cv-data` |
+| `/favicon.ico` | `src/app/favicon.ico` (16/32/48/256 px ICO) | static | — | — |
+| `/_next/image` | `next.config.ts:8-33` → Netlify Image CDN (§8) | optimizer | — | any host (wildcard `**`, `:24-25`, honoured by the adapter) |
+
+Every route also runs `layout.tsx` `generateMetadata` (profile fetch). There is no `loading.tsx`, `error.tsx`, `not-found.tsx`, `route.ts`, `middleware.ts`, `sitemap`, `robots`, or Open Graph asset anywhere under `src/app`; `viewport` is exported as an empty object (`layout.tsx:39`). Sub-page titles are suffixed "- My CV" except education ("- My Space"). There is no `/about-me/recommendations-given/` directory (`src/app/about-me/` holds only `education experience honors-awards languages licenses projects recommendations volunteering`).
+
+---
+
+## 4. Widget system
+
+### Registry (`src/lib/widgetRegistry.tsx`)
+- `widgets: WidgetItem[]` (`:65-129`) — `{ id, title, defaultSize{w,h,…}, content?, modalContent?, disableModal? }` (`:43-57`). `content`/`modalContent` are **pre-instantiated JSX** (`<CoffeeCard/>`), so no per-instance props can be passed.
+- 16 module-scope `next/dynamic` calls (`:18-33`), no `ssr:false`, no `loading`. Export convention is inconsistent: Coffee/Games/DroneNews/Photography cards via `m.default`, Weather/Space/Tech/YouTube cards and all modal bodies via named exports.
+- Layout leftovers from react-grid-layout: `Layout` type (`:4-15`), `breakpointsConfig` lg ≥1200 / md ≥996 / sm ≥768 / xs ≥480 / xxs 0 (`:134-140`) → `colsConfig` 3/3/2/1/1 (`:144-150`), `ORIGINAL_LAYOUTS` (`:155-208`; `lg = clone(layoutMd)` at `:204`; xs/xxs generated by `make1Col()` (`:154-174`, `:206-207`) from `order1Col` (`:154-164`)). Only `x`, `w` and `y` (sort key) are consumed by `dashboard-grid.tsx:73-86`; `h/minW/maxW/minH/maxH` are dead. All widgets have `defaultSize {w:1,h:1}` (`:65-129`), so `h` never affects rendering.
+- **Rendered card order per breakpoint** (items sorted by `(y, x)`, `gridColumn` only, rows auto-flow):
+  - **md / lg (3 columns)** — `layoutMd` (`:188-200`, written column-major): row 1 `weather, tech, coffee` · row 2 `drones, camera, youtube` · row 3 `space, games, cvLink`. Because the initial state is `"md"` (`dashboard-grid.tsx:22`), this is also what SSR and every first paint show.
+  - **sm (2 columns)** — `layoutSm` (`:176-186`): `weather, coffee` · `space, tech` · `youtube, drones` · `games, camera` · `cvLink` alone at `x:1, y:4` (right column, left cell empty).
+  - **xs / xxs (1 column)** — `order1Col`: `coffee, weather, space, tech, youtube, drones, camera, games, cvLink`. Note weather is first on md/sm but coffee is first on one column.
+- `cvLink` ("My Profile", `disableModal:true`, `:123-128`) is UI-only; `dashboard-grid.tsx:103-110` special-cases `id === "cvLink"` → `ProfileWidget` (hard-coded name/title, `src/components/widgets/ProfileWidget.tsx:12-14`).
+
+### Cache (`src/lib/widgetData.ts`)
+- `widgetCache: Record<string, unknown>` + `widgetPending` (`:41-42`) — module-level, no TTL/eviction/size bound; **Error objects are cached** and rethrown forever (`:75,91`).
+- `fetchWidgetData(id)` (`:73-97`): cache hit → return; else deduped `GET ${base}/.netlify/functions/get-widget?widget=${id}`; `!res.ok` → `throw new Error("Failed to fetch widget data")` (a 404 for a missing singleton looks identical to a real failure).
+- `fetchAllWidgetsData()` (`:105-112`) always fetches; `hydrateWidgetCache(data)` (`:118-120`) is `Object.assign`.
+- Two decoding functions: `decodeHtmlEntities` (`:2-21`; entity map `:3-9` for `&amp; &lt; &gt; &quot; &#39;`, regex `:10`, `String.fromCharCode` for hex `:14` and decimal `:17` — so astral code points > 0xFFFF become lone surrogates; `&nbsp;`/`&mdash;` untouched) and `decodeStrings` (`:23-38`), which recurses arrays/objects and delegates strings to `decodeHtmlEntities` (`:25`). Called at `:85` (`fetchWidgetData`) and `:109` (`fetchAllWidgetsData`), on every string including URLs.
+- `computeBaseUrl()` (`:52-71`): `""` in the browser; server: `headers()` → env chain → `http://localhost:8888` (`:69`).
+
+### HOC / hook contract
+- `useWidgetData<T>(id)` (`src/lib/useWidgetData.ts:11-42`) → `{data, loading, error}`; initial state from cache, then an effect that **unconditionally** sets `loading:true` and calls `fetchWidgetData` (cancelled-flag guarded).
+- `withWidgetData<T>(id, { loadingHeight='h-24', errorPadding='p-2' })` (`src/components/widgets/withWidgetData.tsx:15-36`) wraps `ComponentType<P & {data:T}>`: loading → `<div class="relative h-24"><Skeleton/></div>`; error → literal `"Failed to load"`; falsy data → `null`; else `<Component data={data}/>`. Tailwind class names are part of the data-layer API.
+- Every widget file defines unexported pure `XCardBase`/`XModalBodyBase` (`{data}`) and exports `XCard = withWidgetData(id)(…)` and `XModalBody = withWidgetData(id, {loadingHeight:'h-40', errorPadding:'p-4'})(…)`. This is the clean presentational/data seam.
+- Server ↔ client id contract: `ALLOWED_WIDGETS` in `netlify/functions/widget-utils.ts:3-12` is a hand-maintained copy of the registry ids; no shared constant.
+
+| Widget id (title) | Component file | Type file | Mongo collection / doc | Endpoint | Ingestion job (schedule) |
+|---|---|---|---|---|---|
+| `coffee` (Coffee Corner) | `src/components/widgets/CoffeeWidget.tsx` (card slice 0-3) | `src/types/coffee.ts` `CoffeeArticle[]` `{title,url,image,publishedAt}` | collection `coffee` | `get-widget?widget=coffee` | `fetch-coffee-news.yml` (`0 5 * * *`, NewsAPI) |
+| `weather` (Weather) | `WeatherWidget.tsx` (1 s clock, hard-coded "Sydney", `Australia/Sydney`) | `src/types/weather.ts` `{updated, current{temp,icon}, hourly[≤12], daily[≤7]}` | `singletons._id="weather"` | `?widget=weather` | `fetch-weather.yml` (`10 * * * *`, OpenWeather One Call, lat -33.87 lon 151.21) |
+| `space` (Space News) | `SpaceWidget.tsx` (card `priority` image; modal APOD/Mars/EPIC/Mars-weather, no null guards) | inline `Apod` + `src/types/spaceExtra.ts` | merged `{space, epic, mars←marsPhoto, marsWeather}` from four `singletons` docs (`widget-utils.ts:25-38`) | `?widget=space` (4 parallel reads) | `fetch-nasa.yml` (`0 8 * * *`, NASA APOD + EPIC only since `4cbba2f`; `marsPhoto`/`marsWeather` are no longer refreshed) |
+| `tech` (Tech Updates) | `TechWidget.tsx` (slice 0-5) | `src/types/tech.ts` `{id,title,url}` (`url` may be null for Ask/Show HN) | collection `tech` | `?widget=tech` | `fetch-tech.yml` (`0 */3 * * *`, Hacker News, no key) |
+| `youtube` (YouTube Recs) | `YouTubeRecsWidget.tsx` (slice 0-5, `https://youtu.be/{videoId}`) | `src/types/youtubeRecs.ts` `{items:[{channelId,videoId,title,thumbnail,channelTitle,publishedAt}]}` | `singletons._id="youtubeRecs"` | `?widget=youtube` | `fetch-youtube-recs.yml` (`0 2 * * *`, YouTube Data API, 9 hard-coded channels; writes `"null"` strings on quota failure) |
+| `drones` (Drones) | `DroneNewsWidget.tsx` (slice 0-3; modal skips `WidgetSection`) | `src/types/drone.ts` `DroneNewsItem[]` | collection `droneNews` | `?widget=drones` | `fetch-drone-news.yml` (`0 6 * * *`, NewsAPI + banned-word filter) |
+| `camera` (Photography) | `PhotographyWidget.tsx` (inert `prose` classes) | `src/types/photography.ts` `{id,thumbnail,full,photographer,profile,alt,createdAt}` | `singletons._id="photography"` | `?widget=camera` | `fetch-photography.yml` (`0 8 * * *`, Unsplash random landscape) |
+| `games` (Gaming) | `GamesWidget.tsx` (slice 0-5, `https://rawg.io/games/{id}`, no empty-thumbnail fallback) | `src/types/games.ts` `{id,name,thumbnail,released}` | collection `games` | `?widget=games` | `fetch-games.yml` (`0 4 * * *`, RAWG last 30 days by rating) |
+| `cvLink` (My Profile) | `ProfileWidget.tsx` (static `<Link href="/about-me">`) | — | — | none | — |
+
+Array widgets are returned in natural Mongo insertion order with no sort (`widget-utils.ts` `find({}).toArray()`); "top N" is simply the first N the workflow emitted. `get-all-widgets` includes empty arrays (`[]` is not `null`) but omits missing singletons; `space` is never omitted even when all four sub-docs are `null`.
+
+### Modal body inventory
+All modal bodies are wrapped by `withWidgetData(id, {loadingHeight:"h-40", errorPadding:"p-4"})`; `WidgetSection` = `p-4 rounded-2xl bg-gray-50 dark:bg-gray-700` (`src/components/WidgetSection.tsx:13`). Modal chrome: `ModalFrame` via `next/dynamic` `ssr:false` (`dashboard-grid.tsx:15-17`), opened by `?w=<id>` (`:48-49,93`), closed by `router.back()` (`:53`) or Escape (`:55-61`), body `overflow-hidden` (`:63-65`).
+
+| Widget | Modal body (`file:lines`) | Content |
+|---|---|---|
+| Weather | `WeatherWidget.tsx:55-100` | `<article space-y-6 p-4>`; 12-hour strip as `grid grid-cols-4 gap-6` (3 rows of hour label `format "ha"`, 45×45 OWM icon, `°` temp); then a `<table>` of 7 days (`format "EEE d"`, 28×28 icon, max `text-red-500`, min `text-blue-500`). Only modal using a table. |
+| Space | `SpaceWidget.tsx:56-123` | Four `WidgetSection`s: APOD (title, 800×450 image, `explanation` `whitespace-pre-line`, optional "View HD image", "Updated {date}"); Mars rover photos (guarded by `mars.photos.length > 0`, `:93`, each 800×450 with `rover – camera`); EPIC Earth (512×512 `epic.url`, `epic.caption`, `epic.date.split(" ")[0]`); Mars Weather line `Sol … °C, wind … m/s, pressure … Pa` from `marsWeather.latest`. `space`, `epic`, `marsWeather` are dereferenced with no null guards (`:57-58`, `:110-112`, `:119`) although `widget-utils.ts:32-37` returns `null` for any missing singleton. |
+| Photography | `PhotographyWidget.tsx:41-76` | `photo.full` at 1000×600 (`:44-51`), `<h2>` `photo.alt \|\| "Untitled Photo"`, credit link to `photo.profile`, `createdAt` as `MMMM d, yyyy`, alt text quoted (mismatched quote at `:71`) or a fallback sentence. |
+| Coffee / Games / YouTube | `CoffeeWidget.tsx:51-84`, `GamesWidget.tsx:51-82`, `YouTubeRecsWidget.tsx:49-80` | Full list; each item a `<Link target=_blank>` wrapping a `WidgetSection flex items-start space-x-4` with a 160×90 thumbnail and title + date (`MMM d, yyyy`; YouTube prefixes `channelTitle •`). Coffee shows a grey `w-40 h-24` placeholder when `image` is empty (`:72`). |
+| Drones | `DroneNewsWidget.tsx:56-88` | Same 160×90 layout but plain `div` rows with the title as the link — no `WidgetSection`, no hover bg. |
+| Tech | `TechWidget.tsx:36-47` | Titles only: `<a>` → `WidgetSection p-0` → `text-sm` title + `<hr>`. **No thumbnails.** |
+
+---
+
+## 5. API: Netlify Functions
+
+All in `netlify/functions/`, classic `Handler(event, context)` API, bundled by esbuild (`netlify.toml:8-10`), **excluded from `tsconfig.json:27`** so never type-checked by `next build`. The five Mongo-backed functions import `../../src/lib/mongodb` and select `client.db(process.env.MONGODB_DB || "cv")`; `get-deploy-status` and the eBay webhook never touch Mongo.
+
+| Function | Path | Methods | Params | Validation | Response | Cache header |
+|---|---|---|---|---|---|---|
+| `get-widget.ts` | `/.netlify/functions/get-widget` | GET (405 otherwise) | `?widget=<id>` | id ∈ `ALLOWED_WIDGETS` else 400; `fetchWidget` null → 404 | raw widget JSON; 500 `{message:"Database error", error: err.message}` | `public, max-age=60` on **every** status (`:10,19,31,37,44`) |
+| `get-all-widgets.ts` | `/get-all-widgets` | GET | none | — | `{[id]: data}` for non-null widgets; 8 sequential steps / 11 Mongo reads (`:18-23`; `space` = 4 parallel) | `public, max-age=60` incl. 405/500 |
+| `get-cv-section.ts` | `/get-cv-section` | GET | `?section=<name>` | 12-name `ALLOWED_SECTIONS` (`:4-17`, incl. `recommendationsGiven` at `:13`) else 400 | `profile`/`about` → singleton doc **or `null` with 200**; others → array minus `_id` | `public, max-age=60` |
+| `get-full-cv.ts` | `/get-full-cv` | GET | none | — | `{profile, about, experience, …, recommendationsGiven, …, languages}` (12 sequential reads, `:34-47`) | `public, max-age=60` |
+| `upload-cv-data.ts` | `/upload-cv-data` | POST (405 otherwise) | JSON `{sectionIdentifier, fileContentBase64, fileName, secretKey?}` | 400 bad JSON; **403 only if `UPLOAD_SECRET_KEY` set and mismatched** (`:85-88`); section ∈ `ALLOWED_SECTIONS` (`:13-26`); no size/MIME check | 200 `{message}`; 500 with `err.message` (`:223,243`) | **none** (no Content-Type either) |
+| `get-deploy-status.ts` | `/get-deploy-status` | GET | none | `NETLIFY_API_PAT`/`SITE_ID` are read into consts at `:8-9`, but **checked per request** inside the handler: 405 for non-GET first (`:12-18`), then 500 "Missing Netlify API token" (`:20-27`), 500 "Missing Netlify Site ID" (`:29-36`). Module import never throws. | proxies `api.netlify.com/api/v1/sites/{SITE_ID}/deploys?per_page=1` → `{deployId,status,createdAt,publishedAt,commitRef,context}`; 404 if empty | `public, max-age=60` (also sent as a *request* header, `:43-46`) |
+| `ebay-account-deletion-webhook.ts` (127 lines; imports only `@netlify/functions` and `crypto`, `:1-2`) | `/ebay-account-deletion-webhook` | GET, POST (405 otherwise, `:96-101`) | GET `?challenge_code=` (400 if missing); POST JSON body | GET requires `EBAY_WEBHOOK_VERIFICATION_TOKEN` (500 if missing) and uses `EBAY_WEBHOOK_ENDPOINT` or the default `https://nhatminh.dev/.netlify/functions/ebay-account-deletion-webhook`; POST does **no signature check** | GET `{challengeResponse: sha256(challengeCode+token+endpoint)}` (`:28-38`); POST does a best-effort `JSON.parse` (`:105-110`), logs only `notificationId`/`topic`/`eventDate` (`:112-116`) and returns 200 `{message:"Account deletion notification received"}` (`:120-124`). **Nothing is persisted** — the header comment (`:41-49`) says the site stores no eBay user data, so payloads are acknowledged and discarded. No 500 path, no `err.message`, no `NODE_ENV` gating (`grep -rn NODE_ENV src netlify scripts` → nothing). | `Content-Type: application/json` only |
+
+History note: the webhook used to `insertOne` into an `ebay_account_deletions` collection with `status:"processed"` and gate `err.message` on `NODE_ENV` (revision `3e906d4`, 2026-02-17). Commit `ca7c6f1` "Stop persisting eBay account-deletion notifications" (2026-09-18, 37+/70−) removed all of that; `grep -rn ebay_account_deletions src netlify scripts` now finds nothing.
+
+`get-deploy-status` has no caller anywhere in `src/`, README, `netlify.toml` or workflows. `ALLOWED_SECTIONS`/`SINGLETON_SECTIONS` are copy-pasted in three functions plus `UploadForm.tsx:8-21`; `transformCause` (`upload-cv-data.ts:39-50`) duplicates `getDisplayCause` (`src/utils/formatters.ts:6-15`).
+
+`src/lib/mongodb.ts:3-17`: `connectToDatabase()` throws if `MONGODB_URI` is unset, creates one `MongoClient`, caches it module-level, never closes it. It assigns `client` **before** `await client.connect()`, so a failed connect poisons the warm Lambda for its lifetime.
+
+No response anywhere sets security headers: the only headers in the repo are `Cache-Control` for `/_next/static/*` and `/public/*` (`netlify.toml:11-19`), `next.config.ts` exports no `headers()` (whole file is `reactStrictMode` + `images`, `:4-34`), and functions set only `Content-Type`/`Cache-Control`. No CSP, HSTS, X-Frame-Options, Referrer-Policy or Permissions-Policy.
+
+---
+
+## 6. Data model
+
+Single database `MONGODB_DB || "cv"`. Two conventions: **singletons** (one `singletons` collection, documents keyed by string `_id`, readers strip `_id`) and **one collection per list**, auto `ObjectId`s stripped on read. Since `ca7c6f1` nothing outside these two conventions is written (the former `ebay_account_deletions` audit collection may still exist in Atlas as a leftover, but no code reads or writes it).
+
+| Collection / `_id` | Document shape | Written by | Read by |
+|---|---|---|---|
+| `singletons._id="profile"` | first CSV row: `firstName, lastName, maidenName, headline, address, geoLocation, zipCode, twitterHandles, instantMessengers, birthDate, industry, …, websites: string[]` (all scalars strings or null; `$set` upsert so stale fields persist) — `src/types.ts:6-20` `ProfileData`. Rendered fields listed in §2c step 7; `birthDate`/`industry` are typed but hidden. | `upload-cv-data` (`:230-231`) | `layout.tsx` metadata (`firstName`/`lastName` only), `admin/upload/page.tsx` metadata, `get-full-cv`, `/about-me` |
+| `singletons._id="about"` | legacy `{content}` (only shape the CSV path writes: profile upload `:151-152,163,232`, or direct `about` upload `:219,233-234`) **or** structured `{introduction, topPrioritiesAndAchievements[], additionalNotes}` (`src/types.ts:22-37`; only via `migrate-json.ts`/direct edit). `/about-me/page.tsx:132-135` prefers `content` when present. A profile re-upload overwrites `content` only. | `upload-cv-data` (profile or about upload) | `get-full-cv`, `get-cv-section` |
+| `singletons._id="weather"` | `{updated, current{temp,icon}, hourly[{dt,temp,icon}], daily[{dt,min,max,icon}]}` | `fetch-weather.yml` → `push-to-mongo --singleton weather` | `fetchWidget('weather')` |
+| `singletons._id="space"` | raw untrimmed APOD response (`title,url,hdurl,explanation,date,thumbnail_url,…`) | `fetch-nasa.yml:59` | `fetchWidget('space')` |
+| `singletons._id="epic"` | `{date, image, caption, url}`; since `4cbba2f` `url` is the key-free `https://epic.gsfc.nasa.gov/archive/natural/YYYY/MM/DD/png/<image>.png` (`fetch-nasa.yml:45`). Before that it embedded `?api_key=<NASA_KEY>` — the key was public for ~a year; **rotate it** | `fetch-nasa.yml` | `fetchWidget('space')` → served publicly |
+| `singletons._id="marsPhoto"` | `{photos:[{id,img_src,camera,rover}]}` → exposed as key `mars`; live doc is `{photos: []}` | **no longer written** (step removed in `4cbba2f`; the API is gone) | `fetchWidget('space')` |
+| `singletons._id="marsWeather"` | `{sol_keys, latest:{sol,AT,HWS,PRE}}`; live doc frozen at sol 681 (InSight's 2020 data) | **no longer written** (`4cbba2f`) | `fetchWidget('space')` — still rendered as if live (`SpaceWidget.tsx:119`); drop in the redesign |
+| `singletons._id="youtubeRecs"` | `{items:[{channelId,videoId,title,thumbnail,channelTitle,publishedAt}]}` | `fetch-youtube-recs.yml` | `fetchWidget('youtube')` |
+| `singletons._id="photography"` | `{id,thumbnail,full,photographer,profile,alt,createdAt}` | `fetch-photography.yml` | `fetchWidget('camera')` |
+| `coffee`, `droneNews` | ≤5 × `{title,url,image,publishedAt}` (image = NewsAPI `urlToImage \|\| ''`, `fetch-coffee-news.yml:50`, `fetch-drone-news.yml:69`, any host) | `push-to-mongo --collection` (deleteMany + insertMany) | `fetchWidget` |
+| `tech` | 10 × `{id,title,url}` | `fetch-tech.yml` | `fetchWidget('tech')` |
+| `games` | 10 × `{id,name,thumbnail,released}` | `fetch-games.yml` | `fetchWidget('games')` |
+| `experience` | `{companyName, employmentType, totalDurationAtCompany, location, roles:[{title,startDate,endDate,duration,responsibilities[],skills[],location}]}` | `upload-cv-data` (`:173-217`) | `get-cv-section`, `get-full-cv` |
+| `skills` | `{value: "React"}` docs (primitives wrapped by `normaliseArray`, `:69-70`); flattened by `normalizeSkillsArray` (`src/utils/cvData.ts:1-13`) | `upload-cv-data` | `/about-me` skill cloud |
+| `recommendationsGiven` | raw rows from headers `Recipient First Name … Date Given` (`UploadForm.tsx:56-59`); typed `RecommendationGivenEntry[]` (`src/types.ts:139`). **Orphaned**: uploadable (`upload-cv-data.ts:22`, `:236-239`), fetched by `get-full-cv` on every `/about-me` render, but never rendered — `page.tsx:297` is the literal comment `{/* 10. Recommendations: Given - HIDDEN */}` with no JSX, the page never destructures it (`:70-76`), and `/about-me/recommendations` fetches only `recommendationsReceived`. | `upload-cv-data` | `get-full-cv`, `get-cv-section` (nobody consumes the result) |
+| `education`, `licenses`, `projects`, `volunteering`, `recommendationsReceived`, `honorsAwards`, `languages` | raw camelCased CSV rows, all scalars strings/null/`''` (mixed empties: `''` for the 16 required fields, `null` otherwise, `:108-131`); extra CSV columns persist | `upload-cv-data` | `get-cv-section`, `get-full-cv` |
+
+**Stored text may contain mojibake bullets.** `src/utils/formatters.ts:69` splits on `/â€¢|•/g` and `:77` tests `/^\s*[â€¢•]/` — `â€¢` is UTF-8 `•` (E2 80 A2) decoded as Windows-1252, i.e. double-encoded strings have been seen in the DB (the upload path decodes bytes as UTF-8 unconditionally, `upload-cv-data.ts:96`; note the `:77` character class matches any single one of `â`, `€`, `¢`, `•`, not the 3-char sequence). `formatTextWithLineBreaks` re-joins parts with `\n` and a leading `"• "`, rendered through `whitespace-pre-line` in `ExpandableText` (`src/components/ExpandableText.tsx:89`); consumers include `about-me/page.tsx:287` (recommendations) and `:305` (honors).
+
+No indexes are created anywhere. `scripts/migrate-json.ts` (npm `migrate`) is a legacy loader for `src/data`/`data` JSON directories that no longer exist.
+
+---
+
+## 7. Ingestion pipeline
+
+All eight workflows: `permissions: contents: read`, `actions/checkout@v4`, **bare `npm ci` of the full Next tree with no `actions/setup-node` and no `cache:`** (`fetch-weather.yml:21`, `fetch-tech.yml:20`, `fetch-coffee-news.yml:21`, `fetch-drone-news.yml:21`, `fetch-games.yml:20`, `fetch-nasa.yml:25`, `fetch-photography.yml:21`, `fetch-youtube-recs.yml:20`; all `runs-on: ubuntu-latest`), then `node --loader ts-node/esm --experimental-specifier-resolution=node scripts/push-to-mongo.ts --file X.json …` with `MONGODB_URI`/`MONGODB_DB` secrets. Trim steps `process.exit(0)` without writing the file on bad payloads (push then fails on ENOENT, collection untouched), but an *empty valid array* wipes the collection (`push-to-mongo.ts:74-79`).
+
+**On the `--experimental-specifier-resolution=node` flag:** it was removed from Node's documented options in v19 and is absent from `node --help` (only `--loader, --experimental-loader` listed), but it is **accepted-but-inert, not rejected**. Running the verbatim workflow command (`fetch-weather.yml:75-76`) with no args on Node v22.23.2 and v26.8.2 prints the `--experimental-loader` ExperimentalWarning plus a `DEP0180` warning and then `Missing --file option` (`scripts/push-to-mongo.ts:48-51`) — i.e. the script executed. `node --experimental-specifier-resolution=node -e "..."` exits 0 on both, whereas an unknown flag gives `bad option`. Node 20 is not installed locally, so that runtime is unverified. **Confirmed 2026-09-18 from the Actions logs:** the push step runs on `ubuntu-24.04` with only the `--experimental-loader` warning, so the flag is harmless in CI; what actually stopped the feeds was GitHub's 60-day auto-disable (see the status block at the top); the extensionless `../src/lib/mongodb` import (`push-to-mongo.ts:16`) resolves through the ts-node ESM loader.
+
+| Workflow | Schedule (UTC) | Source API | Secret | Transform | Target | Push mode |
+|---|---|---|---|---|---|---|
+| `fetch-weather.yml` | `10 * * * *` (hourly, `:9`) | OpenWeather One Call 3.0, lat -33.87 lon 151.21 metric | `WEATHER_KEY` | node: current + 12 hourly + 7 daily + `updated` | `singletons/weather` | `--singleton` (deleteOne + insertOne) |
+| `fetch-tech.yml` | `0 */3 * * *` (`:9`) | Hacker News Firebase top 10 | none | jq `{id,title,url}` (writes whatever jq yields) | `tech` | `--collection` (deleteMany + insertMany) |
+| `fetch-coffee-news.yml` | `0 5 * * *` (`:9`) | NewsAPI `/v2/everything` | `NEWSAPI_KEY` | node: ≤5 × `{title,url,image,publishedAt}` | `coffee` | `--collection` |
+| `fetch-drone-news.yml` | `0 6 * * *` (`:9`) | NewsAPI | `NEWSAPI_KEY` | same + banned-word title filter (`:50-71`) | `droneNews` | `--collection` |
+| `fetch-games.yml` | `0 4 * * *` (`:8`) | RAWG `/api/games` last 30 days, `-rating`, page_size 10 | `RAWG_KEY` | node: `{id,name,thumbnail,released}` | `games` | `--collection` |
+| `fetch-nasa.yml` | `0 8 * * *` (`:8`) | NASA APOD, EPIC natural (Mars rover + InSight steps removed in `4cbba2f`) | `NASA_KEY` | APOD raw, guarded by `jq -e .date`; EPIC `{date,image,caption,url}` with `url` on `epic.gsfc.nasa.gov` (no key), guarded by `jq -e .image` | `singletons/space`, `epic` | two `--singleton` pushes |
+| `fetch-photography.yml` | `0 8 * * *` (`:9`) | Unsplash random landscape | `UNSPLASH_KEY` | node: `{id,thumbnail,full,photographer,profile,alt,createdAt}` | `singletons/photography` | `--singleton` |
+| `fetch-youtube-recs.yml` | `0 2 * * *` (`:8`) | YouTube Data API v3 search, 9 channel ids | `YOUTUBE_KEY` | bash echo/jq per channel; `null` strings on failure (`:50-65`) | `singletons/youtubeRecs` | `--singleton` |
+
+`scripts/push-to-mongo.ts:48-92`: `--collection` and `--singleton` may be combined; non-object singleton data wrapped as `{value}`; client closed in `finally`. CV data has no cron path — it enters only via `upload-cv-data` (§2d). Run count: weather 24 + tech 8 + six daily jobs = **38 full `npm ci` installs per day**; NASA and photography collide at 08:00.
+
+---
+
+## 8. Caching layers
+
+| Layer | Where | TTL | Notes |
+|---|---|---|---|
+| **1. Netlify static/CDN headers** | `netlify.toml:11-19` | 1 year immutable for `/_next/static/*`; the `/public/*` rule matches nothing (public files serve at `/hero.webp` etc.) | Next already immutable-caches `/_next/static`; effectively a no-op block. |
+| **2. Next page cache (ISR)** | `export const revalidate = 60` on `/` and nine `/about-me*` pages | 60 s | **Verified from build**: applies to `/about-me*` only. `/` is dynamic because `computeBaseUrl()` calls `headers()`; `/admin/upload` is fully static (its profile-derived title is baked at build). Build-time prerender hits the *previous* deploy's functions via `process.env.URL`. |
+| **3. Function `Cache-Control: public, max-age=60`** | `get-widget`, `get-all-widgets`, `get-cv-section`, `get-full-cv`, `get-deploy-status` | 60 s | Sent on 400/404/405/500 too, so an outage or bad query is cached for a minute at CDN/browser. Server-side `fetch()` calls pass no `next: {revalidate}` option (`getCvSection.ts:8`, `widgetData.ts:106`), so the Next Data Cache is not involved. |
+| **4. In-memory `widgetCache`** | `src/lib/widgetData.ts:41-46` | **none** (lifetime of the module: browser tab, or warm server process) | Caches `Error`s permanently (`:91`) — no retry path at all (§2b step 4). Instantiated separately in the RSC bundle (seeded by `fetchAllWidgetsData`) and the client/SSR bundle (seeded by `hydrateWidgetCache` in a `useEffect`, after child effects already fetched). |
+| **5. next/image → Netlify Image CDN** | `next.config.ts:8-25` (`formats` avif/webp `:10`, `minimumCacheTTL: 31536000` `:11`, `deviceSizes [640,768,1024,1280,1600]`, `imageSizes [16…384]` `:12-13`) | 1 year | On Netlify `next/image` is served by the Netlify Image CDN by default (Netlify Next.js docs); the adapter (`opennextjs-netlify/src/build/image-cdn.ts`) converts every `remotePatterns` entry into a picomatch regex `${protocol ?? 'http?(s)'}://${hostname}${port}${pathname ?? '/**'}` and pushes it into `images.remote_images` (`||= []`, so nothing in `netlify.toml` is needed and there is no `[images]` block). Hence the trailing `{protocol:'https', hostname:'**', pathname:'/**'}` / `http` entries (`:24-25`) become a catch-all regex — **the wildcard is honoured, not dropped**. This is load-bearing: coffee/drone `image` values are arbitrary NewsAPI publisher hosts rendered with `next/image` at 64×36 (card) / 160×90 (modal) (`CoffeeWidget.tsx:24-31,63-70`, `DroneNewsWidget.tsx:26-33,61-68`). Derived from adapter source and docs, not a production trace — confirm with a `/_next/image?url=<newsapi-host>` fetch on the live site. |
+
+Interactions and conflicts:
+- Upload → visible: up to 60 s (layer 3) + 60 s (layer 2) ≈ 2 min; the upload UI reports success immediately, and there is no on-demand revalidation or purge.
+- Dashboard freshness: cron interval → layer 3 (60 s) → layer 4 (never expires in-tab). Layer 2 does not apply to `/`, so every visit costs one `get-all-widgets` invocation (11 Mongo reads in 8 sequential steps) plus, in practice, 8 `get-widget` calls from the client due to effect ordering.
+- Missing data vs failure: `get-widget` 404 → `fetchWidgetData` throws → cached Error → `"Failed to load"` for the session; `get-cv-section` returns 200 `null` for a missing singleton instead.
+- Local dev: layer 3 is only reachable through `netlify dev` on 8888; `next dev` alone yields empty pages.
+
+---
+
+## 9. Configuration & environment
+
+| Name | Consumed where | Required for local dev? | Notes |
+|---|---|---|---|
+| `MONGODB_URI` | `src/lib/mongodb.ts:6` (throws if unset) → all Mongo functions + `scripts/*` + every workflow (GitHub secret) | **Yes** (for `netlify dev`) | Atlas URI; opaque in repo. A `.env` exists locally (git-ignored via `.gitignore:34-35`, not read). |
+| `MONGODB_DB` | every Mongo function/script: `process.env.MONGODB_DB \|\| "cv"`; workflow secret | No (defaults `cv`; `.env.example:3` sets `cv`) | |
+| `NEXT_PUBLIC_BASE_URL` | `getCvSection.ts:4`, `getFullCv.ts:4`, `widgetData.ts:66` (env fallback chain) | **Yes**: `http://localhost:8888` (`.env.example:1`) | On Netlify falls back to platform `URL`. `VERCEL_URL` is in the chain but never set on Netlify. |
+| `URL` | same chain (`getCvSection.ts:6`, `widgetData.ts:68`) | No (Netlify-provided) | Points prerender at the previously deployed functions. |
+| `UPLOAD_SECRET_KEY` | `netlify/functions/upload-cv-data.ts:85-88` | Only to protect uploads | **Fail-open when unset.** |
+| `NETLIFY_API_PAT`, `SITE_ID` | `get-deploy-status.ts:8-9` (checked per request, `:20-36`) | No | PAT not in `.env.example`/README; function unused. |
+| `EBAY_WEBHOOK_VERIFICATION_TOKEN`, `EBAY_WEBHOOK_ENDPOINT` | `ebay-account-deletion-webhook.ts` GET branch (endpoint default `https://nhatminh.dev/.netlify/functions/ebay-account-deletion-webhook`) | No | In `.env.example:5-6`, missing from README. |
+| GitHub secrets `WEATHER_KEY`, `NEWSAPI_KEY`, `RAWG_KEY`, `NASA_KEY`, `UNSPLASH_KEY`, `YOUTUBE_KEY` | `.github/workflows/fetch-*.yml` | No (CI only) | Not documented anywhere in the repo. |
+| GA4 id `G-N8S80ZDYP0` | hard-coded `src/app/layout.tsx:60-72` (`gtag/js?id=…` + `gtag('config',…)`, `strategy="afterInteractive"`, preconnect `:59`) | — | Loaded from the root layout, so it fires on **every route including `/admin/upload`**; no consent gate, no `anonymize_ip`, no `consent` default call. Not env-driven. |
+
+`NODE_ENV` is not read anywhere in `src`, `netlify`, `scripts` or `next.config.ts` (grep → no matches).
+
+**Netlify build/deploy config** — `netlify.toml` is 19 lines: `[build] command = "next build"`, `publish = ".next"` (`:4-6`); `[functions] directory = "netlify/functions"`, `node_bundler = "esbuild"` (`:8-10`); two `[[headers]]` blocks (`:11-19`). There is no `[context.*]`, `[build.environment]`, `NODE_VERSION`, `[[plugins]]`, `[dev]` or `[images]`. `next build` + `.next` is exactly what the Netlify Next adapter docs prescribe, and Netlify auto-provisions the adapter when it detects Next.js — consistent with the lockfile, which has no `@netlify/plugin-nextjs` or `@opennextjs/*` entry (only `@netlify/functions`, `package-lock.json:1598`; `package.json:29` `^4.0.0`). Which branch Netlify treats as production and how deploy-preview env vars are scoped live only in the Netlify UI. Node: no `engines` in `package.json`, no `.nvmrc`/`.node-version`, no `NODE_VERSION`, no `setup-node` in any workflow — Netlify and Actions both use platform defaults. Lockfile engine constraints permit **Node ≥ 18.18** (`node_modules/next` 15.5.12 `engines.node = "^18.18.0 || ^19.8.0 || >= 20.0.0"`, `package-lock.json:8055,8069-8071`); `REQUIREMENTS.md:85` / `DEPENDENCIES.md:104` say 18+, consistent.
+
+**What `netlify dev` actually needs (local setup).** `package.json:7` `"dev:netlify": "netlify dev"` and README `:5-11` say to use it, but `netlify-cli` is **not a dependency** (`package.json:15-48`; no `node_modules/.bin/netlify`). On this machine it is a Homebrew install (`/opt/homebrew/bin/netlify` → `netlify-cli/27.8.0 darwin-arm64 node-v26.8.2`) that is not on the default non-login PATH (`which netlify` → not found), so `npm run dev:netlify` fails unless `/opt/homebrew/bin` is on PATH. The site is **not linked**: `.netlify/state.json` holds only a `geolocation` key (no `siteId`), and `.netlify/` is git-ignored (`.gitignore:44-45`), so no env vars are injected from Netlify — everything must come from `.env` (template `.env.example:1-6`: `NEXT_PUBLIC_BASE_URL=http://localhost:8888`, `MONGODB_URI`, `MONGODB_DB=cv`, `UPLOAD_SECRET_KEY`, `EBAY_WEBHOOK_VERIFICATION_TOKEN`, `EBAY_WEBHOOK_ENDPOINT`). Port topology: the CLI's framework detector sets `dev.command = 'next'`, `port: 3000` for Next and proxies it on 8888 (`@netlify/build-info/lib/frameworks/next.js:10-12`), which is why server code defaults to `http://localhost:8888` (`getFullCv.ts:6`, `widgetData.ts:69`). Plain `npm run dev` (`next dev --turbopack`, `package.json:6`) serves 3000 with no functions, so every `/.netlify/functions/*` fetch fails.
+
+Toolchain: `next dev --turbopack` (3000, no functions), `netlify dev` (8888, **the correct dev command**), `next build`, `next start`, `next lint`, `bun test` (`package.json:5-14`; bun is not a dependency, one test file `src/utils/__tests__/formatters.test.ts`). `"type": "module"` (`package.json:49`). `tsconfig.json:26-27` includes `**/*.ts` (so `scripts/` and `tailwind.config.ts` are type-checked by `next build`) but excludes `netlify/`. Unused deps: `node-fetch`, `@octokit/rest`, `@tailwindcss/line-clamp`, `autoprefixer` (not in `postcss.config.mjs`), `@types/estree`, `@types/json-schema`. `eslint-config-next` pinned 15.3.4 vs next 15.5.12.
+
+---
+
+## 10. Styling & design system today
+
+- **Pipeline**: `postcss.config.mjs` → `@tailwindcss/postcss` (v4.1.8) → `src/app/globals.css` starting with `@import 'tailwindcss'` (`:3`) **and** the removed v3 `@tailwind base/components/utilities` directives (`:6-8`, silently accepted). No `@config`, `@plugin`, `@custom-variant`. Therefore `tailwind.config.ts` (`darkMode:'class'`, `--primary`/`--secondary` aliases, `fontSize.base`, four `require()`'d plugins in an ESM project) is **inert**.
+- **Tokens actually wired**: `@theme inline` (`globals.css:45-50`) registers only `--color-background`/`--color-foreground` (`#fff/#171717`, dark `#0a0a0a/#ededed`) and `--font-sans`/`--font-mono` → `var(--font-geist-sans)`/`--font-geist-mono`, which are **never defined**. `--primary`/`--secondary` (`:16-17`) exist as CSS vars only; no `bg-primary`-style utility exists or is used. Usage of the tokens: `<body class="font-sans bg-background text-foreground">` (`layout.tsx:74`) and the unlayered `body {}` rule (`:61-66`).
+- **Dark mode**: OS `prefers-color-scheme` only (`globals.css:20,52,85` media blocks; Tailwind v4's default `dark:` variant). No toggle; the only `classList` call in the app toggles `overflow-hidden` (`dashboard-grid.tsx:64`). 31 source files use `dark:` utilities.
+- **Fonts**: no `next/font` anywhere (`layout.tsx:5` comment "Use system fonts"). Effective font is the unlayered `body { font-family: Arial, Helvetica, sans-serif; font-size: 18px }` (`globals.css:64-65`). Removing that rule without fixing `@theme` exposes the broken `--font-geist-sans` fallback (browser serif). The 18px base does **not** scale Tailwind's rem-based sizes; widgets also use `text-[10px]`/`text-[11px]`, and `text-md` (not a real utility) appears nine times.
+- **Global anchor rule**: `a { @apply text-black dark:text-white }` (`globals.css:68-70`) is unlayered, so it beats every `text-*` utility on links — e.g. `ShowAllButton`'s `text-indigo-700` renders black; link pills use `bg-indigo-500 text-black` (`about-me/page.tsx:121,220`).
+- **Hand-written CSS** (`globals.css:72-105`): `.hero-image` (`:73-79`) is a light checkerboard placeholder (`#f3f4f6` background, two 45° `linear-gradient`s of `#e5e7eb`, `background-size: 20px 20px`, offset `0 0, 10px 10px`); `.hero-image img { transition: opacity .3s }` (`:81-83`); a dark variant under `@media (prefers-color-scheme: dark)` (`:85-91`, `#374151`/`#4b5563`); then `@keyframes shimmer` + `.animate-shimmer` 2 s infinite (`:93-105`). Consumers are exactly two: `src/components/HeroImage.tsx:6` (wrapper `div.hero-image` around a `fill` `next/image` of the fixed Unsplash URL, `:8`, `priority`, `quality 85`) and `src/components/HeroSkeleton.tsx:5-6` (`.hero-image` + `animate-pulse`, inner `animate-shimmer` div), both mounted from `DashboardView.client.tsx:20-22`. `grep -rn hero-image src` → only those lines.
+- **Palette in practice**: Tailwind gray 50–950 for surfaces/borders/text; indigo accent (`border-indigo-500` heading underlines, `bg-indigo-600` buttons/close circle, indigo dates); six-hue skill cloud (`about-me/page.tsx:33-40`); red/blue weather max/min; green/red/blue status boxes in `UploadForm.tsx:306`. Page backgrounds differ: `/` and `/about-me` `bg-gray-100 dark:bg-gray-900`, sub-pages `bg-gray-50 dark:bg-gray-950`, admin `bg-gray-100 dark:bg-gray-900` in a `div`, not `main`.
+- **Layout**: root layout renders only `{children}` — no header/nav/footer (`grep '<nav'` → nothing). Dashboard: CSS grid `mx-auto max-w-[1200px] grid gap-4`, columns from the JS breakpoint table (not Tailwind breakpoints), content-height cards, no row binding (card order per breakpoint in §4). CV: `max-w-3xl` white `rounded-xl shadow-xl` card with indigo-underlined `h1` (`SectionPageLayout.tsx:13-33`), duplicated inline in six pages. Tailwind responsive prefixes used are only `sm/md/lg`.
+- **Card chrome** (`dashboard-grid.tsx:87-119`): `bg-white dark:bg-gray-800 rounded-2xl shadow-lg border hover:scale-[1.02]`, `p-2.5 bg-gray-50 dark:bg-gray-700` title strip (`div role="button" tabIndex=0`, no key handler), body `<button>` wrapping content that itself contains `<a>`/`<Link>` (invalid nesting; a link click also opens the modal).
+- **Modal** (`ModalFrame.tsx:22-66`): only framer-motion consumer (`LazyMotion`+`AnimatePresence`), `fixed z-40 bg-black/60 backdrop-blur` backdrop, `max-w-6xl rounded-2xl` article, `p-6`, `h1` title (second `<h1>` on the page), 20×20 px indigo close circle with lucide `X`; no `role="dialog"`, `aria-modal`, focus trap. Per-widget modal bodies are inventoried in §4.
+- **Text clamping on the CV**: `ExpandableText` (§2c step 8) clamps with inline styles after hydration (not the `line-clamp-*` utility the widgets use, e.g. `CoffeeWidget.tsx:36`), expands one-way, and hard-codes `aria-expanded="false"`.
+- **Animation**: `animate-pulse` Skeleton (`Skeleton.tsx`), custom `shimmer` used by the never-shown `HeroSkeleton`, `hover:scale-[1.02]` on cards, framer fade on modal (exit never plays), `WeatherCard` re-renders every second for a clock.
+- **Icons**: lucide-react (`X`, `ArrowLeft`, `ExternalLink`, `Link`, `Github`, `Linkedin`, `Twitter`). `parseWebsiteString` (`src/utils/formatters.ts:2,39-52`) stores icon components on data (`ParsedWebsite.icon`, `src/types.ts:117`) and the unit test asserts on them.
+- **Hard-coded**: hero Unsplash URL in two places (`layout.tsx:50-55` preload of the raw URL, `HeroImage.tsx:8` rendered via `next/image` → the preload fetches a different resource than the one displayed); `SpaceCard` also `priority`; owner name/title in `ProfileWidget.tsx:12-14`; "Sydney"/`Australia/Sydney`/`en-AU` in `WeatherWidget.tsx:25-45`; "Daily Dash" (`DashboardHeader.tsx:6`, plus an 86 px spacer for a removed reset button); widget titles in `widgetRegistry.tsx`; RAWG/youtu.be/openweathermap URL bases in widgets; GA4 id. `public/` holds only create-next-app SVGs and an unreferenced 205 KB `hero.webp`.
+- **Dead**: `src/components/StaticDashboard.tsx` (no importers), `GenericWidgetContent` (fallback never hit), the first `body {}` gradient rule and `--*-rgb` vars (`globals.css:11-38`), `prose` classes in `PhotographyWidget.tsx:53` (typography plugin not registered), the two unreachable `UploadForm.tsx` branches (`:161`, `:170-175`).
+
+---
+
+## 11. Redesign guide
+
+### Presentational / data boundary per component
+
+| Component | Data coupling | Verdict |
+|---|---|---|
+| `src/components/widgets/*Widget.tsx` `XCardBase` / `XModalBodyBase` | pure `({data}) => JSX` | **Replace freely**; keep the `{data: T}` prop and the `withWidgetData(id)` wrap (or call `useWidgetData(id)` directly). Modal body inventory in §4 tells you what each one shows today. |
+| `withWidgetData.tsx`, `useWidgetData.ts`, `widgetData.ts` | data layer | Keep the contract or replace wholesale (see seams). Class-name options (`loadingHeight`, `errorPadding`) should move out of the HOC. |
+| `widgetRegistry.tsx` | ids are the contract; `title`, `content`, `modalContent`, layouts are presentation | Ids stay. Everything else (layout tables, breakpoints, `defaultSize`, `Layout.h/min/max`, pre-built JSX) is replaceable — the three position tables reduce to the three ordered lists in §4. Prefer component references so cards can take size/variant props. |
+| `dashboard-grid.tsx` | `useSearchParams` modal state + grid maths + card chrome | Chrome and grid maths are free; keep a `<Suspense>` above any `useSearchParams` consumer; fix close to `router.replace(pathname)`. |
+| `ModalFrame.tsx`, `WidgetSection.tsx`, `Skeleton.tsx`, `HeroImage/HeroSkeleton.tsx` (+ `.hero-image`/shimmer CSS), `DashboardHeader.tsx`, `GenericWidgetContent.tsx`, `ProfileWidget.tsx`, `ExpandableText.tsx`, `SectionPageLayout.tsx`, `/about-me` `Section`/`ShowAllButton` | pure presentation | **Safe to replace/delete.** |
+| `DashboardView.tsx` / `DashboardView.client.tsx` | RSC fetch + effect hydration | Restructure: pass `initialData` via props/context or hydrate synchronously. |
+| `src/app/about-me/**/page.tsx` | RSC + `getCvSection`/`getFullCv` + inline markup | Markup free; keep the helper calls, try/catch fallbacks and `revalidate = 60`. The profile header's field list (§2c step 7) is the full set of `profile` fields that reach the screen today. |
+| `src/app/layout.tsx` | `generateMetadata` profile fetch, GA4, preload | Add nav/header/footer here; drop the raw-URL preload; keep GA4 if continuity matters (decide on a consent gate — today it fires everywhere with no consent call). |
+| `UploadForm.tsx` | POST contract | Restyle freely; keep `{sectionIdentifier, fileName, fileContentBase64, secretKey}` unless changing `upload-cv-data.ts:85-88` in lockstep; delete the two dead branches. |
+| `src/utils/formatters.ts`, `cvData.ts`, `src/types*.ts` | data helpers | Keep; note lucide coupling in `parseWebsiteString` and the mojibake-bullet split in `formatTextWithLineBreaks`. |
+| `netlify/functions/*`, `scripts/*`, `.github/workflows/*` | backend | A pure UI redesign leaves these untouched. |
+
+### Safe-to-replace list
+All Tailwind class strings; `globals.css` in its entirety (including `.hero-image`/shimmer, which have only two consumers); card chrome; `ORIGINAL_LAYOUTS`/`breakpointsConfig`/`colsConfig`/`useResponsiveLayout`; `ModalFrame`; `WidgetSection`; hero (both preload and image); `DashboardHeader`; `/about-me` `Section`/`ShowAllButton`/`skillCloudStyles`; `ExpandableText` (only consumer is `about-me/page.tsx`; replace with SSR-correct `line-clamp-*`); six inline sub-page shells (consolidate onto `SectionPageLayout` first); preview counts (3/5) inside Base components; all UI copy listed in §10; `StaticDashboard.tsx`, `public/hero.webp` and the boilerplate SVGs (delete); `tailwind.config.ts` and the four `@tailwindcss/*` plugins (delete, or re-add via `@plugin`); `ProfileWidget` hard-coded text (make data-driven from the `profile` singleton — it is a CV section, so pass it from a server component; it is not in `widgetCache`); `recommendationsGiven` — either render it (the data is already in the `get-full-cv` payload and a UI type exists, `src/types.ts:139`) or drop it from `ALLOWED_SECTIONS` in `get-full-cv.ts` to save one Mongo read per `/about-me` render.
+
+### Must-preserve contracts
+1. URL surface: `/`, `/about-me`, the eight `/about-me/<slug>` routes, `/admin/upload`, and `?w=<id>` deep links (ids `coffee, weather, space, tech, youtube, drones, camera, games`).
+2. Widget ids ↔ `ALLOWED_WIDGETS` (`widget-utils.ts:3-12`) ↔ Mongo names (`droneNews`, `youtubeRecs`, `photography`, `marsPhoto`→`mars`). Renaming touches registry, widget file, `ALLOWED_WIDGETS`, `fetchWidget` switch, workflow target.
+3. Payload shapes in `src/types/*.ts` and `SpaceWidgetData` (composite with nullable parts); `youtube` nests under `.items`; `skills` are `{value}` docs; `about` has two shapes; text fields may hold `•` **and mojibake `â€¢`** bullets (a redesign rendering real `<ul>` must keep splitting on both forms or first clean the stored strings in Mongo); `websites` may be string or `string[]` with `[Label:url]` syntax.
+4. The 12 CV section names as the public contract of `get-cv-section`/`get-full-cv`/`upload-cv-data`/`UploadForm`.
+5. Function endpoint paths and the `upload-cv-data` POST body.
+6. `revalidate = 60` on CV pages and `max-age=60` on read functions (or a deliberate replacement documented in README).
+7. Env names `MONGODB_URI`, `MONGODB_DB`, `UPLOAD_SECRET_KEY`, base-URL resolution via `NEXT_PUBLIC_BASE_URL`/`URL`.
+8. The eBay webhook path and challenge algorithm (`sha256(challengeCode + token + endpoint)`), registered externally with eBay.
+9. A `<Suspense>` boundary above `useSearchParams`.
+10. If news thumbnails stay on `next/image`, the `**` wildcard in `remotePatterns` (or a `remote_images` entry) must stay — otherwise switch coffee/drones to `unoptimized`/`<img>` first.
+
+### Recommended seams for the new design
+- **Design tokens**: define palette, radii, spacing, and fonts in `@theme` in `globals.css`; delete `@tailwind` directives, the duplicate `:root`/`body` blocks, `--*-rgb`, `--primary/--secondary`, and the global `a {}` rule. Introduce `next/font` and set `--font-sans` from it. If a manual theme toggle is wanted, add `@custom-variant dark (&:where(.dark, .dark *));` and a client toggle writing a class on `<html>`.
+- **Data hydration**: either (a) render widget cards as **server components** that receive `initialData[id]` as props (client islands only where interactivity is needed), or (b) keep the cache but seed it synchronously at render (e.g. a context provider that assigns before children mount) and skip `loading:true` when cached. Consider having `DashboardView` fetch Mongo directly through `connectToDatabase()` to remove the self-HTTP hop and the `headers()` call — this restores ISR on `/`. Keep `get-widget` for any client refresh, and add a retry/invalidate path (today none exists).
+- **Layout**: replace the JS breakpoint table with Tailwind `grid-cols-1 sm:grid-cols-2 lg:grid-cols-3` (or `auto-fit`), give cards fixed/min heights, and pass `loading` to `dynamic()` or reserve skeleton height, to eliminate the md-flash and CLS. Decide on one card order (today weather leads on md/sm but coffee leads on one column).
+- **Modal**: a proper dialog primitive (`role="dialog"`, `aria-modal`, focus trap, ≥44 px close target), keep `?w=` state, close via `router.replace(pathname)`, keep the component mounted so exit transitions run; separate "open modal" affordance from in-card links (or make the whole card a link-free surface).
+- **Empty/error states**: per-widget empty state design; distinguish 404 (missing data) from failure in `fetchWidgetData`; guard `space` sub-objects for `null`; stop caching Errors.
+- **Route groups**: `(site)` vs `(admin)` layouts so the admin page drops GA4/hero preload and gains `robots: { index:false }`.
+- **Shared shell**: a header/nav in `layout.tsx`; one `SectionPageLayout` for all eight sub-pages; unify page backgrounds.
+- **Metadata & headers**: OG/Twitter images, `sitemap.ts`, `robots.ts`, `not-found.tsx`, `error.tsx`, consistent title suffix, real `viewport`; add security headers (CSP/HSTS/X-Frame-Options/Referrer-Policy) via `next.config.ts` `headers()` or `netlify.toml` — there are none today.
+
+### Suggested order of work
+1. **Setup & baseline**: `npm install` is done (`node_modules/` present). Put `/opt/homebrew/bin` on PATH (or `npm i -D netlify-cli`), populate `.env` from `.env.example` (at minimum `MONGODB_URI`, `NEXT_PUBLIC_BASE_URL=http://localhost:8888`), then `npm run dev:netlify`; run `next build` to confirm the route table matches §3. All eight feeds were verified live on 2026-09-18; if they go stale again, check whether GitHub auto-disabled the workflows (`gh workflow list --all`).
+2. **Hygiene PR**: delete dead code/assets/deps (incl. the `UploadForm` dead branches), consolidate six sub-pages onto `SectionPageLayout`, fix `netlify.toml` `/public/*` rule, fix modal close and nested-link bug, guard `space` nulls, make `upload-cv-data` fail closed + timing-safe, rotate `NASA_KEY` (the old one was public until `4cbba2f`) and update the GitHub secret, decide on `recommendationsGiven` (render or drop), tighten `remotePatterns` (news thumbnails → `unoptimized` or `<img>`), pin Node in workflows + replace the ts-node loader with `tsx` and add `cache: npm`.
+3. **Token/CSS foundation**: clean `globals.css`, `@theme`, fonts, dark variant decision; delete `tailwind.config.ts`.
+4. **Layout & shell**: root layout nav/footer, route groups, metadata files, security headers.
+5. **Dashboard**: new card/modal system on the `{data}` seam; rework hydration (props or sync cache); CSS-only responsive grid; empty/error states.
+6. **CV pages**: new `SectionPageLayout` and `/about-me` composition; SSR-correct clamping (`line-clamp-*`) replacing `ExpandableText`; real `<ul>` for bullet text (after cleaning mojibake in Mongo or keeping the dual split).
+7. **Admin**: restyle `UploadForm`, add `noindex`, consider real auth (Netlify Identity / basic auth), request-state feedback instead of fake progress, consent-gate or drop GA4 on admin.
+8. **Docs**: rewrite README (dev command + PATH/netlify-cli note, all env vars/secrets, cron jobs, Netlify adapter).
+
+---
+
+## 12. Concerns & tech debt
+
+| Sev | Area | Issue | Evidence |
+|---|---|---|---|
+| High → **fixed in `4cbba2f`** | Security | NASA API key was persisted in `epic.url` and served publicly via `get-widget?widget=space` for ~a year; the workflow now writes a key-free URL. **Remaining action: rotate the key.** | `.github/workflows/fetch-nasa.yml:45`; `netlify/functions/widget-utils.ts:34`; `src/components/widgets/SpaceWidget.tsx:58` |
+| High | Security | Upload endpoint **fails open**: secret only checked when `UPLOAD_SECRET_KEY` is set; plain `!==`; secret in JSON body; no rate limit; then `deleteMany` + `insertMany` | `netlify/functions/upload-cv-data.ts:85-88,236-239` |
+| High | Security | `next/image` `remotePatterns` end with `hostname:'**'` for https **and http** — the Netlify adapter turns it into a catch-all `remote_images` regex, so the Image CDN is an open image proxy; load-bearing for NewsAPI thumbnails | `next.config.ts:24-25`; `fetch-coffee-news.yml:50`; `CoffeeWidget.tsx:24-31` |
+| High | Runtime | `space` payload can carry `null` sub-docs but `SpaceCardBase`/`SpaceModalBodyBase` dereference `space.url`, `epic.url`, `mars.photos.length`, `marsWeather.latest.sol` unguarded → render crash | `widget-utils.ts:32-37`; `SpaceWidget.tsx:31,57-58,93,110-112,119` |
+| High | Perf/caching | `/` is dynamic (`headers()` in `computeBaseUrl`), so `revalidate = 60` is ineffective; every view = function + 11 Mongo reads in 8 sequential steps. **Verified from `.next/prerender-manifest.json`.** | `src/lib/widgetData.ts:57-58`; `src/app/page.tsx:4`; `get-all-widgets.ts:18-23` |
+| High | Perf/UX | Server-seeded widget data is largely wasted: separate RSC/client `widgetCache` instances; `hydrateWidgetCache` in parent `useEffect` runs after child `useWidgetData` effects → skeleton SSR + up to 8 `get-widget` calls per load | `DashboardView.client.tsx:14-16`; `useWidgetData.ts:23-26`; `widgetData.ts:41,105-120` |
+| Medium | Ingestion | Workflows run `node --loader ts-node/esm --experimental-specifier-resolution=node` with no `setup-node`, no `cache:`; the flag is deprecated/inert (harmless on the `ubuntu-24.04` runners, verified from logs) and `--loader` emits `DEP0180`. The real freshness risk is GitHub's 60-day auto-disable, which silently stopped all eight jobs from 2025-08-30 to 2026-09-18. 38 full `npm ci` runs/day. | `package.json:12-13`; `.github/workflows/fetch-weather.yml:9,21,75-76` |
+| Medium | Reliability | `DashboardView` awaits `fetchAllWidgetsData()` with no try/catch → any function failure errors the whole home page | `src/app/DashboardView.tsx:5`; `widgetData.ts:107-108` |
+| Medium | Reliability | `widgetCache` caches `Error` objects permanently and `fetchWidgetData` rethrows before any fetch, so card **and** modal stay on "Failed to load" with zero retries until reload; 60 s `Cache-Control` on 4xx/5xx responses too | `widgetData.ts:74-76,91`; `useWidgetData.ts:12-35`; `get-widget.ts:10,19,31,44` |
+| Medium | Reliability | `connectToDatabase` caches the client before `connect()` resolves → failed connect poisons the warm Lambda | `src/lib/mongodb.ts:11-17` |
+| Medium | Security | No security headers anywhere (no CSP/HSTS/X-Frame-Options/Referrer-Policy/Permissions-Policy); `/admin/upload` publicly routable, indexable, no `noindex`, no auth gate; read functions leak `err.message`; GA4 fires on every route incl. admin with no consent gate | `netlify.toml:11-19`; `next.config.ts:4-34`; `admin/upload/page.tsx:48-51`; `get-widget.ts:43`; `layout.tsx:60-72` |
+| Medium | Security | eBay POST accepts any JSON with no signature check (harmless now — nothing is stored — but the endpoint can be spammed into logs) | `ebay-account-deletion-webhook.ts:95-124` |
+| Medium | UX | Modal close is `router.back()` → deep link `/?w=space` cannot be closed in-app; exit animation never plays | `dashboard-grid.tsx:53,124-130`; `ModalFrame.tsx:23-24` |
+| Medium | UX/CLS | SSR/first paint always 3-column `md`; content-height cards with `h-24` skeletons → reflow; `ExpandableText` clamps via inline styles 50 ms after hydration, one-way expand, hard-coded `aria-expanded="false"` | `dashboard-grid.tsx:22-37`; `withWidgetData.tsx:17`; `ExpandableText.tsx:23-27,45-47,80-83,99` |
+| Medium | A11y/HTML | `<a>` inside card `<button>` (click follows link **and** opens modal); title strip `role="button"` with no `onKeyDown`; modal lacks `role="dialog"`/focus trap; 20 px close target; two `<h1>`s | `dashboard-grid.tsx:89-118`; `CoffeeWidget.tsx:16-22`; `ModalFrame.tsx:41-59` |
+| Medium | Styling | Tailwind config drift: v3 directives beside v4 import; `tailwind.config.ts` inert (dark `class` mode, plugins, tokens all ignored); unlayered `a {}` rule defeats link colours; undefined `--font-geist-*`; `text-md`/`prose` inert | `globals.css:3-8,45-50,61-70`; `tailwind.config.ts:10,38-43`; `PhotographyWidget.tsx:53` |
+| Medium | Perf | Hero preloaded as raw Unsplash URL but rendered via `next/image` (different URL) → double download; `SpaceCard` also `priority` | `layout.tsx:50-55`; `HeroImage.tsx:7-16`; `SpaceWidget.tsx:41` |
+| Medium | Data | Collection replace is non-atomic and an empty CSV/array wipes the section (upload and cron); multi-row `about` upload → `$set` with array → 500; profile upload silently overwrites `about.content`; `skills` taken from first column regardless of header | `upload-cv-data.ts:151-152,163,166,219,231-234,237-239`; `push-to-mongo.ts:74-79` |
+| Medium | Build | Prerender depends on the previous deploy's functions (`process.env.URL`); failures swallowed into "No … data available." until first revalidation | `getCvSection.ts:4-8`; `about-me/experience/page.tsx:27-32` |
+| Medium | Perf | `get-all-widgets` (8 steps / 11 reads) and `get-full-cv` (12, incl. the unused `recommendationsGiven`) do strictly sequential Mongo reads on the SSR critical path | `get-all-widgets.ts:18-23`; `widget-utils.ts:25-31`; `get-full-cv.ts:34-47` |
+| Medium | Dev setup | `netlify-cli` is not a dependency and not on the default PATH here; site not linked (`.netlify/state.json` has no `siteId`), so `npm run dev:netlify` fails out of the box and no env is injected | `package.json:7,15-48`; `.netlify/state.json`; `.gitignore:44-45` |
+| Low | Data | `recommendationsGiven` is uploadable, typed and fetched on every `/about-me` render but never rendered (orphaned section) | `upload-cv-data.ts:22`; `get-full-cv.ts:13,34-47`; `about-me/page.tsx:54,297`; `src/types.ts:139` |
+| Low | Data quality | Mojibake bullets (`â€¢`) are expected in stored text and special-cased in the formatter; upload never sniffs encoding; `TechStory.url` null for Ask/Show HN rendered as `href`; YouTube job writes `"null"` video ids; `dynamicTyping` + `String()` mangles leading zeros; `decodeHtmlEntities` breaks astral emoji | `formatters.ts:69,77`; `upload-cv-data.ts:96,106,144`; `TechWidget.tsx:13-15`; `fetch-youtube-recs.yml:50-65`; `widgetData.ts:14,17` |
+| Low | Maintainability | Six of eight CV sub-pages inline the `SectionPageLayout` shell; `ALLOWED_SECTIONS` copy-pasted ×4; `transformCause` duplicates `getDisplayCause`; registry ids vs `ALLOWED_WIDGETS` unshared; naming drift (`camera`↔`photography`, `drones`↔`droneNews`, `youtube`↔`youtubeRecs`); two dead `UploadForm` branches | `experience/page.tsx:35-49`; `get-cv-section.ts:4-19`; `upload-cv-data.ts:39-50`; `widget-utils.ts:41-50`; `UploadForm.tsx:161,170-175` |
+| Low | Dead code | `StaticDashboard.tsx`, `get-deploy-status.ts` (no caller, needs undocumented PAT), `migrate-json.ts` (dirs gone), `DashboardHeader` 86 px spacer, `HeroSkeleton` Suspense fallback, `public/hero.webp`, `netlify.toml` `/public/*` rule, `node-fetch`/`@octokit/rest`/`line-clamp`/`autoprefixer` | `StaticDashboard.tsx:1`; `get-deploy-status.ts:8-9`; `migrate-json.ts:31-34`; `DashboardHeader.tsx:8-9`; `netlify.toml:16-19`; `package.json:16,22,32,41` |
+| Low | Metadata/SEO | No OG/Twitter, sitemap, robots, error/not-found pages; empty `viewport`; inconsistent title suffixes | `layout.tsx:33-39`; `about-me/experience/page.tsx:21-24` |
+| Low | Docs/tooling | README is create-next-app boilerplate (Geist, Vercel), documents 4 of 6+ env vars, omits the netlify-cli requirement; no Node pin anywhere (lockfile permits ≥ 18.18); `npm test` needs bun (not installed); no CI runs lint/tests; functions un-type-checked; scripts type-checked by site build | `README.md:5-11,27-47,68-72`; `package-lock.json:8069-8071`; `tsconfig.json:26-27`; `global.d.ts:11-14` |
+
+---
+
+## 13. Open questions
+
+1. ~~**Are the cron jobs succeeding?**~~ **Answered 2026-09-18:** they were not — GitHub had auto-disabled all eight since 2025-08-30. Re-enabled and dispatched today; all eight succeed (NASA after `4cbba2f`) and every feed is current (`weather.updated` = 2026-09-18 12:28 UTC).
+2. **What is actually in the live `cv` database?** *Partly answered 2026-09-18 via Atlas:* 15 collections, 139 docs. Singletons present: `about` (structured shape: `introduction`, `topPrioritiesAndAchievements[]`, `additionalNotes`), `profile`, `cv-data` (create-next-app placeholder, unused — delete), `weather`, `space`, `epic`, `marsPhoto` (`{photos:[]}`), `marsWeather` (frozen), `youtubeRecs`, `photography`. `experience` has 7 docs. `ebay_account_deletions` is gone. An unrelated `sample_mflix` demo database (124 MB) sits on the same M0 cluster. *Still open:* `skills` doc shape, whether `recommendationsGiven` holds rows, mojibake in stored text, `get-all-widgets` payload size.
+3. ~~**Netlify runtime, production branch and Node version**~~ **Answered 2026-09-18 from the Netlify API:** site `morning-kafes-2604` (id `2b766f79-e072-4ebb-9259-14868b0ca4fc`), production branch `main`, auto-provisioned `@netlify/plugin-nextjs@5.16.0`, all functions on `nodejs22.x`, 9 functions deployed (the helper `widget-utils.ts` is deployed as one of them). Deploy-preview env scoping is still only visible in the UI.
+4. **Does the Netlify Image CDN really honour the `**` wildcard in production?** Derived from the adapter source; confirm with `/_next/image?url=<newsapi-host>` on nhatminh.dev.
+5. **Production env**: are `UPLOAD_SECRET_KEY` (in all deploy contexts — previews fail open), `NEXT_PUBLIC_BASE_URL`, `NETLIFY_API_PAT`, `EBAY_WEBHOOK_*` set on Netlify?
+6. ~~**Does the browser fire 8 `get-widget` requests on first load**~~ **Answered 2026-09-18:** yes — eight `GET /.netlify/functions/get-widget?widget=…` requests (all 200) observed in the Network tab after page load. No hydration warning was seen; the only console message is the unused-preload warning for the hero image (§10).
+7. ~~**Is the NASA key currently visible**~~ **Answered 2026-09-18:** it was (observed in the live `epic.url`); after `4cbba2f` and a successful run the stored URL is key-free. The key itself should still be rotated.
+8. ~~**Why does the site host an eBay account-deletion webhook?**~~ **Answered 2026-09-18:** the owner keeps an eBay developer app that requires the endpoint; they chose to keep it. The challenge hash was verified against a local reference SHA-256 and the live endpoint acks POSTs with 200.
+9. **Is `get-deploy-status` consumed by anything outside this repo** (a badge elsewhere), or can it be deleted?
+10. **Design intent**: OS-only dark mode or a manual toggle? Is `/admin/upload` in redesign scope? Should `ProfileWidget`/`WeatherWidget` become data-driven (weather location is also hard-coded in the workflow)? Are the react-grid-layout leftovers meant to return as a draggable grid? Should `recommendationsGiven` be shown? Is the differing one-column card order (coffee first) intentional?
+11. **Was the lockfile bump to next 15.5.12 intentional** (package.json/eslint-config-next still say 15.3.4)?
+12. **Has `/admin/upload` been indexed by search engines?** Nothing in the repo prevents it.
+13. **Does Netlify's CDN honour the functions' `Cache-Control: public, max-age=60`** at the edge, or only browsers? This decides whether the 60 s layers stack or overlap.
+14. **GA4 consent**: is un-gated analytics on every route (including admin) acceptable for the site's audience/jurisdiction, or should the redesign add a consent default?
