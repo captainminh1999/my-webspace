@@ -8,17 +8,12 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "test": "bun test",
-    "migrate": "node --loader ts-node/esm --experimental-specifier-resolution=node scripts/migrate-json.ts",
+    "test": "node --test \"src/**/*.test.ts\"",
     "push-to-mongo": "node --loader ts-node/esm --experimental-specifier-resolution=node scripts/push-to-mongo.ts"
   },
   "dependencies": {
-    "@octokit/rest": "^22.0.0",
-    "date-fns": "^4.1.0",
-    "lucide-react": "^0.511.0",
     "mongodb": "^6.17.0",
     "next": "^15.3.4",
-    "node-fetch": "^2.7.0",
     "papaparse": "^5.5.3",
     "react": "^19.1.0",
     "react-dom": "^19.1.0"
@@ -27,8 +22,6 @@
     "@eslint/eslintrc": "^3",
     "@netlify/functions": "^4.0.0",
     "@tailwindcss/postcss": "^4",
-    "@types/estree": "^1.0.7",
-    "@types/json-schema": "^7.0.15",
     "@types/node": "^20",
     "@types/papaparse": "^5.3.16",
     "@types/react": "^19",

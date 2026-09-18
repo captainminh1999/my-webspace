@@ -1,7 +1,6 @@
 // src/types.ts
 
 // Import React for icon type if needed, or define a more generic type
-import type { ElementType } from 'react';
 
 export interface ProfileData {
   firstName: string;
@@ -114,7 +113,6 @@ export interface LanguageEntry {
 export interface ParsedWebsite {
   label: string;
   url: string;
-  icon?: ElementType; // Type for a React component (like an icon)
   siteName?: string; // Detected site name
 }
 

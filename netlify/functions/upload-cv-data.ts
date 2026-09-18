@@ -1,4 +1,5 @@
 // netlify/functions/upload-cv-data.ts
+import { timingSafeEqual } from "crypto";
 import type { Handler, HandlerEvent, HandlerContext } from "@netlify/functions";
 import Papa from "papaparse";
 import { connectToDatabase } from "../../src/lib/mongodb";
@@ -82,8 +83,15 @@ const handler: Handler = async (event: HandlerEvent, _context: HandlerContext) =
     return { statusCode: 400, body: JSON.stringify({ message: "Bad Request: Invalid JSON payload." }) };
   }
 
+  // Fail closed: with no secret configured, nothing may be written.
   const UPLOAD_SECRET_KEY = process.env.UPLOAD_SECRET_KEY;
-  if (UPLOAD_SECRET_KEY && payload.secretKey !== UPLOAD_SECRET_KEY) {
+  if (!UPLOAD_SECRET_KEY) {
+    console.error("UPLOAD_SECRET_KEY is not set; refusing upload");
+    return { statusCode: 503, body: JSON.stringify({ message: "Uploads are disabled on this deployment." }) };
+  }
+  const given = Buffer.from(String(payload.secretKey ?? ""), "utf8");
+  const expected = Buffer.from(UPLOAD_SECRET_KEY, "utf8");
+  if (given.length !== expected.length || !timingSafeEqual(given, expected)) {
     return { statusCode: 403, body: JSON.stringify({ message: "Forbidden: Invalid secret key." }) };
   }
 

@@ -1,6 +1,4 @@
 // src/utils/formatters.ts
-import { Github, Linkedin, Twitter, Link as LinkIcon } from 'lucide-react';
-import type { ElementType } from 'react'; // For ParsedWebsite icon type
 import type { ParsedWebsite } from '@/types'; // Import ParsedWebsite interface
 
 export const getDisplayCause = (rawCause?: string | null): string => {
@@ -20,6 +18,7 @@ export const parseWebsiteString = (websiteStr?: string | null): ParsedWebsite | 
   let explicitLabel: string | null = null;
   let urlPart = websiteStr.trim();
 
+  // "[Label:url]" form, as written by the profile upload
   const formattedMatch = websiteStr.match(/^\[(.*?):(.*?)\]$/);
   if (formattedMatch && formattedMatch[1] && formattedMatch[2]) {
     explicitLabel = formattedMatch[1].trim();
@@ -31,36 +30,17 @@ export const parseWebsiteString = (websiteStr?: string | null): ParsedWebsite | 
   }
 
   try {
-    const urlObj = new URL(urlPart);
-    const hostname = urlObj.hostname.toLowerCase().replace(/^www\./, '');
+    const hostname = new URL(urlPart).hostname.toLowerCase().replace(/^www\./, '');
     let detectedSiteName: string | undefined;
-    let icon: ElementType | undefined;
-
-    if (hostname.includes('github.com')) {
-      detectedSiteName = 'GitHub';
-      icon = Github;
-    } else if (hostname.includes('linkedin.com')) {
-      detectedSiteName = 'LinkedIn';
-      icon = Linkedin;
-    } else if (hostname.includes('twitter.com') || hostname.includes('x.com')) {
-      detectedSiteName = 'Twitter/X';
-      icon = Twitter;
-    } else {
-      // For other known sites, you can add more else if blocks here
-      // e.g., Facebook, Instagram, Behance, Dribbble if you re-add those icons
-      icon = LinkIcon; // Default link icon
-    }
+    if (hostname.includes('github.com')) detectedSiteName = 'GitHub';
+    else if (hostname.includes('linkedin.com')) detectedSiteName = 'LinkedIn';
+    else if (hostname.includes('twitter.com') || hostname.includes('x.com')) detectedSiteName = 'Twitter/X';
 
     const finalLabel = explicitLabel || detectedSiteName || hostname.charAt(0).toUpperCase() + hostname.slice(1);
-
-    return { label: finalLabel, url: urlPart, icon, siteName: detectedSiteName };
-
+    return { label: finalLabel, url: urlPart, siteName: detectedSiteName };
   } catch (e) {
     console.warn("Could not parse as URL:", websiteStr, e);
-    if (explicitLabel) {
-        return { label: explicitLabel, url: urlPart, icon: LinkIcon };
-    }
-    return null;
+    return explicitLabel ? { label: explicitLabel, url: urlPart } : null;
   }
 };
 
