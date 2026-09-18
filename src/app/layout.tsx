@@ -4,7 +4,7 @@ import type { Metadata, Viewport } from "next";
 import Script from "next/script";
 import { Fraunces, IBM_Plex_Mono } from "next/font/google";
 
-import { getCvSection } from '@/lib/getCvSection';
+import { getCvSection } from "@/lib/cv";
 
 // Two self-hosted families (docs/DESIGN-DIRECTION.md § Typography). Body text
 // uses the system stack, so these only carry the display and data registers.

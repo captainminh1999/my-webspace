@@ -2,15 +2,15 @@
 // human-readable time goes through Intl with an explicit time zone.
 export const TZ = "Australia/Sydney";
 
-const fmt = (opts: Intl.DateTimeFormatOptions) => new Intl.DateTimeFormat("en-AU", { timeZone: TZ, ...opts });
+// en-US for month names: en-AU/en-GB abbreviate September as "Sept", the design uses "SEP".
+const fmt = (opts: Intl.DateTimeFormatOptions, locale = "en-AU") => new Intl.DateTimeFormat(locale, { timeZone: TZ, ...opts });
 
 const F = {
   hm: fmt({ hour: "2-digit", minute: "2-digit", hour12: false }),
-  dayMon: fmt({ day: "numeric", month: "short" }),
   dateline: fmt({ weekday: "long", day: "numeric", month: "long", year: "numeric" }),
   weekday: fmt({ weekday: "short" }),
   hourShort: fmt({ hour: "numeric", hour12: true }),
-  mon: fmt({ month: "short" }),
+  mon: fmt({ month: "short" }, "en-US"),
   day: fmt({ day: "numeric" }),
   tzName: fmt({ timeZoneName: "short" }),
 };
@@ -24,7 +24,7 @@ export const toDate = (v: string | number | Date | null | undefined): Date | nul
 /** "07:46" */
 export const hm = (d: Date) => F.hm.format(d);
 /** "14 Sep" → rendered uppercase by the stamp */
-export const dayMon = (d: Date) => F.dayMon.format(d);
+export const dayMon = (d: Date) => `${F.day.format(d)} ${F.mon.format(d)}`;
 /** "Thursday 18 September 2026" */
 export const dateline = (d: Date) => F.dateline.format(d);
 /** "Thu" */
@@ -36,7 +36,7 @@ export const tzAbbrev = (d: Date) => {
   const part = F.tzName.formatToParts(d).find((p) => p.type === "timeZoneName");
   return part?.value ?? "AEST";
 };
-export const monthDay = (d: Date) => `${F.day.format(d)} ${F.mon.format(d)}`;
+export const monthDay = dayMon;
 
 /** Relative age in the stamp register: "14 MIN", "3 H", "4 D". */
 export function relativeAge(from: Date, now: Date): string {

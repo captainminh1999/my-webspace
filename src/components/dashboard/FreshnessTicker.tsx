@@ -6,7 +6,9 @@ import { useEffect } from "react";
 // server rendered. Under 1 KB, no state, no re-render.
 const LIMITS: Record<string, [number, number]> = { hourly: [2, 6], daily: [30, 72] };
 const HM = new Intl.DateTimeFormat("en-AU", { timeZone: "Australia/Sydney", hour: "2-digit", minute: "2-digit", hour12: false });
-const DM = new Intl.DateTimeFormat("en-AU", { timeZone: "Australia/Sydney", day: "numeric", month: "short" });
+const DAY = new Intl.DateTimeFormat("en-AU", { timeZone: "Australia/Sydney", day: "numeric" });
+const MON = new Intl.DateTimeFormat("en-US", { timeZone: "Australia/Sydney", month: "short" });
+const dayMon = (d: Date) => `${DAY.format(d)} ${MON.format(d)}`;
 
 function rel(from: Date, now: Date) {
   const s = Math.max(0, (now.getTime() - from.getTime()) / 1000);
@@ -26,7 +28,7 @@ function tick() {
     el.textContent =
       source === "content"
         ? `LATEST ${r}`
-        : `${now.getTime() - at.getTime() < 86400e3 ? HM.format(at) : DM.format(at).toUpperCase()} · ${r}`;
+        : `${now.getTime() - at.getTime() < 86400e3 ? HM.format(at) : dayMon(at).toUpperCase()} · ${r}`;
     const [fresh, aging] = LIMITS[el.dataset.budget ?? "daily"];
     const hours = (now.getTime() - at.getTime()) / 3.6e6;
     const state = hours <= fresh ? "fresh" : hours <= aging ? "aging" : "stale";

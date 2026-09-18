@@ -6,7 +6,7 @@ import type { Metadata } from 'next';
 import React from 'react';
 
 // Import your profile data to use for the title
-import { getCvSection } from '@/lib/getCvSection';
+import { getCvSection } from "@/lib/cv";
 
 // Import the client component that contains the form
 import UploadPortal from './UploadPortal.client';
@@ -39,6 +39,7 @@ export async function generateMetadata(): Promise<Metadata> {
   }
 
   return {
+    robots: { index: false, follow: false },
     title: pageTitle,
     description: "Admin portal for uploading CV data sections.",
   };

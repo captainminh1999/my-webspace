@@ -18,8 +18,10 @@ const LABEL: Record<WidgetId, string> = {
 
 interface Props {
   now: Date;
-  freshness: Record<WidgetId, Freshness>;
+  freshness?: Record<WidgetId, Freshness>;
   variant?: "dash" | "cv";
+  /** Replaces the dateline on CV pages (the profile's name). */
+  title?: string;
 }
 
 /**
@@ -27,8 +29,8 @@ interface Props {
  * the freshness strip for all feeds, the theme toggle and the CV link.
  * Everything here is in the first HTML flush and nothing is an image.
  */
-export default function Masthead({ now, freshness, variant = "dash" }: Props) {
-  const entries = Object.values(freshness);
+export default function Masthead({ now, freshness, variant = "dash", title }: Props) {
+  const entries = freshness ? Object.values(freshness) : [];
   const stale = entries.filter((f) => f.state === "stale");
   const fresh = entries.filter((f) => f.state === "fresh");
   const ordered = [...stale, ...entries.filter((f) => f.state !== "stale")];
@@ -41,16 +43,18 @@ export default function Masthead({ now, freshness, variant = "dash" }: Props) {
             <i aria-hidden className="inline-block size-1.5 bg-accent" />
             {variant === "dash" ? "DAILY DASH · NHATMINH.DEV" : "NHATMINH.DEV · CV"}
           </p>
-          <h1 className="font-display font-medium text-ink text-[2rem] leading-9 md:text-dateline mt-2">
-            {dateline(now)}
-          </h1>
+          {(variant === "dash" || title) && (
+            <h1 className="font-display font-medium text-ink text-[2rem] leading-9 md:text-dateline mt-2">
+              {title ?? dateline(now)}
+            </h1>
+          )}
           <p className="stamp text-ink-3 mt-2">
             SYDNEY · <span data-live-clock>{hm(now)}</span> {tzAbbrev(now)}
           </p>
         </div>
 
         <div className="flex flex-col md:items-end gap-3 min-w-0">
-          {variant === "dash" ? (
+          {variant === "dash" && freshness ? (
             <>
               {/* md+: every feed inline; stale feeds first */}
               <ul className="hidden md:flex flex-wrap justify-end gap-x-4 gap-y-1 stamp text-ink-2">
