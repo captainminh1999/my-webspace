@@ -31,7 +31,7 @@ export default async function AllVolunteeringPage() {
   }
 
   return (
-    <main className="min-h-screen bg-gray-50 dark:bg-gray-950 py-10 px-4 sm:px-6 lg:px-8">
+    <main className="min-h-screen py-10 px-4 sm:px-6 lg:px-8">
       <div className="max-w-3xl mx-auto">
         
         {/* MODIFIED: Back to Home Link */}

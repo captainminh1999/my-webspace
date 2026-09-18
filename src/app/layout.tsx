@@ -1,10 +1,36 @@
 // src/app/layout.tsx
-import "./globals.css"; // Keep this for Tailwind and other global styles
+import "./globals.css";
 import type { Metadata, Viewport } from "next";
 import Script from "next/script";
-// Use system fonts to avoid build-time downloads
+import { Fraunces, IBM_Plex_Mono } from "next/font/google";
 
 import { getCvSection } from '@/lib/getCvSection';
+
+// Two self-hosted families (docs/DESIGN-DIRECTION.md § Typography). Body text
+// uses the system stack, so these only carry the display and data registers.
+const fraunces = Fraunces({
+  subsets: ["latin"],
+  weight: ["500", "600"],
+  display: "swap",
+  variable: "--font-fraunces",
+  adjustFontFallback: true,
+});
+
+const plexMono = IBM_Plex_Mono({
+  subsets: ["latin"],
+  weight: ["400"],
+  display: "swap",
+  variable: "--font-plex-mono",
+  // next/font has no monospace default and would synthesise a fallback from
+  // proportional Arial, which breaks tabular figures until the woff2 swaps in.
+  adjustFontFallback: false,
+  fallback: ["ui-monospace", "SFMono-Regular", "Menlo", "Consolas", "monospace"],
+});
+
+// Runs before any stylesheet applies so the first paint is already in the
+// right theme. Dark is the default; the OS preference wins on a first visit;
+// an explicit choice in localStorage wins after that.
+const themeScript = `try{var t=localStorage.getItem('theme');if(t!=='light'&&t!=='dark')t=matchMedia('(prefers-color-scheme: light)').matches?'light':'dark';document.documentElement.dataset.theme=t;}catch(e){document.documentElement.dataset.theme='dark';}`;
 
 
 interface ProfileTitleData {
@@ -44,24 +70,16 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    // suppressHydrationWarning: data-theme is written by the inline script
+    // before React hydrates, so the server and client attributes differ on purpose.
+    <html lang="en" className={`${fraunces.variable} ${plexMono.variable}`} suppressHydrationWarning>
       <head>
-        {/* Preload hero image for LCP optimization */}
-        <link
-          rel="preload"
-          as="image"
-          href="https://images.unsplash.com/photo-1465101162946-4377e57745c3?auto=format&fit=crop&w=1600&q=85&fm=webp"
-          fetchPriority="high"
-        />
-        {/* Preconnect to image hosts */}
-        <link rel="preconnect" href="https://images.unsplash.com" />
-        {/* Preconnect to GTM to speed up tag script loading */}
-        <link rel="preconnect" href="https://www.googletagmanager.com" />
+        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=G-N8S80ZDYP0"
-          strategy="afterInteractive"
+          strategy="lazyOnload"
         />
-        <Script id="google-tag" strategy="afterInteractive">
+        <Script id="google-tag" strategy="lazyOnload">
           {`
             window.dataLayer = window.dataLayer || [];
             function gtag(){dataLayer.push(arguments);}
@@ -71,7 +89,7 @@ export default function RootLayout({
           `}
         </Script>
       </head>
-      <body className="font-sans bg-background text-foreground">
+      <body className="font-sans bg-bg text-ink">
         {children}
       </body>
     </html>

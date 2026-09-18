@@ -1,105 +1,156 @@
-/* src/app/globals.css */
+/* src/app/globals.css — Ledger, night edition (docs/DESIGN-DIRECTION.md) */
+@import "tailwindcss";
 
-@import 'tailwindcss';
-
-/* THEN Tailwind directives */
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-/* You can add other global styles here if needed */
-:root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
-  /* base color palette */
-  --primary: #3b82f6; /* blue-500 */
-  --secondary: #f97316; /* orange-500 */
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 0, 0, 0;
-    --background-end-rgb: 0, 0, 0;
-    --primary: #60a5fa; /* blue-400 */
-    --secondary: #fb923c; /* orange-400 */
+/* data-theme is set on <html> before paint by the inline script in layout.tsx.
+   Dark is the default; the OS preference is honoured on first visit; the toggle persists. */
+/* dark: applies for an explicit dark choice, and — when the theme script has not run
+   (no data-theme attribute) — whenever the tokens themselves default to dark. */
+@custom-variant dark {
+  &:where([data-theme="dark"], [data-theme="dark"] *) { @slot; }
+  @media not (prefers-color-scheme: light) {
+    &:where(:root:not([data-theme]), :root:not([data-theme]) *) { @slot; }
   }
 }
+@custom-variant light (&:where([data-theme="light"], [data-theme="light"] *));
 
-body {
-  color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
-}
-
+/* ---- Raw tokens: dark (default) ---- */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  color-scheme: dark;
+  --bg: #0E0F12;            /* page ground: warm near-black, not slate */
+  --surface: #16181D;       /* card, dialog, CV table row */
+  --surface-2: #1D2026;     /* table head, image frames, mono blocks */
+  --ink: #ECEAE4;           /* primary text, sparkline stroke, numerals */
+  --ink-2: #A7ABB3;         /* secondary text, kickers, captions */
+  --ink-3: #7E838C;         /* tertiary: source lines, folios, unknown-age (4.7:1 on --surface) */
+  --rule: #262A31;          /* hairlines */
+  --rule-strong: #363B44;   /* hover/focus borders, masthead rule */
+  --accent: #FF6A3D;        /* vermilion: masthead mark, link hover, focus ring, sparkline fill @10% */
+  --accent-soft: rgb(255 106 61 / 0.14);
+  --fresh: #3DBB7A;
+  --aging: #E0A431;
+  --stale: #F26B5B;
+  --temp-max: #FF6A3D;
+  --temp-min: #6FA8FF;
+  --scrim: rgb(14 15 18 / 0.6);   /* dialog backdrop */
 }
 
+/* ---- Raw tokens: light (paper) ---- */
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) {
+    color-scheme: light;
+    --bg: #F7F5F0; --surface: #FFFFFF; --surface-2: #F1EEE7;
+    --ink: #15171A; --ink-2: #4A4F57; --ink-3: #6B7079;
+    --rule: #E3DFD6; --rule-strong: #C9C3B6;
+    --accent: #C8381F; --accent-soft: rgb(200 56 31 / 0.12);
+    --fresh: #1F7A4D; --aging: #8A5A12; --stale: #B42318;
+    --temp-max: #C8381F; --temp-min: #2B6CB0;
+    --scrim: rgb(21 23 26 / 0.45);
+  }
+}
+:root[data-theme="light"] {
+  color-scheme: light;
+  --bg: #F7F5F0; --surface: #FFFFFF; --surface-2: #F1EEE7;
+  --ink: #15171A; --ink-2: #4A4F57; --ink-3: #6B7079;
+  --rule: #E3DFD6; --rule-strong: #C9C3B6;
+  --accent: #C8381F; --accent-soft: rgb(200 56 31 / 0.12);
+  --fresh: #1F7A4D; --aging: #8A5A12; --stale: #B42318;
+  --temp-max: #C8381F; --temp-min: #2B6CB0;
+  --scrim: rgb(21 23 26 / 0.45);
+}
+
+/* ---- Tailwind v4 theme: utilities read the variables, so no dark: prefixes are needed ---- */
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-ink-3: var(--ink-3);
+  --color-rule: var(--rule);
+  --color-rule-strong: var(--rule-strong);
+  --color-accent: var(--accent);
+  --color-accent-soft: var(--accent-soft);
+  --color-fresh: var(--fresh);
+  --color-aging: var(--aging);
+  --color-stale: var(--stale);
+  --color-temp-max: var(--temp-max);
+  --color-temp-min: var(--temp-min);
+
+  --font-display: var(--font-fraunces), Georgia, "Times New Roman", serif;
+  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: var(--font-plex-mono), monospace;
+
+  /* Type scale (px in comments; rem in values). Fraunces is reachable only through the last three. */
+  --text-source: 0.6875rem;  --text-source--line-height: 1rem;                                   /* 11/16 */
+  --text-kicker: 0.75rem;    --text-kicker--line-height: 1rem;   --text-kicker--letter-spacing: 0.08em; /* 12/16 */
+  --text-dense: 0.8125rem;   --text-dense--line-height: 1.125rem;                                /* 13/18 */
+  --text-item: 0.875rem;     --text-item--line-height: 1.25rem;                                  /* 14/20 */
+  --text-body: 1rem;         --text-body--line-height: 1.5rem;                                   /* 16/24 */
+  --text-cv: 1.0625rem;      --text-cv--line-height: 1.6875rem;                                  /* 17/27 */
+  --text-headline: 1.375rem; --text-headline--line-height: 1.75rem;                              /* 22/28 Fraunces */
+  --text-h2: 1.75rem;        --text-h2--line-height: 2.125rem;                                   /* 28/34 Fraunces */
+  --text-dateline: 2.5rem;   --text-dateline--line-height: 2.75rem;                              /* 40/44 Fraunces */
+  --text-numeral: 4.5rem;    --text-numeral--line-height: 1;   --text-numeral--letter-spacing: -0.02em; /* 72 Fraunces */
+
+  --radius-card: 6px;
+  --radius-thumb: 3px;
+  --container-page: 82.5rem;     /* 1320px */
+  --container-measure: 45rem;    /* 720px CV column */
+  --spacing-stamp: 7.5rem;       /* fixed freshness column */
+  --shadow-*: initial;           /* no shadow utilities exist to reach for */
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-    --primary: #60a5fa;
-    --secondary: #fb923c;
-  }
+@layer base {
+  html { background: var(--bg); }
+  body { background: var(--bg); color: var(--ink); font-family: var(--font-sans); font-size: 1rem; line-height: 1.5; -webkit-font-smoothing: antialiased; }
+  .font-mono, [class*="text-kicker"], [class*="text-source"] { font-variant-numeric: tabular-nums; }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  @media (prefers-reduced-motion: reduce) { *, ::before, ::after { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; } }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: 18px;
+@layer components {
+  /* Rasterblatt's hairline grid, used for inner grids and CV tables */
+  .raster { display: grid; gap: 1px; background: var(--rule); }
+  .raster > * { background: var(--surface); }
+  /* Ledger's mono stamp register */
+  .stamp { font-family: var(--font-mono); font-size: 0.75rem; line-height: 1rem; letter-spacing: 0.08em; text-transform: uppercase; font-variant-numeric: tabular-nums; }
+  /* Native dialog entrance; falls back to instant where @starting-style is unsupported */
+  dialog[open] { opacity: 1; transition: opacity 150ms ease-out, overlay 150ms allow-discrete, display 150ms allow-discrete; }
+  dialog { opacity: 0; }
+  @starting-style { dialog[open] { opacity: 0; } }
+  dialog::backdrop { background: var(--scrim); }
 }
 
-a {
-  @apply text-black dark:text-white;
-}
+/* ---- Freshness states (data-freshness on the card, dialog or strip entry) ---- */
+@layer components {
+  .dot { background: var(--ink-3); }
+  .stale-prefix { display: none; }
+  [data-freshness="fresh"] .dot { background: var(--fresh); }
+  [data-freshness="aging"] .dot { background: transparent; box-shadow: inset 0 0 0 1px var(--aging); }
+  [data-freshness="aging"] .stamp-text { color: var(--aging); }
+  [data-freshness="stale"] .dot { background: var(--stale); }
+  [data-freshness="stale"] .stamp-text { color: var(--stale); }
+  [data-freshness="stale"] .stale-prefix { display: inline; }
+  [data-freshness="unknown"] .stamp-text { color: var(--ink-3); }
+  .card[data-freshness="stale"] { border-top: 2px solid var(--stale); }
+  .card[data-freshness="stale"] .card-body { opacity: 0.72; }
 
-/* Hero image placeholder and loading optimization */
-.hero-image {
-  background-color: #f3f4f6;
-  background-image: linear-gradient(45deg, #e5e7eb 25%, transparent 25%),
-                    linear-gradient(-45deg, #e5e7eb 25%, transparent 25%);
-  background-size: 20px 20px;
-  background-position: 0 0, 10px 10px;
+  /* ---- Data-drawing micro-animation: once on load, again on hover/focus, never looping ---- */
+  .draw { stroke-dasharray: 1; stroke-dashoffset: 1; animation: draw 600ms ease-out 80ms forwards; }
+  .grow { transform: scaleX(0); transform-origin: left; animation: grow 500ms ease-out forwards; }
+  .pop  { transform: scaleY(0); transform-origin: bottom; animation: pop 300ms ease-out forwards; }
+  .fade { opacity: 0; animation: fade 600ms ease-out 200ms forwards; }
+  .card:hover .draw, .card:focus-within .draw { animation-name: draw-again; }
+  .card:hover .grow, .card:focus-within .grow { animation-name: grow-again; }
+  .card:hover .pop,  .card:focus-within .pop  { animation-name: pop-again; }
 }
+@keyframes draw { to { stroke-dashoffset: 0; } }
+@keyframes draw-again { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+@keyframes grow { to { transform: scaleX(1); } }
+@keyframes grow-again { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+@keyframes pop { to { transform: scaleY(1); } }
+@keyframes pop-again { from { transform: scaleY(0); } to { transform: scaleY(1); } }
+@keyframes fade { to { opacity: 1; } }
 
-.hero-image img {
-  transition: opacity 0.3s ease;
-}
-
-@media (prefers-color-scheme: dark) {
-  .hero-image {
-    background-color: #374151;
-    background-image: linear-gradient(45deg, #4b5563 25%, transparent 25%),
-                      linear-gradient(-45deg, #4b5563 25%, transparent 25%);
-  }
-}
-
-/* Shimmer animation for skeleton loading */
-@keyframes shimmer {
-  0% {
-    transform: translateX(-100%);
-  }
-  100% {
-    transform: translateX(100%);
-  }
-}
-
-.animate-shimmer {
-  animation: shimmer 2s infinite;
-}
+/* Tailwind's 120ms isn't a default duration step; the design's hover transitions use it everywhere. */
+@utility duration-120 { transition-duration: 120ms; }

@@ -30,13 +30,8 @@ npm install react-dom@^19.1.0
 
 ```bash
 npm install tailwindcss@^4.1.8
-npm install @tailwindcss/typography@^0.5.16
-npm install @tailwindcss/forms@^0.5.10
-npm install @tailwindcss/aspect-ratio@^0.4.2
-npm install @tailwindcss/line-clamp@^0.4.4
 npm install @tailwindcss/postcss@^4
 npm install postcss@^8.5.4
-npm install autoprefixer@^10.4.21
 ```
 
 ## Icons & Animations
@@ -82,7 +77,6 @@ npm install --save-dev ts-node@^10.9.2
 
 ### Production Dependencies
 ```bash
-npm install next@^15.3.3 react@^19.1.0 react-dom@^19.1.0 tailwindcss@^4.1.8 @tailwindcss/typography@^0.5.16 @tailwindcss/forms@^0.5.10 @tailwindcss/aspect-ratio@^0.4.2 @tailwindcss/line-clamp@^0.4.4 @tailwindcss/postcss@^4 postcss@^8.5.4 autoprefixer@^10.4.21 lucide-react@^0.511.0 framer-motion@^12.18.1 mongodb@^6.17.0 papaparse@^5.5.3 date-fns@^4.1.0 node-fetch@^2.7.0 @octokit/rest@^22.0.0
 ```
 
 ### Development Dependencies

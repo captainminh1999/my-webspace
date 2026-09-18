@@ -153,7 +153,7 @@ Replace `src/app/globals.css` wholesale. Delete `tailwind.config.ts` (unreferenc
   body { background: var(--bg); color: var(--ink); font-family: var(--font-sans); font-size: 1rem; line-height: 1.5; -webkit-font-smoothing: antialiased; }
   .font-mono, [class*="text-kicker"], [class*="text-source"] { font-variant-numeric: tabular-nums; }
   :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-  @media (prefers-reduced-motion: reduce) { *, ::before, ::after { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; } }
+  @media (prefers-reduced-motion: reduce) { *, ::before, ::after { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; } }
 }
 
 @layer components {
@@ -205,7 +205,8 @@ const plexMono = IBM_Plex_Mono({
   weight: ["400"],
   display: "swap",
   variable: "--font-plex-mono",
-  adjustFontFallback: true,
+  adjustFontFallback: false, // no mono default in next/font; a synthesised Arial fallback breaks tabular figures
+  fallback: ["ui-monospace", "SFMono-Regular", "Menlo", "Consolas", "monospace"],
 });
 
 // <html lang="en" className={`${fraunces.variable} ${plexMono.variable}`} suppressHydrationWarning>

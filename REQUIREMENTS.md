@@ -9,13 +9,8 @@ This document lists all the necessary packages and dependencies for the Interact
 
 ## UI Framework & Styling
 - **tailwindcss**: ^4.1.8 - Utility-first CSS framework
-- **@tailwindcss/typography**: ^0.5.16 - Typography plugin for Tailwind
-- **@tailwindcss/forms**: ^0.5.10 - Form styling plugin
-- **@tailwindcss/aspect-ratio**: ^0.4.2 - Aspect ratio utilities
-- **@tailwindcss/line-clamp**: ^0.4.4 - Line clamping utilities
 - **@tailwindcss/postcss**: ^4 - PostCSS integration
 - **postcss**: ^8.5.4 - CSS post-processor
-- **autoprefixer**: ^10.4.21 - CSS vendor prefixing
 
 ## Icons & Animations
 - **lucide-react**: ^0.511.0 - Beautiful icon library
