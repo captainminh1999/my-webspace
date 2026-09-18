@@ -14,9 +14,8 @@
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
 
-# Baseline security headers for every response. No CSP yet: the inline theme
-# script in src/app/layout.tsx and Google Analytics would need nonces/hashes
-# first (tracked in docs/ARCHITECTURE.md §12).
+# Baseline security headers for static files. Page responses come from the
+# Next.js runtime and get the same headers from next.config.ts headers().
 [[headers]]
   for = "/*"
   [headers.values]
