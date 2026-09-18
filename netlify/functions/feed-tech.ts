@@ -6,4 +6,5 @@ import { tech } from "./feeds/sources";
 const handler = async () => runFeed("tech", tech);
 export default handler;
 
-export const config: Config = { schedule: "0 */3 * * *" };
+// TEMPORARY (2026-09-19): one extra run to confirm the keyless feed (normal: "0 */3 * * *"); restored in the next commit.
+export const config: Config = { schedule: "2 23 * * *" };

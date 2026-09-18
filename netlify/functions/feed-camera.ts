@@ -6,5 +6,4 @@ import { camera } from "./feeds/sources";
 const handler = async () => runFeed("camera", camera);
 export default handler;
 
-// TEMPORARY (2026-09-19): one extra run to test UNSPLASH_KEY (normal: "0 8 * * *"); restored in the next commit.
-export const config: Config = { schedule: "51 22 * * *" };
+export const config: Config = { schedule: "0 8 * * *" };

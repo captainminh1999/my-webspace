@@ -6,5 +6,4 @@ import { youtube } from "./feeds/sources";
 const handler = async () => runFeed("youtube", youtube);
 export default handler;
 
-// TEMPORARY (2026-09-19): one extra run to test YOUTUBE_KEY (normal: "0 2 * * *"); restored in the next commit.
-export const config: Config = { schedule: "52 22 * * *" };
+export const config: Config = { schedule: "0 2 * * *" };

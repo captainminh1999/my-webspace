@@ -6,4 +6,5 @@ import { coffee } from "./feeds/sources";
 const handler = async () => runFeed("coffee", coffee);
 export default handler;
 
-export const config: Config = { schedule: "0 5 * * *" };
+// TEMPORARY (2026-09-19): one extra run to test NEWSAPI_KEY (normal: "0 5 * * *"); restored in the next commit.
+export const config: Config = { schedule: "0 23 * * *" };
