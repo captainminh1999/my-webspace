@@ -1,5 +1,4 @@
-import type { Handler, HandlerEvent, HandlerContext } from "@netlify/functions";
-import { connectToDatabase } from "../../src/lib/mongodb";
+import type { Handler, HandlerEvent } from "@netlify/functions";
 import crypto from "crypto";
 
 interface EBayNotificationPayload {
@@ -21,6 +20,8 @@ interface EBayNotificationPayload {
   };
 }
 
+const JSON_HEADERS = { "Content-Type": "application/json" };
+
 /**
  * Handles eBay marketplace account deletion webhook verification challenge
  * eBay requires hashing: challengeCode + verificationToken + endpoint
@@ -38,10 +39,15 @@ const handleVerificationChallenge = (
 };
 
 /**
- * Handles eBay marketplace account deletion webhook notifications
- * Stores the deletion request in MongoDB for audit trail
+ * Handles eBay marketplace account deletion webhook notifications.
+ *
+ * eBay sends one of these for every account deleted on the marketplace, not
+ * just accounts that ever touched this site. This site stores no eBay user
+ * data, so there is nothing to delete and nothing to keep: acknowledge the
+ * notification with a 2xx and discard it. Persisting the payload would mean
+ * retaining identifiers for people whose request was to be forgotten.
  */
-const handler: Handler = async (event: HandlerEvent, _context: HandlerContext) => {
+const handler: Handler = async (event: HandlerEvent) => {
   // eBay sends both GET (for verification challenge) and POST (for notifications)
   if (event.httpMethod === "GET") {
     // Initial webhook verification challenge from eBay
@@ -50,7 +56,7 @@ const handler: Handler = async (event: HandlerEvent, _context: HandlerContext) =
       return {
         statusCode: 400,
         body: JSON.stringify({ message: "Missing challenge code" }),
-        headers: { "Content-Type": "application/json" },
+        headers: JSON_HEADERS,
       };
     }
 
@@ -60,7 +66,7 @@ const handler: Handler = async (event: HandlerEvent, _context: HandlerContext) =
       return {
         statusCode: 500,
         body: JSON.stringify({ message: "Server configuration error" }),
-        headers: { "Content-Type": "application/json" },
+        headers: JSON_HEADERS,
       };
     }
 
@@ -74,14 +80,14 @@ const handler: Handler = async (event: HandlerEvent, _context: HandlerContext) =
       return {
         statusCode: 200,
         body: JSON.stringify({ challengeResponse }),
-        headers: { "Content-Type": "application/json" },
+        headers: JSON_HEADERS,
       };
-    } catch (err: any) {
+    } catch (err) {
       console.error("Error generating challenge response:", err);
       return {
         statusCode: 500,
         body: JSON.stringify({ message: "Error generating challenge response" }),
-        headers: { "Content-Type": "application/json" },
+        headers: JSON_HEADERS,
       };
     }
   }
@@ -90,71 +96,32 @@ const handler: Handler = async (event: HandlerEvent, _context: HandlerContext) =
     return {
       statusCode: 405,
       body: JSON.stringify({ message: "Method Not Allowed" }),
-      headers: { "Content-Type": "application/json" },
+      headers: JSON_HEADERS,
     };
   }
 
+  // Best-effort parse purely for the log line. Never log or store the
+  // notification.data block: it identifies the deleted eBay user.
+  let payload: EBayNotificationPayload | undefined;
   try {
-    // Parse the webhook payload
-    if (!event.body) {
-      return {
-        statusCode: 400,
-        body: JSON.stringify({ message: "Empty request body" }),
-        headers: { "Content-Type": "application/json" },
-      };
-    }
-
-    const payload: EBayNotificationPayload = JSON.parse(event.body);
-
-    // Log the webhook for debugging
-    console.log("eBay account deletion notification received:", {
-      notificationId: payload.notification?.notificationId,
-      eventDate: payload.notification?.eventDate,
-      userId: payload.notification?.data?.userId,
-      topic: payload.metadata?.topic,
-    });
-
-    // Connect to MongoDB and store the deletion request
-    const client = await connectToDatabase();
-    const db = client.db(process.env.MONGODB_DB || "cv");
-    const deletionRequests = db.collection("ebay_account_deletions");
-
-    const deletionRecord = {
-      notificationId: payload.notification?.notificationId,
-      eventDate: payload.notification?.eventDate ? new Date(payload.notification.eventDate) : new Date(),
-      publishDate: payload.notification?.publishDate ? new Date(payload.notification.publishDate) : null,
-      publishAttemptCount: payload.notification?.publishAttemptCount || 1,
-      userId: payload.notification?.data?.userId,
-      username: payload.notification?.data?.username,
-      eiasToken: payload.notification?.data?.eiasToken,
-      topic: payload.metadata?.topic,
-      schemaVersion: payload.metadata?.schemaVersion,
-      receivedAt: new Date(),
-      status: "processed",
-    };
-
-    const result = await deletionRequests.insertOne(deletionRecord);
-
-    console.log("Account deletion request stored:", result.insertedId);
-
-    // Return 200 OK to acknowledge receipt (required by eBay)
-    // Valid status codes: 200 OK, 201 Created, 202 Accepted, 204 No Content
-    return {
-      statusCode: 200,
-      body: JSON.stringify({ message: "Account deletion notification received" }),
-      headers: { "Content-Type": "application/json" },
-    };
-  } catch (err: any) {
-    console.error("Error processing eBay account deletion webhook:", err);
-    return {
-      statusCode: 500,
-      body: JSON.stringify({
-        message: "Error processing webhook",
-        error: process.env.NODE_ENV === "development" ? err.message : undefined,
-      }),
-      headers: { "Content-Type": "application/json" },
-    };
+    payload = event.body ? JSON.parse(event.body) : undefined;
+  } catch {
+    console.warn("eBay account deletion notification had an unparseable body");
   }
+
+  console.log("eBay account deletion notification acknowledged:", {
+    notificationId: payload?.notification?.notificationId,
+    topic: payload?.metadata?.topic,
+    eventDate: payload?.notification?.eventDate,
+  });
+
+  // Return 200 OK to acknowledge receipt (required by eBay; anything else is
+  // retried and eventually marks the endpoint as failing).
+  return {
+    statusCode: 200,
+    body: JSON.stringify({ message: "Account deletion notification received" }),
+    headers: JSON_HEADERS,
+  };
 };
 
 export { handler };
