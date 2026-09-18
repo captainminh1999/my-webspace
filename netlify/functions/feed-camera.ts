@@ -1,4 +1,4 @@
-// Scheduled feed: camera (08:00 UTC). Dormant until FEEDS_VIA_NETLIFY=true — see feeds/lib.ts.
+// Scheduled feed: camera (08:00 UTC). Runs only while FEEDS_VIA_NETLIFY=true — see feeds/lib.ts.
 import type { Config } from "@netlify/functions";
 import { runFeed } from "./feeds/lib";
 import { camera } from "./feeds/sources";

@@ -1,10 +1,10 @@
 // Shared plumbing for the scheduled feed functions. Each feed is a pure
-// `fetch → trim → write` step with the same replace semantics as
-// scripts/push-to-mongo.ts, plus the meta.fetchedAt stamp the dashboard reads.
+// `fetch → trim → write` step that replaces the stored data, then writes the
+// meta.fetchedAt stamp the dashboard reads and a meta.lastRun record.
 import type { Db, Document } from "mongodb";
 import { connectToDatabase } from "../../../src/lib/mongodb";
 
-/** The switch. Until it is "true" on Netlify, every scheduled feed is a no-op and the GitHub Actions stay in charge. */
+/** The switch. Unless it is "true" on Netlify, every scheduled feed is a no-op (the data simply stops updating and the stamps age). */
 export const enabled = () => process.env.FEEDS_VIA_NETLIFY === "true";
 
 export function requireEnv(name: string): string {

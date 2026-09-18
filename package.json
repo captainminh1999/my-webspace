@@ -9,8 +9,7 @@
     "start": "next start",
     "lint": "next lint",
     "typecheck": "tsc --noEmit -p tsconfig.json && tsc --noEmit -p tsconfig.functions.json",
-    "test": "node --test \"src/**/*.test.ts\"",
-    "push-to-mongo": "node --loader ts-node/esm --experimental-specifier-resolution=node scripts/push-to-mongo.ts"
+    "test": "node --test \"src/**/*.test.ts\""
   },
   "dependencies": {
     "mongodb": "^6.17.0",
@@ -31,7 +30,6 @@
     "eslint-config-next": "15.3.4",
     "postcss": "^8.5.4",
     "tailwindcss": "^4.1.8",
-    "ts-node": "^10.9.2",
     "typescript": "^5.8.3"
   },
   "type": "module"
