@@ -51,3 +51,12 @@ jobs:
             --file space.json --singleton space
           node --loader ts-node/esm --experimental-specifier-resolution=node scripts/push-to-mongo.ts \
             --file epic.json --singleton epic
+
+      # Stamps singletons/meta.fetchedAt.space; the dashboard shows feed age from it.
+      - name: Record fetch time
+        env:
+          MONGODB_URI: ${{ secrets.MONGODB_URI }}
+          MONGODB_DB: ${{ secrets.MONGODB_DB }}
+        run: |
+          node --loader ts-node/esm --experimental-specifier-resolution=node scripts/push-to-mongo.ts \
+            --meta space

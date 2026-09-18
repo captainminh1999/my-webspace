@@ -24,7 +24,7 @@ jobs:
           TOP_IDS=$(curl -s https://hacker-news.firebaseio.com/v0/topstories.json | jq '.[0:10]')
           STORIES=$(echo "$TOP_IDS" | jq -r '.[]' | while read ID; do
             curl -s "https://hacker-news.firebaseio.com/v0/item/${ID}.json" \
-              | jq '{ id: .id, title: .title, url: .url }'
+              | jq '{ id: .id, title: .title, url: .url, score: .score }'
           done | jq -s '.')
           echo "$STORIES" > tech.json
 
@@ -36,3 +36,12 @@ jobs:
         run: |
           node --loader ts-node/esm --experimental-specifier-resolution=node scripts/push-to-mongo.ts \
             --file tech.json --collection tech
+
+      # Stamps singletons/meta.fetchedAt.tech; the dashboard shows feed age from it.
+      - name: Record fetch time
+        env:
+          MONGODB_URI: ${{ secrets.MONGODB_URI }}
+          MONGODB_DB: ${{ secrets.MONGODB_DB }}
+        run: |
+          node --loader ts-node/esm --experimental-specifier-resolution=node scripts/push-to-mongo.ts \
+            --meta tech
