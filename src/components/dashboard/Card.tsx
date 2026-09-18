@@ -2,6 +2,9 @@ import type { ReactNode } from "react";
 import type { Freshness } from "@/lib/freshness";
 import { Stamp } from "./Stamp";
 
+// Header layout: the title, then the stamp and the affordance. The whole header is the
+// button and its text content is its accessible name, so a stale stamp is read aloud.
+
 interface CardProps {
   id: string;
   folio: string; // "01"
@@ -28,9 +31,9 @@ export function Card({ id, folio, title, freshness, footer, className = "", open
         <span className="text-ink-3">{folio}</span> {title}
       </span>
       <span className="flex items-center gap-4 shrink-0">
-        {freshness && <Stamp f={freshness} />}
+        {freshness && <Stamp f={freshness} fixed={false} />}
         {opens && (
-          <span className="stamp text-ink-3 group-hover:text-accent transition-colors duration-120" aria-hidden>
+          <span className="stamp text-ink-3 group-hover:text-accent transition-colors duration-120 hidden md:inline" aria-hidden>
             Open ↗
           </span>
         )}
@@ -41,19 +44,20 @@ export function Card({ id, folio, title, freshness, footer, className = "", open
     <article
       id={`card-${id}`}
       data-freshness={freshness?.state ?? "unknown"}
-      className={`card group bg-surface border border-rule rounded-card overflow-hidden flex flex-col hover:border-rule-strong transition-colors duration-120 ${className}`}
+      className={`card group bg-surface border border-rule data-[freshness=stale]:border-t-2 data-[freshness=stale]:border-t-stale rounded-card overflow-hidden flex flex-col hover:border-rule-strong transition-colors duration-120 ${className}`}
     >
       {opens ? (
-        <button
-          type="button"
-          data-open-dialog={id}
-          aria-label={`Open ${title.toLowerCase()}`}
-          className="h-10 px-4 border-b border-rule flex items-center justify-between gap-4 text-left w-full cursor-pointer"
-        >
-          {header}
-        </button>
+        <h2>
+          <button
+            type="button"
+            data-open-dialog={id}
+            className="h-10 px-4 border-b border-rule flex items-center justify-between gap-4 text-left w-full cursor-pointer focus-visible:-outline-offset-2"
+          >
+            {header}
+          </button>
+        </h2>
       ) : (
-        <div className="h-10 px-4 border-b border-rule flex items-center justify-between gap-4">{header}</div>
+        <h2 className="h-10 px-4 border-b border-rule flex items-center justify-between gap-4">{header}</h2>
       )}
       <div className="card-body p-4 lg:p-5 flex-1 min-w-0">{children}</div>
       {footer && (
@@ -81,9 +85,9 @@ export function WidgetDialog({ id, folio, title, freshness, children }: DialogPr
       data-widget={id}
       data-freshness={freshness?.state ?? "unknown"}
       aria-labelledby={`dialog-${id}-title`}
-      className="m-auto w-[min(60rem,calc(100vw-2rem))] max-h-[calc(100vh-2rem)] bg-surface text-ink border border-rule rounded-card p-0 overflow-hidden"
+      className="m-auto w-[min(60rem,calc(100vw-2rem))] max-h-[calc(100dvh-2rem)] bg-surface text-ink border border-rule rounded-card p-0 overflow-hidden"
     >
-      <div className="flex flex-col max-h-[calc(100vh-2rem)]">
+      <div className="flex flex-col max-h-[calc(100dvh-2rem)]">
         <header className="h-12 px-5 border-b border-rule flex items-center justify-between gap-4 shrink-0">
           <div className="flex items-baseline gap-3 min-w-0">
             <span className="stamp text-ink-3">{folio}</span>
@@ -92,10 +96,14 @@ export function WidgetDialog({ id, folio, title, freshness, children }: DialogPr
             </h2>
           </div>
           <div className="flex items-center gap-4 shrink-0">
-            {freshness && <Stamp f={freshness} />}
+            {freshness && (
+              <span className="hidden md:inline-flex">
+                <Stamp f={freshness} fixed={false} />
+              </span>
+            )}
             <form method="dialog">
               <button type="submit" className="stamp text-ink-3 hover:text-accent transition-colors duration-120 py-2">
-                Close ✕
+                Close <span aria-hidden>✕</span>
               </button>
             </form>
           </div>

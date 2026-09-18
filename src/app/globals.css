@@ -113,7 +113,9 @@
   input[type="file"]::file-selector-button { font: inherit; color: var(--ink-2); background: var(--surface-2); border: 1px solid var(--rule); border-radius: 4px; padding: 0.25rem 0.75rem; margin-right: 0.75rem; }
   /* CV: the section a rail link jumped to gets the accent rule on its running head */
   .cv-section:target .running-head { color: var(--accent); }
-  @media (prefers-reduced-motion: reduce) { *, ::before, ::after { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; } }
+  @media (prefers-reduced-motion: reduce) { *, ::before, ::after { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; animation-delay: 0s !important; animation-iteration-count: 1 !important; } }
+  /* Lock the page while a widget dialog is modal; native <dialog> does not do this itself */
+  body:has(dialog:modal) { overflow: hidden; }
 }
 
 @layer components {
@@ -135,22 +137,23 @@
   .stale-prefix { display: none; }
   [data-freshness="fresh"] .dot { background: var(--fresh); }
   [data-freshness="aging"] .dot { background: transparent; box-shadow: inset 0 0 0 1px var(--aging); }
-  [data-freshness="aging"] .stamp-text { color: var(--aging); }
+  [data-freshness="aging"] .stamp-text, [data-freshness="aging"].stamp-text { color: var(--aging); }
   [data-freshness="stale"] .dot { background: var(--stale); }
-  [data-freshness="stale"] .stamp-text { color: var(--stale); }
+  [data-freshness="stale"] .stamp-text, [data-freshness="stale"].stamp-text { color: var(--stale); }
   [data-freshness="stale"] .stale-prefix { display: inline; }
-  [data-freshness="unknown"] .stamp-text { color: var(--ink-3); }
-  .card[data-freshness="stale"] { border-top: 2px solid var(--stale); }
-  .card[data-freshness="stale"] .card-body { opacity: 0.72; }
+  [data-freshness="unknown"] .stamp-text, [data-freshness="unknown"].stamp-text { color: var(--ink-3); }
+  /* Stale: the 2px top rule is a data-[] utility on the card; only media is dimmed so text keeps its contrast */
+  .card[data-freshness="stale"] .card-body :is(img, svg) { opacity: 0.72; }
 
   /* ---- Data-drawing micro-animation: once on load, again on hover/focus, never looping ---- */
   .draw { stroke-dasharray: 1; stroke-dashoffset: 1; animation: draw 600ms ease-out 80ms forwards; }
   .grow { transform: scaleX(0); transform-origin: left; animation: grow 500ms ease-out forwards; }
   .pop  { transform: scaleY(0); transform-origin: bottom; animation: pop 300ms ease-out forwards; }
   .fade { opacity: 0; animation: fade 600ms ease-out 200ms forwards; }
-  .card:hover .draw, .card:focus-within .draw { animation-name: draw-again; }
-  .card:hover .grow, .card:focus-within .grow { animation-name: grow-again; }
-  .card:hover .pop,  .card:focus-within .pop  { animation-name: pop-again; }
+  /* Hover/focus adds a second animation, so the replay runs on entering the card and nothing restarts on leaving it */
+  .card:hover .draw, .card:focus-within .draw { animation-name: draw, draw-again; }
+  .card:hover .grow, .card:focus-within .grow { animation-name: grow, grow-again; }
+  .card:hover .pop,  .card:focus-within .pop  { animation-name: pop, pop-again; }
 }
 @keyframes draw { to { stroke-dashoffset: 0; } }
 @keyframes draw-again { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }

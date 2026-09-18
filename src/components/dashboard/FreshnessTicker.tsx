@@ -25,10 +25,9 @@ function tick() {
     if (Number.isNaN(at.getTime())) return;
     const source = el.dataset.source;
     const r = rel(at, now);
-    el.textContent =
-      source === "content"
-        ? `LATEST ${r}`
-        : `${now.getTime() - at.getTime() < 86400e3 ? HM.format(at) : dayMon(at).toUpperCase()} · ${r}`;
+    const full = source === "content" ? `LATEST ${r}` : `${now.getTime() - at.getTime() < 86400e3 ? HM.format(at) : dayMon(at).toUpperCase()} · ${r}`;
+    // The masthead strip shows only the relative part; keep that shape so the strip never reflows.
+    el.textContent = el.hasAttribute("data-short") ? full.replace(/^.*· /, "") : full;
     const [fresh, aging] = LIMITS[el.dataset.budget ?? "daily"];
     const hours = (now.getTime() - at.getTime()) / 3.6e6;
     const state = hours <= fresh ? "fresh" : hours <= aging ? "aging" : "stale";

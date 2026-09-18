@@ -114,7 +114,7 @@ export default function SectionPageLayout({ id, now, children }: { id: SectionId
     <CvFrame now={now} title={s.title} rail={<Rail current={id} />}>
       <p className="stamp text-ink-3">
         <Link href="/about-me" className="hover:text-accent transition-colors duration-120">
-          ← Index
+          <span aria-hidden>←</span> Index
         </Link>{" "}
         · Section {String(index).padStart(2, "0")} of {SECTIONS.length}
       </p>

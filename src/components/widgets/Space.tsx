@@ -35,8 +35,8 @@ export function SpaceCard({ data }: { data: SpaceData | null }) {
       </div>
       {epic?.url && lead !== epic.url && (
         <div className="flex items-center gap-3 pt-3 border-t border-rule">
-          <div className="relative size-12 shrink-0 rounded-thumb overflow-hidden bg-surface-2 border border-rule">
-            <Image src={epic.url} alt="" fill sizes="48px" quality={60} className="object-cover" />
+          <div className="size-12 shrink-0 rounded-thumb overflow-hidden bg-surface-2 border border-rule">
+            <Image src={epic.url} alt="" width={48} height={48} quality={60} className="size-full object-cover" />
           </div>
           <div className="font-mono text-source text-ink-3 leading-4">
             <div className="text-ink-2">EARTH · EPIC / DSCOVR</div>
@@ -68,7 +68,7 @@ export function SpaceFull({ data }: { data: SpaceData | null }) {
             {apod.copyright ? `© ${apod.copyright.trim()} · ` : ""}
             {apod.hdurl && (
               <a href={apod.hdurl} target="_blank" rel="noopener noreferrer" className="hover:text-accent underline underline-offset-3">
-                HD image ↗
+                HD image <span aria-hidden>↗</span>
               </a>
             )}
           </p>

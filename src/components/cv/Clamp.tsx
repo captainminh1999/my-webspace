@@ -36,7 +36,7 @@ export default function Clamp({
           onClick={() => setOpen((v) => !v)}
           className="stamp text-ink-3 hover:text-accent transition-colors duration-120 mt-1"
         >
-          {open ? "Less ↑" : "More ↓"}
+          {open ? "Less" : "More"} <span aria-hidden>{open ? "↑" : "↓"}</span>
         </button>
       )}
     </div>

@@ -18,7 +18,7 @@ export function ProfileCard({ data }: { data: ProfileData | null }) {
           </ul>
         )}
       </div>
-      <span className="stamp text-ink-2 group-hover/link:text-accent transition-colors duration-120">Read the CV →</span>
+      <span className="stamp text-ink-2 group-hover/link:text-accent transition-colors duration-120">Read the CV <span aria-hidden>→</span></span>
     </Link>
   );
 }

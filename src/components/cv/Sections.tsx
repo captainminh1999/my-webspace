@@ -47,7 +47,7 @@ export function AllLink({ count, noun, href }: { count: number; noun: string; hr
   return (
     <p className="mt-4">
       <Link href={href} className="stamp text-ink-2 hover:text-accent transition-colors duration-120">
-        All {count} {noun} →
+        All {count} {noun} <span aria-hidden>→</span>
       </Link>
     </p>
   );
@@ -171,7 +171,7 @@ export function Licences({ items, limit }: { items: LicenseCertificationEntry[];
             <p className="text-item text-ink">
               {l.url ? (
                 <a href={l.url} target="_blank" rel="noopener noreferrer" className="hover:text-accent transition-colors duration-120">
-                  {l.name} ↗
+                  {l.name} <span aria-hidden>↗</span>
                 </a>
               ) : (
                 l.name
@@ -202,7 +202,7 @@ export function Projects({ items, limit }: { items: ProjectEntry[]; limit?: numb
           )}
           {p.url && (
             <a href={p.url} target="_blank" rel="noopener noreferrer" className="stamp text-ink-3 hover:text-accent transition-colors duration-120 inline-block mt-2">
-              Project ↗
+              Project <span aria-hidden>↗</span>
             </a>
           )}
         </LedgerRow>

@@ -10,6 +10,7 @@ const F = {
   dateline: fmt({ weekday: "long", day: "numeric", month: "long", year: "numeric" }),
   weekday: fmt({ weekday: "short" }),
   hourShort: fmt({ hour: "numeric", hour12: true }),
+  hour24: fmt({ hour: "2-digit", hourCycle: "h23" }),
   mon: fmt({ month: "short" }, "en-US"),
   day: fmt({ day: "numeric" }),
   tzName: fmt({ timeZoneName: "short" }),
@@ -29,6 +30,8 @@ export const dayMon = (d: Date) => `${F.day.format(d)} ${F.mon.format(d)}`;
 export const dateline = (d: Date) => F.dateline.format(d);
 /** "Thu" */
 export const weekday = (d: Date) => F.weekday.format(d);
+/** "22", "00" — two tabular characters, so twelve cells fit any card width */
+export const hour24 = (d: Date) => F.hour24.format(d);
 /** "7 am" → "7am" */
 export const hourShort = (d: Date) => F.hourShort.format(d).replace(/\s/g, "").toLowerCase();
 /** "AEST" / "AEDT" */

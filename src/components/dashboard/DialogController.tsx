@@ -27,6 +27,12 @@ function syncFromUrl() {
 
 export default function DialogController() {
   useEffect(() => {
+    // A click is dispatched on the common ancestor of mousedown and mouseup targets, so a
+    // text-selection drag from the content onto the backdrop would otherwise close the dialog.
+    let pressedOnDialog = false;
+    const onPointerDown = (e: PointerEvent) => {
+      pressedOnDialog = e.target instanceof HTMLDialogElement;
+    };
     const onClick = (e: MouseEvent) => {
       const trigger = (e.target as HTMLElement).closest<HTMLElement>("[data-open-dialog]");
       if (trigger) {
@@ -41,7 +47,7 @@ export default function DialogController() {
       }
       // Backdrop click: the dialog element is the target only outside its content box.
       const dialog = e.target as HTMLElement;
-      if (dialog instanceof HTMLDialogElement && dialog.open) {
+      if (pressedOnDialog && dialog instanceof HTMLDialogElement && dialog.open) {
         const r = dialog.getBoundingClientRect();
         if (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom) dialog.close();
       }
@@ -63,11 +69,13 @@ export default function DialogController() {
       observer.observe(d, { attributes: true, attributeFilter: ["open"] }),
     );
 
+    document.addEventListener("pointerdown", onPointerDown);
     document.addEventListener("click", onClick);
     window.addEventListener("popstate", syncFromUrl);
     syncFromUrl();
     return () => {
       observer.disconnect();
+      document.removeEventListener("pointerdown", onPointerDown);
       document.removeEventListener("click", onClick);
       window.removeEventListener("popstate", syncFromUrl);
     };

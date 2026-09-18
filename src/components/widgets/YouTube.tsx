@@ -26,8 +26,8 @@ function Row({ v, now }: { v: YouTubeRecItem; now: Date }) {
   return (
     <li className="py-2.5">
       <a href={url(v)} target="_blank" rel="noopener noreferrer" className="flex gap-3 items-start">
-        <span className="relative w-[7.5rem] aspect-video shrink-0 rounded-thumb overflow-hidden bg-surface-2 border border-rule">
-          <Image src={thumb(v)} alt="" fill sizes="120px" quality={65} className="object-cover" />
+        <span className="block w-[7.5rem] aspect-video shrink-0 rounded-thumb overflow-hidden bg-surface-2 border border-rule">
+          <Image src={thumb(v)} alt="" width={120} height={68} quality={65} className="size-full object-cover" />
         </span>
         <span className="min-w-0">
           <span className="block text-item text-ink line-clamp-2">{v.title}</span>

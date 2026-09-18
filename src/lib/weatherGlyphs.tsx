@@ -2,9 +2,10 @@
 // Replaces the 50 px PNGs from openweathermap.org (docs/DESIGN-DIRECTION.md § Widget card).
 export type Glyph = "sun" | "moon" | "cloud-sun" | "cloud" | "rain" | "thunder" | "snow" | "mist";
 
-export function glyphFor(code: string): { glyph: Glyph; word: string } {
-  const n = code.slice(0, 2);
-  const night = code.endsWith("n");
+export function glyphFor(code: string | null | undefined): { glyph: Glyph; word: string } {
+  const c = typeof code === "string" ? code : "";
+  const n = c.slice(0, 2);
+  const night = c.endsWith("n");
   switch (n) {
     case "01":
       return night ? { glyph: "moon", word: "Clear" } : { glyph: "sun", word: "Sunny" };
@@ -25,7 +26,7 @@ export function glyphFor(code: string): { glyph: Glyph; word: string } {
     case "50":
       return { glyph: "mist", word: "Mist" };
     default:
-      return { glyph: "cloud", word: "—" };
+      return { glyph: "cloud", word: "Weather" };
   }
 }
 
@@ -65,7 +66,18 @@ const PATHS: Record<Glyph, React.ReactNode> = {
   mist: <path d="M4 9h12M6 13h14M4 17h10M8 21h8" />,
 };
 
-export function WeatherGlyph({ code, size = 40, className = "" }: { code: string; size?: number; className?: string }) {
+export function WeatherGlyph({
+  code,
+  size = 40,
+  className = "",
+  decorative = false,
+}: {
+  code: string | null | undefined;
+  size?: number;
+  className?: string;
+  /** true when the condition word is already in adjacent text */
+  decorative?: boolean;
+}) {
   const { glyph, word } = glyphFor(code);
   return (
     <svg
@@ -78,8 +90,7 @@ export function WeatherGlyph({ code, size = 40, className = "" }: { code: string
       strokeLinecap="round"
       strokeLinejoin="round"
       className={className}
-      role="img"
-      aria-label={word}
+      {...(decorative ? { "aria-hidden": true } : { role: "img", "aria-label": word })}
     >
       {PATHS[glyph]}
     </svg>

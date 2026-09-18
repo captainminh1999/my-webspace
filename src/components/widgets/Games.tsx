@@ -13,7 +13,7 @@ export function GamesCard({ data, now }: { data: GameItem[]; now: Date }) {
       {covers.length > 0 && (
         <div className="raster grid-cols-3">
           {covers.map((g) => (
-            <a key={g.id} href={url(g)} target="_blank" rel="noopener noreferrer" className="relative aspect-[3/4] overflow-hidden">
+            <a key={g.id} href={url(g)} target="_blank" rel="noopener noreferrer" className="relative aspect-[3/4] overflow-hidden focus-visible:-outline-offset-2">
               <Image src={g.thumbnail} alt={g.name} fill sizes="(max-width: 768px) 33vw, 140px" quality={65} className="object-cover" />
             </a>
           ))}
@@ -46,8 +46,8 @@ export function GamesFull({ data, now }: { data: GameItem[]; now: Date }) {
           const d = toDate(g.released);
           return (
             <li key={g.id} className="py-3 flex items-center gap-4">
-              <span className="relative w-14 aspect-[3/4] shrink-0 rounded-thumb overflow-hidden bg-surface-2 border border-rule">
-                {g.thumbnail && <Image src={g.thumbnail} alt="" fill sizes="56px" quality={65} className="object-cover" />}
+              <span className="block w-14 aspect-[3/4] shrink-0 rounded-thumb overflow-hidden bg-surface-2 border border-rule">
+                {g.thumbnail && <Image src={g.thumbnail} alt="" width={56} height={75} quality={65} className="size-full object-cover" />}
               </span>
               <div className="min-w-0 flex-1">
                 <a href={url(g)} target="_blank" rel="noopener noreferrer" className="text-body text-ink hover:text-accent transition-colors duration-120">

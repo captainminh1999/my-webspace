@@ -30,7 +30,7 @@ export function NewsList({ items, limit, now, source }: { items: NewsItem[]; lim
                   <img src={item.image} alt="" width={48} height={48} loading="lazy" decoding="async" className="size-12 object-cover" />
                 </span>
               ) : (
-                <span className="size-12 shrink-0 rounded-thumb bg-surface-2 border border-rule flex items-center justify-center font-mono text-dense text-ink-3">
+                <span className="size-12 shrink-0 rounded-thumb bg-surface-2 border border-rule flex items-center justify-center font-mono text-dense text-ink-2">
                   {String(i + 1).padStart(2, "0")}
                 </span>
               )}

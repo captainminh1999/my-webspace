@@ -23,7 +23,7 @@ function Rows({ stories, all }: { stories: Story[]; all: Story[] }) {
                 <span className="h-0.5 flex-1 bg-rule rounded-full overflow-hidden">
                   <span className="block h-full bg-ink-3 grow" style={{ width: `${(s.score / max) * 100}%`, animationDelay: `${i * 40}ms` }} />
                 </span>
-                <span className="font-mono text-source text-ink-3 w-12 text-right">▲ {s.score}</span>
+                <span className="font-mono text-source text-ink-3 w-12 text-right"><span aria-hidden>▲</span> {s.score}</span>
               </div>
             )}
           </div>

@@ -44,7 +44,7 @@ export default function Masthead({ now, freshness, variant = "dash", title }: Pr
             {variant === "dash" ? "DAILY DASH · NHATMINH.DEV" : "NHATMINH.DEV · CV"}
           </p>
           {(variant === "dash" || title) && (
-            <h1 className="font-display font-medium text-ink text-[2rem] leading-9 md:text-dateline mt-2">
+            <h1 className="font-display font-medium text-ink text-[2rem] leading-9 md:text-dateline md:leading-11 mt-2">
               {title ?? dateline(now)}
             </h1>
           )}
@@ -71,7 +71,7 @@ export default function Masthead({ now, freshness, variant = "dash", title }: Pr
                     <a href={`#card-${f.id}`} className="hover:text-ink">
                       {LABEL[f.id]}{" "}
                       {f.at ? (
-                        <time dateTime={f.at.toISOString()} data-budget={f.budget} data-source={f.source} className="text-ink-3">
+                        <time dateTime={f.at.toISOString()} data-budget={f.budget} data-source={f.source} data-short="" className="text-ink-3">
                           {f.text.replace(/^.*· /, "")}
                         </time>
                       ) : (
@@ -82,8 +82,9 @@ export default function Masthead({ now, freshness, variant = "dash", title }: Pr
                 ))}
               </ul>
               {/* below md: the aggregate, expandable */}
-              <details className="md:hidden stamp text-ink-2">
-                <summary className={`cursor-pointer list-none ${stale.length ? "text-stale" : fresh.length === entries.length ? "text-fresh" : ""}`}>
+              <details className="group md:hidden stamp text-ink-2">
+                <summary className={`cursor-pointer list-none flex items-center gap-2 ${stale.length ? "text-stale" : fresh.length === entries.length ? "text-fresh" : ""}`}>
+                  <span aria-hidden className="inline-block transition-transform duration-120 group-open:rotate-90">▸</span>
                   {entries.length} FEEDS · {fresh.length} FRESH
                   {stale.length ? ` · ${stale.length} STALE` : ""}
                   {entries.length - fresh.length - stale.length ? ` · ${entries.length - fresh.length - stale.length} AGING` : ""}
@@ -106,11 +107,11 @@ export default function Masthead({ now, freshness, variant = "dash", title }: Pr
             <ThemeToggle />
             {variant === "dash" ? (
               <Link href="/about-me" className="stamp text-ink-2 hover:text-accent transition-colors duration-120">
-                CV →
+                CV <span aria-hidden>→</span>
               </Link>
             ) : (
               <Link href="/" className="stamp text-ink-2 hover:text-accent transition-colors duration-120">
-                ← Daily Dash
+                <span aria-hidden>←</span> Daily Dash
               </Link>
             )}
           </div>

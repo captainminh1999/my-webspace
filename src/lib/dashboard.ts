@@ -28,7 +28,7 @@ export function decodeStrings<T>(input: T): T {
       if (ENTITIES[match]) return ENTITIES[match];
       if (code[0] === "#") {
         const n = code[1] === "x" || code[1] === "X" ? parseInt(code.slice(2), 16) : parseInt(code.slice(1), 10);
-        return Number.isNaN(n) ? match : String.fromCodePoint(n);
+        return Number.isNaN(n) || n > 0x10ffff ? match : String.fromCodePoint(n);
       }
       return match;
     }) as unknown as T;
@@ -98,7 +98,17 @@ export async function getDashboardData(): Promise<DashboardData> {
   const renderedAt = new Date().toISOString();
   try {
     const data = process.env.MONGODB_URI ? await fromMongo() : await fromFunctions();
-    return { ...decodeStrings(data), renderedAt };
+    // Decode per key so one malformed string in one feed cannot blank the others.
+    const out: Record<string, unknown> = {};
+    for (const [k, v] of Object.entries(data)) {
+      try {
+        out[k] = decodeStrings(v);
+      } catch (err) {
+        console.error(`Could not decode ${k}`, err);
+        out[k] = (EMPTY as Record<string, unknown>)[k];
+      }
+    }
+    return { ...(out as Omit<DashboardData, "renderedAt">), renderedAt };
   } catch (err) {
     // Render the shell with empty cards rather than a 500; every card has an empty state.
     console.error("Dashboard data unavailable", err);

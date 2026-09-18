@@ -286,7 +286,7 @@ Text forms: under 24h `HH:MM · 14 MIN` / `HH:MM · 3 H`; 24h and older `14 SEP 
 **States.**
 - FRESH: filled `--fresh` dot, text `--ink-2`.
 - AGING: 1px `--aging` ring (hollow dot), text `--aging`.
-- STALE: filled `--stale` dot, text `--stale` prefixed `STALE ·`, the card's 2px `--stale` top rule, body images and text at opacity 0.72 (not grayscale, which fights dark mode), and the footer notice with the absolute last-fetch time. The dialog for that widget repeats the notice in its header.
+- STALE: filled `--stale` dot, text `--stale` prefixed `STALE ·`, the card's 2px `--stale` top rule, body images and diagrams at opacity 0.72 — text stays at full opacity to keep its contrast (not grayscale, which fights dark mode), and the footer notice with the absolute last-fetch time. The dialog for that widget repeats the notice in its header.
 - UNKNOWN / LATEST: `--ink-3` dot, text `--ink-3`.
 
 **Masthead strip.** At md+ a mono 12px inline list of all nine: `WEATHER 14 MIN · NEWS 3 H · SPACE 1 D · ...` each with its dot, in `--ink-2`. If any feed is stale the strip re-sorts stale feeds first and prefixes `2 FEEDS STALE` in `--stale`, linking to the first stale card by anchor. Below md the strip is a `<details>` whose summary is the aggregate `9 FEEDS · 8 FRESH · 1 STALE` (count in `--fresh` when all fresh, `--stale` when any stale) and whose body is the full list. No toasts, no badges, no icons: the age is typographic.
