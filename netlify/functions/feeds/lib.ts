@@ -38,6 +38,26 @@ export async function stamp(db: Db, key: string) {
     .updateOne({ _id: "meta" }, { $set: { [`fetchedAt.${key}`]: new Date().toISOString() } }, { upsert: true });
 }
 
+/**
+ * singletons/meta.lastRun.<key>: when the feed last ran here, whether it worked, and why not.
+ * The function log is only visible inside Netlify; this makes a failing feed diagnosable from the data.
+ * The message never carries a URL, because upstream URLs carry the API key.
+ */
+async function record(key: string, run: { ok: boolean; ms: number; error?: string }) {
+  try {
+    const client = await connectToDatabase();
+    await client
+      .db(process.env.MONGODB_DB || "cv")
+      .collection<{ _id: string }>("singletons")
+      .updateOne({ _id: "meta" }, { $set: { [`lastRun.${key}`]: { at: new Date().toISOString(), by: "netlify", ...run } } }, { upsert: true });
+  } catch (err) {
+    console.error(`feed ${key}: could not record the run`, err);
+  }
+}
+
+const safeMessage = (err: unknown) =>
+  (err instanceof Error ? `${err.name}: ${err.message}` : String(err)).replace(/https?:\/\/\S+/g, "[url]").slice(0, 200);
+
 /** Runs one feed: skips when disabled, logs, never throws (a failed feed leaves the previous data in place). */
 export async function runFeed(key: string, fn: (db: Db) => Promise<void>): Promise<Response> {
   if (!enabled()) {
@@ -51,9 +71,11 @@ export async function runFeed(key: string, fn: (db: Db) => Promise<void>): Promi
     await fn(db);
     await stamp(db, key);
     console.log(`feed ${key}: ok in ${Date.now() - started}ms`);
+    await record(key, { ok: true, ms: Date.now() - started });
     return new Response("ok", { status: 200 });
   } catch (err) {
     console.error(`feed ${key}: failed`, err);
+    await record(key, { ok: false, ms: Date.now() - started, error: safeMessage(err) });
     return new Response("failed", { status: 500 });
   }
 }
