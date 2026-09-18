@@ -72,7 +72,7 @@ Requires Node 22 (Netlify runs the functions on `nodejs22.x`).
 
 GitHub disables scheduled workflows after 60 days without repository activity; if every feed goes stale at once, check `gh workflow list --all` and re-enable them.
 
-The same eight feeds also exist as **Netlify Scheduled Functions** (`netlify/functions/feed-*.ts`, logic in `netlify/functions/feeds/`), on the same schedules, and are dormant by default. To move off GitHub Actions: add the six feed API keys above to the Netlify site environment, set `FEEDS_VIA_NETLIFY=true`, deploy, confirm the feed ages on the dashboard keep updating, then delete `.github/workflows/fetch-*.yml`.
+The same eight feeds also exist as **Netlify Scheduled Functions** (`netlify/functions/feed-*.ts`, logic in `netlify/functions/feeds/`), on the same schedules. They run only when `FEEDS_VIA_NETLIFY=true` is set on the site (it is, since 2026-09-19) **and** the six feed API keys above are in the site environment (Site configuration → Environment variables, scope *Functions*, mark them secret). A feed whose key is missing logs `failed` and leaves the previous data in place. Scheduled functions get 30 s, so every upstream request has an 8 s timeout. Once every Netlify feed has stamped `meta.fetchedAt` once, delete `.github/workflows/fetch-*.yml`; until then the two schedulers run side by side.
 
 ## Deploy
 

@@ -13,22 +13,23 @@ export function requireEnv(name: string): string {
   return v;
 }
 
+/** Scheduled functions get 30 s in total: 8 s to reach Mongo (src/lib/mongodb.ts), 8 s per upstream request (made in parallel within a feed). */
 export async function getJson<T = unknown>(url: string, init?: RequestInit): Promise<T> {
-  const res = await fetch(url, { ...init, signal: AbortSignal.timeout(20_000) });
+  const res = await fetch(url, { ...init, signal: AbortSignal.timeout(8_000) });
   if (!res.ok) throw new Error(`${res.status} ${res.statusText} from ${new URL(url).host}`);
   return (await res.json()) as T;
 }
 
+/** Replaces a list. New documents go in before the old ones come out, so a page render never sees an empty list. */
 export async function writeCollection(db: Db, name: string, docs: Document[]) {
+  if (!docs.length) throw new Error(`nothing to write to ${name}; keeping the previous items`);
   const coll = db.collection(name);
-  await coll.deleteMany({});
-  if (docs.length) await coll.insertMany(docs);
+  const { insertedIds } = await coll.insertMany(docs);
+  await coll.deleteMany({ _id: { $nin: Object.values(insertedIds) } });
 }
 
 export async function writeSingleton(db: Db, id: string, doc: Document) {
-  const singletons = db.collection<{ _id: string }>("singletons");
-  await singletons.deleteOne({ _id: id });
-  await singletons.insertOne({ _id: id, ...doc });
+  await db.collection<{ _id: string }>("singletons").replaceOne({ _id: id }, doc, { upsert: true });
 }
 
 export async function stamp(db: Db, key: string) {

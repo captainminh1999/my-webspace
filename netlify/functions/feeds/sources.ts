@@ -73,12 +73,16 @@ export async function games(db: Db) {
 
 export async function space(db: Db) {
   const key = requireEnv("NASA_KEY");
-  const apod = await getJson<Any>(`https://api.nasa.gov/planetary/apod?api_key=${key}&thumbs=true`);
+  // Both fetches first, in parallel, so a failed EPIC call cannot leave a new APOD under an old stamp.
+  const [apod, epicList] = await Promise.all([
+    getJson<Any>(`https://api.nasa.gov/planetary/apod?api_key=${key}&thumbs=true`),
+    getJson<Any[]>(`https://api.nasa.gov/EPIC/api/natural?api_key=${key}`),
+  ]);
   if (!apod?.date) throw new Error("unexpected APOD payload");
-  await writeSingleton(db, "space", apod);
-  const epic = (await getJson<Any[]>(`https://api.nasa.gov/EPIC/api/natural?api_key=${key}`))[0];
+  const epic = epicList?.[0];
   if (!epic?.image) throw new Error("unexpected EPIC payload");
   const [ymd] = String(epic.date).split(" ");
+  await writeSingleton(db, "space", apod);
   await writeSingleton(db, "epic", {
     date: epic.date,
     image: epic.image,
