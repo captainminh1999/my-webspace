@@ -1,6 +1,5 @@
 # netlify.toml
 
-# Example existing build and functions configuration
 [build]
   command = "next build"
   publish = ".next"
@@ -8,12 +7,27 @@
 [functions]
   directory = "netlify/functions"
   node_bundler = "esbuild"
+
+# Hashed build assets never change under the same URL.
 [[headers]]
   for = "/_next/static/*"
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
 
+# Baseline security headers for every response. No CSP yet: the inline theme
+# script in src/app/layout.tsx and Google Analytics would need nonces/hashes
+# first (tracked in docs/ARCHITECTURE.md §12).
 [[headers]]
-  for = "/public/*"
+  for = "/*"
   [headers.values]
-    Cache-Control = "public, max-age=31536000, immutable"
+    Strict-Transport-Security = "max-age=31536000; includeSubDomains"
+    X-Content-Type-Options = "nosniff"
+    X-Frame-Options = "DENY"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=(), payment=()"
+
+# The admin upload page is not for search engines.
+[[headers]]
+  for = "/admin/*"
+  [headers.values]
+    X-Robots-Tag = "noindex, nofollow"
