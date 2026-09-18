@@ -2,7 +2,8 @@
 // Used directly by the Next.js server (src/lib/dashboard.ts) and by the
 // Netlify functions (netlify/functions/widget-utils.ts).
 import type { Db, Document, WithId } from "mongodb";
-import { WIDGET_IDS, type WidgetId } from "@/types/dashboard";
+// Relative on purpose: this module is bundled into the Netlify functions, where the @/ alias is not guaranteed.
+import { WIDGET_IDS, type WidgetId } from "../types/dashboard";
 
 export const ALLOWED_WIDGETS = WIDGET_IDS;
 

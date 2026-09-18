@@ -34,7 +34,7 @@ const handler: Handler = async (event) => {
 
     for (const section of ALLOWED_SECTIONS) {
       if (SINGLETON_SECTIONS.has(section)) {
-        const doc = await db.collection("singletons").findOne({ _id: section });
+        const doc = await db.collection<{ _id: string }>("singletons").findOne({ _id: section });
         if (doc) {
           const { _id, ...rest } = doc as any;
           result[section] = rest;

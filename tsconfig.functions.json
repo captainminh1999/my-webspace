@@ -1,0 +1,6 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": { "noEmit": true, "jsx": "preserve" },
+  "include": ["netlify/**/*.ts", "src/lib/mongodb.ts", "src/lib/widgetQueries.ts", "src/types/**/*.ts", "src/types.ts", "global.d.ts"],
+  "exclude": ["node_modules"]
+}

@@ -236,10 +236,10 @@ const handler: Handler = async (event: HandlerEvent, _context: HandlerContext) =
     const db = client.db(process.env.MONGODB_DB || "cv");
 
     if (payload.sectionIdentifier === "profile") {
-      await db.collection("singletons").updateOne({ _id: "profile" }, { $set: finalJsonData.profile }, { upsert: true });
-      await db.collection("singletons").updateOne({ _id: "about" }, { $set: finalJsonData.about }, { upsert: true });
+      await db.collection<{ _id: string }>("singletons").updateOne({ _id: "profile" }, { $set: finalJsonData.profile }, { upsert: true });
+      await db.collection<{ _id: string }>("singletons").updateOne({ _id: "about" }, { $set: finalJsonData.about }, { upsert: true });
     } else if (SINGLETON_SECTIONS.has(payload.sectionIdentifier)) {
-      await db.collection("singletons").updateOne({ _id: payload.sectionIdentifier }, { $set: finalJsonData }, { upsert: true });
+      await db.collection<{ _id: string }>("singletons").updateOne({ _id: payload.sectionIdentifier }, { $set: finalJsonData }, { upsert: true });
     } else {
       const coll = db.collection(payload.sectionIdentifier);
       await coll.deleteMany({});

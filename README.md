@@ -70,7 +70,9 @@ Requires Node 22 (Netlify runs the functions on `nodejs22.x`).
 | `fetch-coffee-news.yml` | 05:00 | NewsAPI | `coffee` |
 | `fetch-drone-news.yml` | 06:00 | NewsAPI | `droneNews` |
 
-GitHub disables scheduled workflows after 60 days without repository activity; if every feed goes stale at once, check `gh workflow list --all` and re-enable them. Moving these jobs to Netlify Scheduled Functions is on the backlog.
+GitHub disables scheduled workflows after 60 days without repository activity; if every feed goes stale at once, check `gh workflow list --all` and re-enable them.
+
+The same eight feeds also exist as **Netlify Scheduled Functions** (`netlify/functions/feed-*.ts`, logic in `netlify/functions/feeds/`), on the same schedules, and are dormant by default. To move off GitHub Actions: add the six feed API keys above to the Netlify site environment, set `FEEDS_VIA_NETLIFY=true`, deploy, confirm the feed ages on the dashboard keep updating, then delete `.github/workflows/fetch-*.yml`.
 
 ## Deploy
 

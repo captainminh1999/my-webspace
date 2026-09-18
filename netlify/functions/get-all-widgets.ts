@@ -1,6 +1,6 @@
 import type { Handler } from "@netlify/functions";
 import { connectToDatabase } from "../../src/lib/mongodb";
-import { ALLOWED_WIDGETS, fetchWidget, fetchMeta } from "./widget-utils";
+import { ALLOWED_WIDGETS, fetchWidget, fetchMeta } from "../../src/lib/widgetQueries";
 
 const handler: Handler = async (event) => {
   if (event.httpMethod !== "GET") {

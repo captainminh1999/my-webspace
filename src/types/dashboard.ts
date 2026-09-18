@@ -8,7 +8,7 @@ import type { GameItem } from "./games";
 import type { PhotographyData } from "./photography";
 import type { YouTubeRecData } from "./youtubeRecs";
 import type { EpicData, MarsPhotoData, MarsWeatherData } from "./spaceExtra";
-import type { ProfileData } from "@/types";
+import type { ProfileData } from "../types";
 
 export interface Apod {
   url: string;
