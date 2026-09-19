@@ -12,6 +12,7 @@ import { TechCard, TechFull } from "@/components/widgets/Tech";
 import { PhotographyCard, PhotographyFull } from "@/components/widgets/Photography";
 import { ProfileCard } from "@/components/widgets/Profile";
 import { NewsList } from "@/components/widgets/NewsList";
+import { VerseCard, VerseFooter, VerseFull } from "@/components/widgets/Verse";
 import { GamesCard, GamesFull } from "@/components/widgets/Games";
 import { YouTubeCard, YouTubeFull } from "@/components/widgets/YouTube";
 
@@ -65,9 +66,9 @@ export default async function Page() {
       card: <NewsList items={data.coffee} limit={3} now={now} />, full: <NewsList items={data.coffee} now={now} source="Sprudge · Daily Coffee News · Perfect Daily Grind · Barista Magazine · Fresh Cup · BeanScene" />,
     },
     {
-      id: "drones", folio: "07", title: "DRONES", span: "md:col-span-3 lg:col-span-4 md:order-7",
-      footer: <span>Source: NewsAPI</span>,
-      card: <NewsList items={data.drones} limit={3} now={now} />, full: <NewsList items={data.drones} now={now} source="NewsAPI · titles matching drone, FPV, DJI…" />,
+      id: "verse", folio: "07", title: "VERSE", span: "md:col-span-3 lg:col-span-4 md:order-7",
+      footer: data.verse ? <VerseFooter data={data.verse} /> : null,
+      card: <VerseCard data={data.verse} />, full: <VerseFull data={data.verse} />,
     },
     {
       id: "games", folio: "08", title: "GAMES", span: "md:col-span-3 lg:col-span-4 md:order-8",

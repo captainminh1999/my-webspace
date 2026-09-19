@@ -26,8 +26,8 @@ export async function fetchWidget(db: Db, widget: string): Promise<unknown> {
       return list(db, "coffee");
     case "tech":
       return list(db, "tech");
-    case "drones":
-      return list(db, "droneNews");
+    case "verse":
+      return stripId(await singletons.findOne({ _id: "verse" as unknown as never }));
     case "games":
       return list(db, "games");
     case "weather":

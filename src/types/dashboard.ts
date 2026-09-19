@@ -3,7 +3,7 @@
 import type { WeatherData } from "./weather";
 import type { TechStory } from "./tech";
 import type { CoffeeArticle } from "./coffee";
-import type { DroneNewsItem } from "./drone";
+import type { VerseData } from "./verse";
 import type { GameItem } from "./games";
 import type { PhotographyData } from "./photography";
 import type { YouTubeRecData } from "./youtubeRecs";
@@ -42,7 +42,7 @@ export const WIDGET_IDS = [
   "space",
   "camera",
   "coffee",
-  "drones",
+  "verse",
   "games",
   "youtube",
 ] as const;
@@ -54,7 +54,7 @@ export interface DashboardData {
   space: SpaceData | null;
   camera: PhotographyData | null;
   coffee: CoffeeArticle[];
-  drones: DroneNewsItem[];
+  verse: VerseData | null;
   games: GameItem[];
   youtube: YouTubeRecData | null;
   meta: MetaData | null;

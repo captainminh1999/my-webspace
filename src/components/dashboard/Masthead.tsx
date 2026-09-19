@@ -12,7 +12,7 @@ const LABEL: Record<WidgetId, string> = {
   space: "SPACE",
   camera: "PHOTO",
   coffee: "COFFEE",
-  drones: "DRONES",
+  verse: "VERSE",
   games: "GAMES",
   youtube: "VIDEO",
 };
@@ -34,6 +34,9 @@ export default function Masthead({ now, freshness, variant = "dash", title }: Pr
   const entries = freshness ? Object.values(freshness) : [];
   const stale = entries.filter((f) => f.state === "stale");
   const fresh = entries.filter((f) => f.state === "fresh");
+  const aging = entries.filter((f) => f.state === "aging").length;
+  // A feed that has not run since it was added (no stamp yet) is waiting, not ageing.
+  const pending = entries.filter((f) => f.state === "unknown").length;
   const ordered = [...stale, ...entries.filter((f) => f.state !== "stale")];
 
   return (
@@ -84,11 +87,12 @@ export default function Masthead({ now, freshness, variant = "dash", title }: Pr
               </ul>
               {/* below md: the aggregate, expandable */}
               <details className="group md:hidden stamp text-ink-2">
-                <summary className={`cursor-pointer list-none flex items-center gap-2 ${stale.length ? "text-stale" : fresh.length === entries.length ? "text-fresh" : ""}`}>
+                <summary className={`cursor-pointer list-none flex items-center gap-2 ${stale.length ? "text-stale" : fresh.length + pending === entries.length ? "text-fresh" : ""}`}>
                   <span aria-hidden className="inline-block transition-transform duration-120 group-open:rotate-90">▸</span>
                   {entries.length} FEEDS · {fresh.length} FRESH
                   {stale.length ? ` · ${stale.length} STALE` : ""}
-                  {entries.length - fresh.length - stale.length ? ` · ${entries.length - fresh.length - stale.length} AGING` : ""}
+                  {aging ? ` · ${aging} AGING` : ""}
+                  {pending ? ` · ${pending} PENDING` : ""}
                 </summary>
                 <ul className="mt-2 flex flex-col gap-1">
                   {ordered.map((f) => (

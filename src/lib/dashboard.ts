@@ -56,7 +56,7 @@ const EMPTY: Omit<DashboardData, "renderedAt"> = {
   space: null,
   camera: null,
   coffee: [],
-  drones: [],
+  verse: null,
   games: [],
   youtube: null,
   meta: null,

@@ -28,7 +28,7 @@ export const BUDGET: Record<WidgetId, Budget> = {
   space: "daily",
   camera: "daily",
   coffee: "daily",
-  drones: "daily",
+  verse: "daily",
   games: "daily",
   youtube: "daily",
 };
@@ -58,8 +58,8 @@ function contentDate(data: DashboardData, id: WidgetId): Date | null {
       return newest([data.space?.space?.date, data.space?.epic?.date?.replace(" ", "T") + "Z"]);
     case "coffee":
       return newest(data.coffee.map((a) => a.publishedAt));
-    case "drones":
-      return newest(data.drones.map((a) => a.publishedAt));
+    case "verse":
+      return toDate(data.verse?.date ?? null);
     case "games":
       return newest(data.games.map((g) => g.released));
     case "tech":

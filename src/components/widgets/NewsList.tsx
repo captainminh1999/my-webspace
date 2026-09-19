@@ -11,7 +11,7 @@ export interface NewsItem {
 }
 
 /**
- * Shared body for the headline feeds (Coffee, Drones): a thumbnail or mono
+ * Body of the coffee card, a list of headlines from several papers: a thumbnail or mono
  * index, a two-line title, a mono paper and date — and the "when did these arrive" axis.
  * Thumbnails come from arbitrary publisher hosts, so they stay plain <img>
  * rather than going through the image optimizer.

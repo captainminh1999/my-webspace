@@ -2,17 +2,13 @@
 import type { Db } from "mongodb";
 import { READER, getJson, getText, imageSize, requireEnv, writeCollection, writeSingleton } from "./lib";
 import { fromWordPress, selectReading, type Article } from "../../../src/utils/papers";
-import { parseFeed, shareImage } from "../../../src/utils/rss";
+import { headline, parseFeed, shareImage } from "../../../src/utils/rss";
+import { dayNumber, joinContent, parseReference, rotate, sydneyDate, type Reference } from "../../../src/utils/verse";
+import { METHODS } from "../../../src/utils/reflection";
+import { scripture } from "../../../src/utils/scripture";
+import type { VerseData, VerseSegment } from "../../../src/types/verse";
 
 type Any = Record<string, any>; // eslint-disable-line @typescript-eslint/no-explicit-any
-
-const NEWS_TRIM = (articles: Any[]) =>
-  articles.map((a) => ({
-    title: a.title || "",
-    url: a.url || "",
-    image: a.urlToImage || "",
-    publishedAt: a.publishedAt || "",
-  }));
 
 export async function weather(db: Db) {
   const src = await getJson<Any>(
@@ -92,16 +88,152 @@ export async function coffee(db: Db) {
   return note;
 }
 
-const DRONE_BANNED = ["military", "attack", "atttack", "russia", "ukraine", "strike", "strikes", "war", "dick"];
+// ---- Verse of the day ------------------------------------------------------------------------------
+// BibleGateway chooses the verse (the NET Bible's verse of the day stands in when it cannot be reached). The translation
+// changes daily. NIV, KJV, ESV and NLT are the ones BibleGateway's documented verse-of-the-day service itself serves; its
+// JSON also answers for versions that service refuses "due to copyright issues", so nothing else is taken from it.
+// BSB is public domain and comes from bible.helloao.org by reference. The notices are the publishers' own wording:
+// upstream sends an empty copyright field.
+interface Translation {
+  code: string;
+  name: string;
+  notice: string;
+  publicDomain: boolean;
+  via: "biblegateway" | "helloao" | "netbible";
+}
+const KJV: Translation = { code: "KJV", name: "King James Version", notice: "King James Version (1611; the text of 1769). Public domain outside the United Kingdom.", publicDomain: true, via: "biblegateway" };
+const NET: Translation = {
+  code: "NET",
+  name: "New English Translation",
+  notice: "Scripture quoted by permission. Quotations designated (NET) are from the NET Bible® copyright ©1996, 2019 by Biblical Studies Press, L.L.C. http://netbible.com All rights reserved.",
+  publicDomain: false,
+  via: "netbible",
+};
+const TRANSLATIONS: readonly Translation[] = [
+  {
+    code: "NIV",
+    name: "New International Version",
+    notice: "Scripture quotations taken from The Holy Bible, New International Version® NIV®. Copyright © 1973, 1978, 1984, 2011 by Biblica, Inc.® Used by permission. All rights reserved worldwide.",
+    publicDomain: false,
+    via: "biblegateway",
+  },
+  KJV,
+  {
+    code: "ESV",
+    name: "English Standard Version",
+    notice: "Scripture quotations are from the ESV® Bible (The Holy Bible, English Standard Version®), © 2001 by Crossway, a publishing ministry of Good News Publishers. ESV Text Edition: 2025. The ESV text may not be quoted in any publication made available to the public by a Creative Commons license. The ESV may not be translated in whole or in part into any other language. Used by permission. All rights reserved.",
+    publicDomain: false,
+    via: "biblegateway",
+  },
+  {
+    code: "NLT",
+    name: "New Living Translation",
+    notice: "Scripture quotations are taken from the Holy Bible, New Living Translation, copyright © 1996, 2004, 2015 by Tyndale House Foundation. Used by permission of Tyndale House Publishers, Inc., Carol Stream, Illinois 60188. All rights reserved.",
+    publicDomain: false,
+    via: "biblegateway",
+  },
+  { code: "BSB", name: "Berean Standard Bible", notice: "Berean Standard Bible. Public domain.", publicDomain: true, via: "helloao" },
+];
 
-export async function drones(db: Db) {
-  const q = 'drone OR drones OR fpv OR "dji avata" OR "dji mavic"';
-  const src = await getJson<Any>(
-    `https://newsapi.org/v2/everything?qInTitle=${encodeURIComponent(q)}&pageSize=5&sortBy=publishedAt&apiKey=${requireEnv("NEWSAPI_KEY")}`,
-  );
-  if (!Array.isArray(src?.articles)) throw new Error("unexpected NewsAPI payload");
-  const kept = src.articles.filter((a: Any) => !DRONE_BANNED.some((b) => (a.title || "").toLowerCase().includes(b)));
-  await writeCollection(db, "droneNews", NEWS_TRIM(kept));
+const BIBLEGATEWAY = "https://www.biblegateway.com";
+
+/** The verses of a reference in the Berean Standard Bible; throws when any of them cannot be read. */
+async function berean(ref: Reference): Promise<VerseSegment[]> {
+  const chapter = await getJson<Any>(`https://bible.helloao.org/api/BSB/${ref.usfm}/${ref.chapter}.json`, { headers: READER });
+  const rows: Any[] = Array.isArray(chapter?.chapter?.content) ? chapter.chapter.content : [];
+  return ref.verses.map((number) => {
+    const text = joinContent(rows.find((r) => r?.type === "verse" && r.number === number)?.content);
+    if (!text) throw new Error("unexpected helloao payload");
+    return { number, text };
+  });
+}
+
+export async function verse(db: Db) {
+  const date = sydneyDate();
+  const day = dayNumber(date);
+  const wanted = rotate(TRANSLATIONS, day);
+  const method = rotate(METHODS, day, true);
+
+  let reference: string;
+  let text: string;
+  let verses: VerseSegment[] | undefined;
+  let translation = wanted;
+  let source = "BibleGateway.com";
+  let sourceUrl = BIBLEGATEWAY;
+  try {
+    // On a BSB day only the reference is wanted, so the by-product text asked for is a public-domain one.
+    const asked = wanted.via === "biblegateway" ? wanted : KJV;
+    const bg = await getJson<Any>(`${BIBLEGATEWAY}/votd/get/?format=json&version=${asked.code}`, { headers: READER });
+    // Its errors arrive as HTTP 200 with an `error` key.
+    if (bg?.error || !bg?.votd?.reference || !bg.votd.content) throw new Error("unexpected BibleGateway payload");
+    reference = headline(String(bg.votd.reference));
+    text = scripture(String(bg.votd.content));
+    translation = asked;
+    const parsed = wanted.via === "helloao" ? parseReference(reference) : null;
+    if (parsed) {
+      // A reference it cannot take verse by verse, or a resolver that is down, leaves the day in the King James.
+      verses = await berean(parsed).catch(() => undefined);
+      if (verses) {
+        text = verses.map((v) => v.text).join(" ");
+        translation = wanted;
+      }
+    }
+    // For "Romans 8:35,37" BibleGateway sends the first part only; the citation must name what is quoted.
+    if (!verses && reference.includes(",")) reference = reference.split(",")[0].trim();
+  } catch (err) {
+    console.warn("feed verse: BibleGateway did not answer, asking the NET Bible", err instanceof Error ? err.message : err);
+    const rows = await getJson<Any[]>("https://labs.bible.org/api/?passage=votd&type=json", { headers: READER });
+    if (!Array.isArray(rows) || !rows.length || !rows.every((r) => r?.bookname && r.chapter && r.verse && r.text)) throw new Error("unexpected NET Bible payload");
+    const [first, last] = [rows[0], rows[rows.length - 1]];
+    reference = `${first.bookname} ${first.chapter}:${first.verse}${last.verse !== first.verse ? `-${last.verse}` : ""}`;
+    verses = rows.map((r) => ({ number: Number(r.verse), text: scripture(String(r.text)) }));
+    text = verses.map((v) => v.text).join(" ");
+    translation = NET;
+    source = "NET Bible";
+    sourceUrl = "https://netbible.org";
+  }
+
+  // Scripture is stored whole or not at all: anything that looks cut, empty or still encoded keeps yesterday's verse.
+  // (The shortest verse there is, "Jesus wept.", is 11 characters.)
+  if (!reference || text.length < 8 || text.length > 1500 || /&[a-z#0-9]+;|</i.test(text)) throw new Error("unexpected verse payload");
+
+  const parsed = parseReference(reference);
+  const book = parsed?.book ?? reference.replace(/\s+\d+(?::.*)?$/, "");
+  const chapter = parsed?.chapter ?? (Number(reference.match(/\s(\d+)(?::|$)/)?.[1]) || 0);
+  // Links are built here from the reference, never pasted from upstream. BibleGateway has no BSB; Bible Hub does.
+  const passage = (search: string) => `${BIBLEGATEWAY}/passage/?search=${encodeURIComponent(search)}&version=${translation.code}`;
+  const bsbChapter = parsed && `https://biblehub.com/bsb/${parsed.usfm === "SNG" ? "songs" : parsed.name.toLowerCase().replace(/ /g, "_")}/${parsed.chapter}.htm`;
+  const chapterUrl = translation.code === "BSB" && bsbChapter ? bsbChapter : passage(chapter ? `${book} ${chapter}` : reference);
+
+  const doc: VerseData = {
+    date,
+    reference,
+    book,
+    chapter,
+    text,
+    ...(verses && verses.length > 1 ? { verses } : {}),
+    translation: translation.code,
+    translationName: translation.name,
+    notice: translation.notice,
+    publicDomain: translation.publicDomain,
+    passageUrl: translation.code === "BSB" ? chapterUrl : passage(reference),
+    chapterUrl,
+    questions: [...method.questions],
+    method: method.name,
+    methodNote: method.note,
+    source,
+    sourceUrl,
+  };
+  // The second run of the morning is there to repair a failed first one, never to swap a good verse for a stand-in.
+  if (translation !== wanted) {
+    const stored = await db.collection<{ _id: string }>("singletons").findOne({ _id: "verse" }).catch(() => null) as Partial<VerseData> | null;
+    if (stored?.date === date && stored.translation === wanted.code) {
+      return `kept this morning's ${stored.reference} · ${stored.translation} (this run got ${translation.code} via ${source})`;
+    }
+  }
+  // One document, replaced whole: no archive of past verses, which is also what the publishers' terms expect.
+  await writeSingleton(db, "verse", doc);
+  return `${reference} · ${translation.code}${translation === wanted ? "" : ` (wanted ${wanted.code})`} · via ${source} · ${method.name}`;
 }
 
 export async function games(db: Db) {
