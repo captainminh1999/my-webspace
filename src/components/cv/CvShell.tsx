@@ -2,20 +2,11 @@ import Link from "next/link";
 import type { ProfileData } from "@/types";
 import Masthead from "@/components/dashboard/Masthead";
 import { parseWebsiteString } from "@/utils/formatters";
+import Rail from "./Rail";
+import { SECTIONS, type SectionId } from "./sectionList";
 
-export const SECTIONS = [
-  { id: "about", folio: "01", title: "About", href: null },
-  { id: "experience", folio: "02", title: "Experience", href: "/about-me/experience" },
-  { id: "education", folio: "03", title: "Education", href: "/about-me/education" },
-  { id: "licenses", folio: "04", title: "Licences", href: "/about-me/licenses" },
-  { id: "projects", folio: "05", title: "Projects", href: "/about-me/projects" },
-  { id: "volunteering", folio: "06", title: "Volunteering", href: "/about-me/volunteering" },
-  { id: "skills", folio: "07", title: "Skills", href: null },
-  { id: "honors", folio: "08", title: "Honours", href: "/about-me/honors-awards" },
-  { id: "languages", folio: "09", title: "Languages", href: "/about-me/languages" },
-  { id: "recommendations", folio: "10", title: "Recommendations", href: "/about-me/recommendations" },
-] as const;
-export type SectionId = (typeof SECTIONS)[number]["id"];
+export { Rail, SECTIONS };
+export type { SectionId };
 
 export function fullName(p: ProfileData | null) {
   if (!p) return "Minh Nguyen";
@@ -55,33 +46,9 @@ export function ProfileHeader({ profile, now }: { profile: ProfileData | null; n
   );
 }
 
-/** Sticky left rail (lg) / horizontal index (below lg) listing the sections. */
-export function Rail({ current }: { current?: SectionId }) {
-  return (
-    <nav aria-label="CV sections" className="lg:sticky lg:top-6 lg:self-start">
-      <ol className="flex lg:flex-col gap-x-5 gap-y-2 overflow-x-auto lg:overflow-visible pb-2 lg:pb-0 -mx-4 px-4 lg:mx-0 lg:px-0">
-        {SECTIONS.map((s) => {
-          const active = s.id === current;
-          const href = current ? (s.href ?? `/about-me#${s.id}`) : `#${s.id}`;
-          return (
-            <li key={s.id} className="shrink-0">
-              <Link
-                href={href}
-                className={`stamp whitespace-nowrap transition-colors duration-120 lg:border-l-2 lg:pl-3 ${active ? "text-ink lg:border-accent" : "text-ink-3 hover:text-ink lg:border-transparent"}`}
-              >
-                <span className="text-ink-3">{s.folio}</span> {s.title}
-              </Link>
-            </li>
-          );
-        })}
-      </ol>
-    </nav>
-  );
-}
-
 export function Section({ id, folio, title, children }: { id: string; folio: string; title: string; children: React.ReactNode }) {
   return (
-    <section id={id} className="cv-section scroll-mt-6 border-t border-rule pt-8 pb-12 first:border-t-0 first:pt-0">
+    <section id={id} className="cv-section scroll-mt-16 lg:scroll-mt-6 border-t border-rule pt-8 pb-12 first:border-t-0 first:pt-0">
       <p className="running-head stamp text-ink-3">
         {folio} · {title}
       </p>
@@ -98,7 +65,8 @@ export function CvFrame({ now, title, rail, children }: { now: Date; title?: str
       <Masthead now={now} variant="cv" title={title} />
       <main className="mx-auto max-w-page px-4 md:px-6 py-8 md:py-10">
         <div className="lg:grid lg:grid-cols-[15rem_minmax(0,45rem)] lg:gap-16">
-          <div className="mb-8 lg:mb-0">{rail}</div>
+          {/* Below lg the index rides along under the top edge; at lg the nav inside is the sticky one. */}
+          <div className="sticky top-0 z-10 -mx-4 px-4 md:-mx-6 md:px-6 py-2 mb-8 bg-bg border-b border-rule lg:static lg:z-auto lg:m-0 lg:p-0 lg:border-0">{rail}</div>
           <div className="min-w-0 max-w-measure">{children}</div>
         </div>
       </main>

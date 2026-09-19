@@ -99,7 +99,9 @@ export default function Masthead({ now, freshness, variant = "dash", title }: Pr
                     <li key={f.id} data-freshness={f.state} className="flex items-center justify-between gap-3">
                       <span className="inline-flex items-center gap-1.5">
                         <i aria-hidden className="dot size-1.5 rounded-full" />
-                        {LABEL[f.id]}
+                        <a href={`#card-${f.id}`} className="hover:text-ink">
+                          {LABEL[f.id]}
+                        </a>
                       </span>
                       <Stamp f={f} fixed={false} />
                     </li>

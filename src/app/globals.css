@@ -113,6 +113,10 @@
   input[type="file"]::file-selector-button { font: inherit; color: var(--ink-2); background: var(--surface-2); border: 1px solid var(--rule); border-radius: 4px; padding: 0.25rem 0.75rem; margin-right: 0.75rem; }
   /* CV: the section a rail link jumped to gets the accent rule on its running head */
   .cv-section:target .running-head { color: var(--accent); }
+  /* In-page jumps (the CV rail, the masthead's feed strip) glide; the dashboard card that was jumped to shows its border once */
+  @media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
+  .card { scroll-margin-top: 1.5rem; }
+  .card:target { animation: arrive 1800ms ease-out; }
   @media (prefers-reduced-motion: reduce) { *, ::before, ::after { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; animation-delay: 0s !important; animation-iteration-count: 1 !important; } }
   /* Lock the page while a widget dialog is modal; native <dialog> does not do this itself */
   body:has(dialog:modal) { overflow: hidden; }
@@ -163,6 +167,7 @@
 @keyframes pop { to { transform: scaleY(1); } }
 @keyframes pop-again { from { transform: scaleY(0); } to { transform: scaleY(1); } }
 @keyframes fade { to { opacity: 1; } }
+@keyframes arrive { from, 40% { border-color: var(--accent); } }
 
 /* Tailwind's 120ms isn't a default duration step; the design's hover transitions use it everywhere. */
 @utility duration-120 { transition-duration: 120ms; }

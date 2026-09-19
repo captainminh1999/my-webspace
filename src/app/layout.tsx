@@ -72,7 +72,7 @@ export default function RootLayout({
   return (
     // suppressHydrationWarning: data-theme is written by the inline script
     // before React hydrates, so the server and client attributes differ on purpose.
-    <html lang="en" className={`${fraunces.variable} ${plexMono.variable}`} suppressHydrationWarning>
+    <html lang="en" data-scroll-behavior="smooth" className={`${fraunces.variable} ${plexMono.variable}`} suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
         <Script
