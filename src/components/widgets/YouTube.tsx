@@ -3,14 +3,16 @@ import type { YouTubeRecData, YouTubeRecItem } from "@/types/youtubeRecs";
 import { relativeAge, toDate } from "@/lib/time";
 
 const url = (v: YouTubeRecItem) => `https://youtu.be/${v.videoId}`;
-const thumb = (v: YouTubeRecItem) => v.thumbnail.replace(/\/(hq|sd|maxres)default/, "/mqdefault");
+// The feed stores the largest rendition that exists. Documents from before it did hold the 320px "mq" one; "hq" (480px)
+// always exists, and the 16:9 frame crops the black bars of its 4:3 picture exactly.
+const thumb = (v: YouTubeRecItem) => v.thumbnail.replace("/mqdefault", "/hqdefault");
 
 function Cell({ v, now }: { v: YouTubeRecItem; now: Date }) {
   const d = toDate(v.publishedAt);
   return (
     <a href={url(v)} target="_blank" rel="noopener noreferrer" className="group/cell block p-3">
       <span className="relative block aspect-video rounded-thumb overflow-hidden bg-surface-2 border border-rule">
-        <Image src={thumb(v)} alt="" fill sizes="(max-width: 768px) 100vw, 33vw" quality={65} className="object-cover" />
+        <Image src={thumb(v)} alt="" fill sizes="(max-width: 768px) 100vw, 33vw" quality={70} className="object-cover" />
       </span>
       <span className="block mt-2 text-item text-ink line-clamp-2 group-hover/cell:text-accent transition-colors duration-120">{v.title}</span>
       <span className="block mt-1 font-mono text-source text-ink-3 uppercase truncate">

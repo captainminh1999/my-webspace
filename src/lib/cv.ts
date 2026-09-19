@@ -5,6 +5,7 @@ import type { Document } from "mongodb";
 import { connectToDatabase } from "./mongodb";
 import { baseUrl, decodeStrings } from "./dashboard";
 import type { FullCvData } from "@/types";
+import { orderSection } from "@/utils/cvOrder";
 
 export type CvSection = keyof FullCvData;
 
@@ -69,7 +70,7 @@ async function readSection<S extends CvSection>(section: S): Promise<FullCvData[
 export async function getCvSection<S extends CvSection>(section: S): Promise<FullCvData[S]> {
   try {
     const value = await readSection(section);
-    return decodeStrings(value ?? EMPTY_CV[section]) as FullCvData[S];
+    return orderSection(section, decodeStrings(value ?? EMPTY_CV[section]) as FullCvData[S]);
   } catch (err) {
     console.error(`CV section ${section} unavailable`, err);
     return EMPTY_CV[section];

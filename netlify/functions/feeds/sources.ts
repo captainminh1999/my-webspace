@@ -303,6 +303,15 @@ const CHANNELS = [
   "UCftwRNsjfRo08xYE31tkiyw",
 ];
 
+/** The largest thumbnail a video has. Only "hq" is guaranteed; the card's 16:9 frame crops the bars of the 4:3 renditions. */
+async function bestThumbnail(videoId: string): Promise<string> {
+  for (const name of ["maxresdefault", "sddefault"]) {
+    const url = `https://i.ytimg.com/vi/${videoId}/${name}.jpg`;
+    if (await fetch(url, { method: "HEAD", signal: AbortSignal.timeout(4_000) }).then((r) => r.ok, () => false)) return url;
+  }
+  return `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`;
+}
+
 export async function youtube(db: Db) {
   const key = requireEnv("YOUTUBE_KEY");
   const results = await Promise.all(
@@ -324,7 +333,9 @@ export async function youtube(db: Db) {
       }),
     ),
   );
-  const items = results.filter(Boolean);
-  if (!items.length) throw new Error("no YouTube results");
+  const found = results.filter((r): r is NonNullable<typeof r> => !!r);
+  if (!found.length) throw new Error("no YouTube results");
+  // The API's search result only offers renditions up to 480px; the card draws the pictures wider than that.
+  const items = await Promise.all(found.map(async (it) => ({ ...it, thumbnail: await bestThumbnail(it.videoId) })));
   await writeSingleton(db, "youtubeRecs", { items });
 }

@@ -14,7 +14,8 @@ export function GamesCard({ data, now }: { data: GameItem[]; now: Date }) {
         <div className="raster grid-cols-3">
           {covers.map((g) => (
             <a key={g.id} href={url(g)} target="_blank" rel="noopener noreferrer" className="relative aspect-[3/4] overflow-hidden focus-visible:-outline-offset-2">
-              <Image src={g.thumbnail} alt={g.name} fill sizes="(max-width: 768px) 33vw, 140px" quality={65} className="object-cover" />
+              {/* `sizes` is the width the picture is drawn at, not the frame's: a 3:4 window onto a 16:9 picture shows a slice of one about 2.4 times its own width. Sized to the frame, the file was stretched up to 2.7 times. */}
+              <Image src={g.thumbnail} alt={g.name} fill sizes="(max-width: 768px) 75vw, (max-width: 1024px) 40vw, 340px" quality={70} className="object-cover" />
             </a>
           ))}
         </div>
@@ -46,8 +47,8 @@ export function GamesFull({ data, now }: { data: GameItem[]; now: Date }) {
           const d = toDate(g.released);
           return (
             <li key={g.id} className="py-3 flex items-center gap-4">
-              <span className="block w-14 aspect-[3/4] shrink-0 rounded-thumb overflow-hidden bg-surface-2 border border-rule">
-                {g.thumbnail && <Image src={g.thumbnail} alt="" width={56} height={75} quality={65} className="size-full object-cover" />}
+              <span className="relative block w-14 aspect-[3/4] shrink-0 rounded-thumb overflow-hidden bg-surface-2 border border-rule">
+                {g.thumbnail && <Image src={g.thumbnail} alt="" fill sizes="140px" quality={70} className="object-cover" />}
               </span>
               <div className="min-w-0 flex-1">
                 <a href={url(g)} target="_blank" rel="noopener noreferrer" className="text-body text-ink hover:text-accent transition-colors duration-120">
