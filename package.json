@@ -5,6 +5,8 @@
   "scripts": {
     "dev": "next dev --turbopack",
     "dev:netlify": "netlify dev",
+    "serve:netlify": "netlify dev --framework '#custom' --command 'next start' --target-port 3000 --no-open",
+    "verify:csp": "node scripts/verify-csp.mjs",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
@@ -22,6 +24,7 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
+    "@netlify/edge-functions": "^4.0.0",
     "@netlify/functions": "^6.0.0",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^22",

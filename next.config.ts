@@ -1,11 +1,16 @@
 // next.config.ts
 import type { NextConfig } from 'next';
+import { BASELINE_POLICY } from './src/lib/csp';
 
 const SECURITY_HEADERS = [
   { key: 'Strict-Transport-Security', value: 'max-age=31536000; includeSubDomains' },
   { key: 'X-Content-Type-Options', value: 'nosniff' },
   { key: 'X-Frame-Options', value: 'DENY' },
   { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
+  // The part of the Content-Security-Policy that needs no nonce. HTML pages get the
+  // full policy from netlify/edge-functions/csp.ts, which replaces this header;
+  // this is what is left if that function is off or bypassed, and what `next dev` serves.
+  { key: 'Content-Security-Policy', value: BASELINE_POLICY },
   { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=(), payment=()' },
 ];
 
@@ -13,8 +18,9 @@ const nextConfig: NextConfig = {
   reactStrictMode: true,
 
   // Pages are served by the Next.js runtime on Netlify, which does not apply
-  // netlify.toml [[headers]] to them — those only cover static files. No CSP yet:
-  // the inline theme script in layout.tsx and Google Analytics need nonces/hashes first.
+  // netlify.toml [[headers]] to them — those only cover static files. The script
+  // policy is not here: pages are ISR, so their nonce is added per response at
+  // the edge (src/lib/csp.ts explains the trade-off).
   async headers() {
     return [
       { source: '/(.*)', headers: SECURITY_HEADERS },

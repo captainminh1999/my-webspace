@@ -43,3 +43,7 @@ next-env.d.ts
 
 # Local Netlify folder
 .netlify
+
+# `netlify dev` sometimes writes this beside package.json when it runs the edge
+# function. It pins Netlify's own bootstrap code, not anything of ours.
+deno.lock
