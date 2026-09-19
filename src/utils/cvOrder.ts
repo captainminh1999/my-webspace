@@ -63,6 +63,16 @@ export function orderSection<S extends keyof FullCvData>(section: S, value: Full
   // A licence's second date is when it expires, which says nothing about how recent it is.
   else if (section === "licenses") out = ordered(list, (l) => ({ start: text(l.startedOn) }), "moment");
   else if (section === "honorsAwards") out = ordered(list, (h) => ({ start: text(h.issuedOn) }), "moment");
+  // The export dates a recommendation "07/08/26, 05:28 PM" (month/day/year).
+  else if (section === "recommendationsReceived" || section === "recommendationsGiven") {
+    const day = (v: unknown) => {
+      const m = (text(v) ?? "").match(/^(\d{1,2})\/(\d{1,2})\/(\d{2}|\d{4})/);
+      if (!m) return -Infinity;
+      const year = m[3].length === 4 ? Number(m[3]) : Number(m[3]) + (Number(m[3]) < 50 ? 2000 : 1900);
+      return Date.UTC(year, Number(m[1]) - 1, Number(m[2]));
+    };
+    out = list.map((item, index) => ({ item, index, at: day(item.creationDate) })).sort((a, b) => compare(a.at, b.at) || a.index - b.index).map(({ item }) => item);
+  }
   return out as unknown as FullCvData[S];
 }
 

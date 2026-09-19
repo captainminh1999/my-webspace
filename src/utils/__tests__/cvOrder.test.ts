@@ -62,3 +62,13 @@ test('a running role is counted to today, both months included', () => {
   assert.equal(elapsed('', now), null);
   assert.equal(elapsed('Jan 2030', now), null);
 });
+
+test('recommendations read newest first by their month/day/year date', () => {
+  const recs = [
+    { firstName: 'Blake', creationDate: '04/24/23, 05:28 PM' },
+    { firstName: 'Jag', creationDate: '05/06/23, 07:44 AM' },
+    { firstName: 'Undated', creationDate: '' },
+    { firstName: 'Dave', creationDate: '07/08/26' },
+  ];
+  assert.deepEqual((orderSection('recommendationsReceived', recs as never) as unknown as typeof recs).map((r) => r.firstName), ['Dave', 'Jag', 'Blake', 'Undated']);
+});

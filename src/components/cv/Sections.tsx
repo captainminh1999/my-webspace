@@ -273,7 +273,8 @@ export function Recommendations({ items, limit }: { items: RecommendationReceive
             </Clamp>
           </blockquote>
           <figcaption className="font-mono text-source text-ink-3 mt-3 uppercase">
-            {r.firstName} {r.lastName} · {r.jobTitle}, {r.company}
+            {r.firstName} {r.lastName}
+            {[r.jobTitle, r.company].some(Boolean) ? ` · ${[r.jobTitle, r.company].filter(Boolean).join(", ")}` : ""}
             {r.creationDate ? ` · ${r.creationDate}` : ""}
           </figcaption>
         </figure>
