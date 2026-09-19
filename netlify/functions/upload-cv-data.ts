@@ -3,6 +3,7 @@ import { timingSafeEqual } from "crypto";
 import type { Handler, HandlerEvent, HandlerContext } from "@netlify/functions";
 import Papa from "papaparse";
 import { connectToDatabase } from "../../src/lib/mongodb";
+import { refreshPages } from "./feeds/refresh";
 
 interface UploadPayload {
   sectionIdentifier: string;
@@ -250,6 +251,10 @@ const handler: Handler = async (event: HandlerEvent, _context: HandlerContext) =
     console.error("Error writing to MongoDB:", err);
     return { statusCode: 500, body: JSON.stringify({ message: "Database error", error: err.message }) };
   }
+
+  // The CV pages are cached too; without this an upload only shows up one visit later. The profile also sits on the dashboard.
+  const refreshed = await Promise.all([refreshPages("cv"), ...(payload.sectionIdentifier === "profile" ? [refreshPages("home")] : [])]);
+  console.log(`upload ${payload.sectionIdentifier}: page refresh ${refreshed.join(", ")}`);
 
   const msg =
     payload.sectionIdentifier === "profile"

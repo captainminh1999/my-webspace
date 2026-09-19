@@ -1,6 +1,7 @@
 // Shared plumbing for the scheduled feed functions. Each feed is a pure
 // `fetch → trim → write` step that replaces the stored data, then writes the
 // meta.fetchedAt stamp the dashboard reads and a meta.lastRun record.
+import { refreshPages } from "./refresh";
 import type { Db, Document } from "mongodb";
 import { connectToDatabase } from "../../../src/lib/mongodb";
 
@@ -39,11 +40,11 @@ export async function stamp(db: Db, key: string) {
 }
 
 /**
- * singletons/meta.lastRun.<key>: when the feed last ran here, whether it worked, and why not.
+ * singletons/meta.lastRun.<key>: when the feed last ran here, whether it worked, why not, and whether the site took the refresh.
  * The function log is only visible inside Netlify; this makes a failing feed diagnosable from the data.
  * The message never carries a URL, because upstream URLs carry the API key.
  */
-async function record(key: string, run: { ok: boolean; ms: number; error?: string }) {
+async function record(key: string, run: { ok: boolean; ms: number; error?: string; refresh?: string }) {
   try {
     const client = await connectToDatabase();
     await client
@@ -70,8 +71,10 @@ export async function runFeed(key: string, fn: (db: Db) => Promise<void>): Promi
     const db = client.db(process.env.MONGODB_DB || "cv");
     await fn(db);
     await stamp(db, key);
-    console.log(`feed ${key}: ok in ${Date.now() - started}ms`);
-    await record(key, { ok: true, ms: Date.now() - started });
+    // New data is in: the cached home page is now out of date, so the next visitor should get a fresh render.
+    const refresh = await refreshPages("home");
+    console.log(`feed ${key}: ok in ${Date.now() - started}ms (page refresh: ${refresh})`);
+    await record(key, { ok: true, ms: Date.now() - started, refresh });
     return new Response("ok", { status: 200 });
   } catch (err) {
     console.error(`feed ${key}: failed`, err);

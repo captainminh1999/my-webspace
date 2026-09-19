@@ -52,7 +52,7 @@ Requires Node 22 (Netlify runs the functions on `nodejs22.x`).
 | `MONGODB_URI` | Netlify (site + build), GitHub secret | Atlas connection string. Optional locally. |
 | `MONGODB_DB` | same | Database name, default `cv` |
 | `NEXT_PUBLIC_BASE_URL` | local `.env` | Where pages fetch functions from when there is no `MONGODB_URI`; on Netlify the platform `URL` is used |
-| `UPLOAD_SECRET_KEY` | Netlify | Required by `upload-cv-data`; uploads are refused when unset |
+| `UPLOAD_SECRET_KEY` | Netlify | Required by `upload-cv-data`; uploads are refused when unset. Also the bearer token for `/api/revalidate` unless `REVALIDATE_SECRET` is set |
 | `EBAY_WEBHOOK_VERIFICATION_TOKEN`, `EBAY_WEBHOOK_ENDPOINT` | Netlify | eBay marketplace account-deletion challenge (the endpoint acknowledges notifications and stores nothing) |
 | `WEATHER_KEY`, `NEWSAPI_KEY`, `RAWG_KEY`, `NASA_KEY`, `UNSPLASH_KEY`, `YOUTUBE_KEY` | Netlify (secret) | Feed API keys read by the scheduled functions |
 | `FEEDS_VIA_NETLIFY` | Netlify | `true` switches the scheduled feeds on |
@@ -74,7 +74,8 @@ Each feed is a **Netlify Scheduled Function** (`netlify/functions/feed-*.ts`, lo
 
 - The functions run only while `FEEDS_VIA_NETLIFY=true` is set on the site. Create environment variables in the Netlify UI (or with all scopes): a variable created through the API with a functions-only scope never reached the functions. A deploy is needed before functions see a new or changed variable.
 - To run a feed by hand: Netlify → Logs → Functions → `feed-<name>` → **Run now**. Outside requests to a scheduled function get a 403.
-- Every run records itself in `singletons/meta.lastRun.<feed>` (`at`, `ok`, `ms`, and the `error` without any URL), so a failing feed can be diagnosed from the data; the full log stays in Netlify for 24 hours.
+- Pages are cached (ISR, 60 s), and a visit to an expired page gets the old copy while a new one renders behind it; on a quiet site that copy is as old as the previous visit. So after a successful write each feed calls `POST /api/revalidate` (bearer `REVALIDATE_SECRET`, falling back to `UPLOAD_SECRET_KEY`), and the next visitor gets a page rendered from the new data. The CV upload does the same for `/about-me`. This is a page refresh inside the running site, not a Netlify build.
+- Every run records itself in `singletons/meta.lastRun.<feed>` (`at`, `ok`, `ms`, the page `refresh` result, and the `error` without any URL), so a failing feed can be diagnosed from the data; the full log stays in Netlify for 24 hours.
 - A failed feed leaves the previous data in place, an empty upstream result is treated as a failure, and new items are inserted before old ones are removed, so a page render never sees an empty list. Scheduled functions get 30 s: 8 s to reach MongoDB and 8 s per upstream request.
 
 ## Deploy
