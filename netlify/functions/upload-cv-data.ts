@@ -157,8 +157,9 @@ const handler: Handler = async (event: HandlerEvent, _context: HandlerContext) =
     if (payload.sectionIdentifier === "profile") {
       if (processedData.length === 0) throw new Error("Profile CSV is empty or invalid.");
       const profileObject = { ...processedData[0] };
+      // The summary stays on the profile too: the dashboard's Profile card reads it from there. Dropping it
+      // here left the card showing the summary of an upload long past.
       const summaryForAbout = profileObject.summary || "";
-      delete profileObject.summary;
 
       if (profileObject.websites && typeof profileObject.websites === "string") {
         profileObject.websites = profileObject.websites
@@ -238,7 +239,8 @@ const handler: Handler = async (event: HandlerEvent, _context: HandlerContext) =
 
     if (payload.sectionIdentifier === "profile") {
       await db.collection<{ _id: string }>("singletons").updateOne({ _id: "profile" }, { $set: finalJsonData.profile }, { upsert: true });
-      await db.collection<{ _id: string }>("singletons").updateOne({ _id: "about" }, { $set: finalJsonData.about }, { upsert: true });
+      // Replaced, not merged: an About written for the last job (its own list of achievements and notes) must not stay under a new summary.
+      await db.collection<{ _id: string }>("singletons").replaceOne({ _id: "about" }, finalJsonData.about, { upsert: true });
     } else if (SINGLETON_SECTIONS.has(payload.sectionIdentifier)) {
       await db.collection<{ _id: string }>("singletons").updateOne({ _id: payload.sectionIdentifier }, { $set: finalJsonData }, { upsert: true });
     } else {

@@ -16,6 +16,7 @@ import type {
 import { normalizeSkillsArray } from "@/utils/cvData";
 import { getDisplayCause } from "@/utils/formatters";
 import { dateRange, isCurrent, splitBullets } from "@/utils/bullets";
+import { elapsed, monthOf } from "@/utils/cvOrder";
 import Clamp from "./Clamp";
 
 /* ---------- primitives ---------- */
@@ -95,6 +96,17 @@ export function About({ about }: { about: AboutData | null }) {
 export function Experience({ items, limit }: { items: CompanyExperience[]; limit?: number }) {
   if (!items.length) return <Empty what="experience" />;
   const shown = limit ? items.slice(0, limit) : items;
+  // A role that still runs is counted to today; the stored duration dates from the upload.
+  const now = new Date();
+  const roleDuration = (r: CompanyExperience["roles"][number]) => (isCurrent(r.endDate) ? elapsed(r.startDate, now) : null) ?? r.duration;
+  const companyDuration = (c: CompanyExperience) => {
+    const roles = c.roles ?? [];
+    if (!roles.some((r) => isCurrent(r.endDate))) return c.totalDurationAtCompany;
+    // Only worth a line when there is more than one role; the single role already says it.
+    if (roles.length < 2) return null;
+    const first = roles.map((r) => r.startDate).sort((a, b) => (monthOf(a) ?? Infinity) - (monthOf(b) ?? Infinity))[0];
+    return elapsed(first, now) ?? c.totalDurationAtCompany;
+  };
   return (
     <div className="divide-y divide-rule">
       {shown.map((c, i) => (
@@ -102,15 +114,15 @@ export function Experience({ items, limit }: { items: CompanyExperience[]; limit
           <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 mb-3">
             <h3 className="text-body font-semibold text-ink">{c.companyName}</h3>
             <p className="font-mono text-source text-ink-3 uppercase">
-              {[c.location, c.employmentType, c.totalDurationAtCompany].filter(Boolean).join(" · ")}
+              {[c.location, c.employmentType, companyDuration(c)].filter(Boolean).join(" · ")}
             </p>
           </div>
           <div className="divide-y divide-rule">
             {(c.roles ?? []).map((r, j) => (
               <LedgerRow key={j} date={dateRange(r.startDate, r.endDate)} current={isCurrent(r.endDate)}>
                 <p className="text-body text-ink">{r.title}</p>
-                {(r.location || r.duration) && (
-                  <p className="font-mono text-source text-ink-3 uppercase mt-0.5">{[r.location, r.duration].filter(Boolean).join(" · ")}</p>
+                {(r.location || roleDuration(r)) && (
+                  <p className="font-mono text-source text-ink-3 uppercase mt-0.5">{[r.location, roleDuration(r)].filter(Boolean).join(" · ")}</p>
                 )}
                 {r.responsibilities?.length > 0 && (
                   <div className="mt-2">

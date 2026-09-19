@@ -58,9 +58,24 @@ export function orderSection<S extends keyof FullCvData>(section: S, value: Full
     out = ordered(companies, (c) => ({ start: text(c.roles[0]?.startDate), end: text(c.roles[0]?.endDate) }), "current");
   } else if (section === "education") out = ordered(list, (e) => ({ start: text(e.startDate), end: text(e.endDate) }), "current");
   else if (section === "volunteering") out = ordered(list, (v) => ({ start: text(v.startedOn), end: text(v.finishedOn) }), "current");
-  else if (section === "projects") out = ordered(list, (p) => ({ start: text(p.startedOn), end: text(p.finishedOn) }), "moment");
+  // A project without an end date is still going ("May 2025 – Present").
+  else if (section === "projects") out = ordered(list, (p) => ({ start: text(p.startedOn), end: text(p.finishedOn) }), "current");
   // A licence's second date is when it expires, which says nothing about how recent it is.
   else if (section === "licenses") out = ordered(list, (l) => ({ start: text(l.startedOn) }), "moment");
   else if (section === "honorsAwards") out = ordered(list, (h) => ({ start: text(h.issuedOn) }), "moment");
   return out as unknown as FullCvData[S];
+}
+
+/**
+ * How long something that still runs has run, the way LinkedIn writes it ("2 yrs 1 mo", both months counted).
+ * A stored duration is a snapshot from the day of the upload and is wrong a month later; null when the start cannot be read.
+ */
+export function elapsed(start: string | null | undefined, now: Date): string | null {
+  const from = monthOf(start);
+  if (from === null || !Number.isFinite(from)) return null;
+  const months = now.getUTCFullYear() * 12 + now.getUTCMonth() - from + 1;
+  if (months < 1) return null;
+  const years = Math.floor(months / 12);
+  const rest = months % 12;
+  return [years ? `${years} yr${years > 1 ? "s" : ""}` : "", rest ? `${rest} mo${rest > 1 ? "s" : ""}` : ""].filter(Boolean).join(" ");
 }

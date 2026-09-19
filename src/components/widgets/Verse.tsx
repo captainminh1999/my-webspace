@@ -43,22 +43,36 @@ export function VerseCard({ data }: { data: VerseData | null }) {
         <blockquote cite={data.passageUrl}>
           <p className={`text-ink text-pretty ${shown.text.length > LONG ? "text-body" : "font-display font-medium text-headline"}`}>{shown.text}</p>
         </blockquote>
-        <figcaption className="mt-3 font-mono text-source text-ink-3 uppercase">
-          <a href={data.passageUrl} target="_blank" rel="noopener noreferrer" className="text-ink-2 hover:text-accent transition-colors duration-120">
-            <cite className="not-italic">{enDash(data.reference)}</cite>
-          </a>{" "}
-          ·{" "}
-          <abbr title={data.translationName} className="no-underline">
-            {data.translation}
-          </abbr>
-          {shown.continues && (
-            <>
-              {" "}
-              ·{" "}
-              <button type="button" data-open-dialog="verse" className="uppercase text-ink-2 hover:text-accent transition-colors duration-120 cursor-pointer">
-                Read in full ↗
-              </button>
-            </>
+        {/* The citation, and the way to the whole chapter on the right; on a narrow card the link wraps under it. */}
+        <figcaption className="mt-3 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 font-mono text-source text-ink-3 uppercase">
+          <span>
+            <a href={data.passageUrl} target="_blank" rel="noopener noreferrer" className="text-ink-2 hover:text-accent transition-colors duration-120">
+              <cite className="not-italic">{enDash(data.reference)}</cite>
+            </a>{" "}
+            ·{" "}
+            <abbr title={data.translationName} className="no-underline">
+              {data.translation}
+            </abbr>
+            {shown.continues && (
+              <>
+                {" "}
+                ·{" "}
+                <button type="button" data-open-dialog="verse" className="uppercase text-ink-2 hover:text-accent transition-colors duration-120 cursor-pointer">
+                  Read in full ↗
+                </button>
+              </>
+            )}
+          </span>
+          {data.chapter > 0 && (
+            <a
+              href={data.chapterUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={`Read full chapter: ${data.book} ${data.chapter}`}
+              className="text-ink-2 hover:text-accent transition-colors duration-120"
+            >
+              Read full chapter <span aria-hidden>↗</span>
+            </a>
           )}
         </figcaption>
       </figure>
@@ -76,11 +90,11 @@ export function VerseFooter({ data }: { data: VerseData }) {
       <a href={data.sourceUrl} target="_blank" rel="noopener noreferrer" className="shrink-0 hover:text-accent">
         {data.source === "BibleGateway.com" ? "Powered by BibleGateway.com" : `Verse of the day: ${data.source}`}
       </a>
-      {data.chapter > 0 && (
-        <a href={data.chapterUrl} target="_blank" rel="noopener noreferrer" className="hidden xl:inline truncate text-ink-2 hover:text-accent">
-          Read {data.book} {data.chapter} <span aria-hidden>↗</span>
-        </a>
-      )}
+      {/* The chapter link sits under the verse; the footer's other end names the day's translation where there is room. */}
+      <span className="hidden xl:inline truncate">
+        {data.translationName}
+        {data.publicDomain ? " · public domain" : ""}
+      </span>
     </>
   );
 }
@@ -113,7 +127,7 @@ export function VerseFull({ data }: { data: VerseData | null }) {
         {data.chapter > 0 && (
           <p className="mt-5">
             <a href={data.chapterUrl} target="_blank" rel="noopener noreferrer" className="stamp text-ink-2 hover:text-accent transition-colors duration-120">
-              Read {data.book} {data.chapter} <span aria-hidden>↗</span>
+              Read full chapter · {data.book} {data.chapter} <span aria-hidden>↗</span>
             </a>
           </p>
         )}

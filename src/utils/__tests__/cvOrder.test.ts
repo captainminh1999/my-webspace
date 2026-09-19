@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { monthOf, orderSection } from '../cvOrder.ts';
+import { elapsed, monthOf, orderSection } from '../cvOrder.ts';
 
 test('reads the date forms the CV holds', () => {
   assert.equal(monthOf('Oct 2017'), 2017 * 12 + 9);
@@ -50,4 +50,15 @@ test('volunteering that has not ended comes first; sections without dates and si
   const languages = [{ name: 'Vietnamese' }, { name: 'English' }];
   assert.deepEqual(orderSection('languages', languages as never), languages);
   assert.equal(orderSection('about', null), null);
+});
+
+test('a running role is counted to today, both months included', () => {
+  const now = new Date('2026-09-19T10:00:00Z');
+  assert.equal(elapsed('Aug 2026', now), '2 mos');
+  assert.equal(elapsed('Apr 2022', now), '4 yrs 6 mos');
+  assert.equal(elapsed('Oct 2025', now), '1 yr');
+  assert.equal(elapsed('Sep 2026', now), '1 mo');
+  assert.equal(elapsed('Present', now), null);
+  assert.equal(elapsed('', now), null);
+  assert.equal(elapsed('Jan 2030', now), null);
 });
