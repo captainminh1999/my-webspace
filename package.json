@@ -13,24 +13,29 @@
   },
   "dependencies": {
     "mongodb": "^6.17.0",
-    "next": "^15.3.4",
+    "next": "~15.5.25",
     "papaparse": "^5.5.3",
     "react": "^19.1.0",
     "react-dom": "^19.1.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
-    "@netlify/functions": "^4.0.0",
+    "@netlify/functions": "^6.0.0",
     "@tailwindcss/postcss": "^4",
-    "@types/node": "^20",
+    "@types/node": "^22",
     "@types/papaparse": "^5.3.16",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
-    "eslint-config-next": "15.3.4",
-    "postcss": "^8.5.4",
+    "eslint-config-next": "15.5.25",
+    "postcss": "^8.5.28",
     "tailwindcss": "^4.1.8",
     "typescript": "^5.8.3"
   },
-  "type": "module"
+  "type": "module",
+  "overrides": {
+    "next": {
+      "postcss": "$postcss"
+    }
+  }
 }

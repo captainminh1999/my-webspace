@@ -73,7 +73,7 @@ export function YouTubeFull({ data, now }: { data: YouTubeRecData | null; now: D
           <Row key={v.videoId} v={v} now={now} />
         ))}
       </ul>
-      <p className="font-mono text-source text-ink-3 mt-6">Source: YouTube Data API · latest upload from each followed channel</p>
+      <p className="font-mono text-source text-ink-3 mt-6">Source: YouTube · latest upload from each followed channel</p>
     </div>
   );
 }

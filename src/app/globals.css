@@ -123,9 +123,13 @@
 }
 
 @layer components {
-  /* Rasterblatt's hairline grid, used for inner grids and CV tables */
-  .raster { display: grid; gap: 1px; background: var(--rule); }
-  .raster > * { background: var(--surface); }
+  /* Rasterblatt's hairline grid, used for inner grids and CV tables. Each cell hangs its own top and left
+     border into the 1px gap, and the grid clips the pair that falls outside it. The gap itself used to be
+     the line (the grid's background showing through), but a gap at a fractional position — twelve 1fr
+     columns across a 262.33px card — is squeezed out when the cells on either side snap to whole pixels,
+     so separators went missing here and there. A border is never painted thinner than one device pixel. */
+  .raster { display: grid; gap: 1px; overflow: hidden; overflow: clip; }
+  .raster > * { background: var(--surface); border: solid var(--rule); border-width: 1px 0 0 1px; margin: -1px 0 0 -1px; }
   /* Ledger's mono stamp register */
   .stamp { font-family: var(--font-mono); font-size: 0.75rem; line-height: 1rem; letter-spacing: 0.08em; text-transform: uppercase; font-variant-numeric: tabular-nums; }
   /* Native dialog entrance; falls back to instant where @starting-style is unsupported */

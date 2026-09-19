@@ -33,7 +33,9 @@ npm run dev               # http://localhost:3000, pages fetch data from the liv
 
 With `NEXT_PUBLIC_BASE_URL=https://nhatminh.dev` in `.env`, the dashboard and CV render against production data without a database. To run the functions locally too, install the Netlify CLI, `netlify login`, `netlify link`, then `npm run dev:netlify` (port 8888) — it injects the site's environment variables, including `MONGODB_URI`.
 
-Requires Node 22 (Netlify runs the functions on `nodejs22.x`).
+Requires Node 22.12 or newer (`@netlify/functions` 6 asks for it). Netlify builds with the Node named in `.nvmrc` and runs the functions on `nodejs22.x`.
+
+`package.json` carries one `overrides` entry. Next 15.5.x pins `postcss` 8.4.31 exactly, which `npm audit` flags (GHSA-qx2v-qp2m-jg93 and three more), so `next` is pointed at the root `postcss` instead; the compiled CSS is byte-identical with and without it. `next` is held to `~15.5` on purpose: maintenance releases of an old major may arrive as minors "even if they are breaking changes". Delete the override when moving to Next 16, which pins a fixed postcss itself.
 
 ## Scripts
 
@@ -83,3 +85,5 @@ Each feed is a **Netlify Scheduled Function** (`netlify/functions/feed-*.ts`, lo
 ## Deploy
 
 Push to `main`. Netlify builds with `next build` (fonts are self-hosted through `next/font` and downloaded at build time), deploys the functions in `netlify/functions/`, and reports a Lighthouse score on each deploy.
+
+To undo a bad deploy: Netlify → Deploys → the last good production deploy → **Publish deploy**. It is instant, does not rebuild and costs no credits. The next push to `main` publishes over it again unless **Lock to stop auto publishing** is on.
