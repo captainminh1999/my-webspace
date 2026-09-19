@@ -1,6 +1,8 @@
 // One function per feed, mirroring .github/workflows/fetch-*.yml step for step.
 import type { Db } from "mongodb";
-import { getJson, requireEnv, writeCollection, writeSingleton } from "./lib";
+import { READER, getJson, getText, imageSize, requireEnv, writeCollection, writeSingleton } from "./lib";
+import { fromWordPress, selectReading, type Article } from "../../../src/utils/papers";
+import { parseFeed, shareImage } from "../../../src/utils/rss";
 
 type Any = Record<string, any>; // eslint-disable-line @typescript-eslint/no-explicit-any
 
@@ -35,13 +37,59 @@ export async function tech(db: Db) {
   );
 }
 
+// The coffee card reads specialty-coffee publishers directly: the publisher is the filter.
+// WordPress JSON where the site offers it (it carries a square thumbnail), RSS otherwise and as the way back in.
+const WP = "/wp-json/wp/v2/posts?per_page=8&_embed=wp:featuredmedia&_fields=title,link,date_gmt,_links,_embedded";
+const PAPERS: { source: string; json?: string; thumb?: string; rss?: string }[] = [
+  { source: "Sprudge", json: `https://sprudge.com${WP}`, rss: "https://sprudge.com/feed" },
+  // Its robots.txt asks readers to stay off query-string URLs, so RSS only.
+  { source: "Daily Coffee News", rss: "https://dailycoffeenews.com/feed/" },
+  { source: "Perfect Daily Grind", json: `https://perfectdailygrind.com${WP}`, thumb: "thumblist", rss: "https://perfectdailygrind.com/feed/" },
+  { source: "Barista Magazine", json: `https://www.baristamagazine.com${WP}`, rss: "https://www.baristamagazine.com/feed/" },
+  // 14255 is Fresh Cup's "Sponsored" category.
+  { source: "Fresh Cup", json: `https://freshcup.com${WP}&categories_exclude=14255`, rss: "https://freshcup.com/feed/" },
+  { source: "BeanScene", json: `https://www.beanscenemag.com.au${WP}`, rss: "https://www.beanscenemag.com.au/feed/" },
+];
+
+async function readPaper(paper: (typeof PAPERS)[number]): Promise<Article[]> {
+  // One deadline for both tries, so a site that lets the connection hang cannot take two full timeouts out of the run's 30 s.
+  const deadline = AbortSignal.timeout(10_000);
+  if (paper.json) {
+    try {
+      const posts = fromWordPress(await getJson(paper.json, { headers: READER, signal: deadline }), paper.source, paper.thumb);
+      if (posts.length) return posts;
+    } catch (err) {
+      if (!paper.rss) throw err;
+    }
+  }
+  if (!paper.rss) return [];
+  return parseFeed(await getText(paper.rss, deadline)).map(({ title, url, image, publishedAt }) => ({ source: paper.source, title, url, image, publishedAt }));
+}
+
 export async function coffee(db: Db) {
-  const q = 'coffee OR robusta OR barista OR arabica OR liberica OR "latte," OR "flat white" OR espresso OR americano';
-  const src = await getJson<Any>(
-    `https://newsapi.org/v2/everything?qInTitle=${encodeURIComponent(q)}&pageSize=5&sortBy=publishedAt&apiKey=${requireEnv("NEWSAPI_KEY")}`,
+  const read = await Promise.allSettled(PAPERS.map(readPaper));
+  // Which papers answered goes into meta.lastRun: a publisher's firewall turning the function away shows up there, not only in the log.
+  const note = read.map((r, i) => `${PAPERS[i].source} ${r.status === "fulfilled" ? r.value.length : "failed"}`).join(" · ");
+  console.log(`feed coffee: ${note}`);
+  const picked = selectReading(read.flatMap((r) => (r.status === "fulfilled" ? r.value : [])), {
+    count: 8,
+    days: 14,
+    // BeanScene is the Australian trade paper, and half of it is franchise news: one item at most, and only when it is about coffee.
+    caps: { BeanScene: 1 },
+    only: {
+      BeanScene: {
+        keep: /coffee|caf[eé]|barista|roast|espresso|brew|latte|milk|championship|v60/i,
+        drop: /\b(kfc|mcdonald|soul origin|hungry jack|franchise|energy drink)|^innovation in focus/i,
+      },
+    },
+  });
+  if (picked.length < 3) throw new Error(`only ${picked.length} coffee items (${note}); keeping the previous list`);
+  // A feed without pictures (an RSS fallback) gets each article's share picture instead — briefly, the 30 s are nearly spent by then.
+  const items = await Promise.all(
+    picked.map(async (a) => (a.image ? a : { ...a, image: await getText(a.url, 4_000).then(shareImage, () => "") })),
   );
-  if (!Array.isArray(src?.articles)) throw new Error("unexpected NewsAPI payload");
-  await writeCollection(db, "coffee", NEWS_TRIM(src.articles));
+  await writeCollection(db, "coffee", items);
+  return note;
 }
 
 const DRONE_BANNED = ["military", "attack", "atttack", "russia", "ukraine", "strike", "strikes", "war", "dick"];
@@ -82,7 +130,10 @@ export async function space(db: Db) {
   const epic = epicList?.[0];
   if (!epic?.image) throw new Error("unexpected EPIC payload");
   const [ymd] = String(epic.date).split(" ");
-  await writeSingleton(db, "space", apod);
+  // The picture the dashboard will show (a video's thumbnail on video days), measured so it can be framed to its own shape.
+  const shown = apod.media_type === "image" ? apod.url : apod.thumbnail_url;
+  const size = shown ? await imageSize(shown) : null;
+  await writeSingleton(db, "space", { ...apod, ...(size ?? {}) });
   await writeSingleton(db, "epic", {
     date: epic.date,
     image: epic.image,
@@ -99,6 +150,8 @@ export async function camera(db: Db) {
     id: src.id,
     thumbnail: src.urls.small,
     full: src.urls.full,
+    width: src.width,
+    height: src.height,
     photographer: src.user.name,
     profile: src.user.links.html,
     alt: src.alt_description || "",

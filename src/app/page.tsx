@@ -61,8 +61,8 @@ export default async function Page() {
     },
     {
       id: "coffee", folio: "06", title: "COFFEE", span: "md:col-span-3 lg:col-span-4 md:order-6",
-      footer: <span>Source: NewsAPI</span>,
-      card: <NewsList items={data.coffee} limit={3} now={now} />, full: <NewsList items={data.coffee} now={now} source="NewsAPI · titles matching coffee, espresso, barista…" />,
+      footer: <span className="truncate">Source: six coffee papers</span>,
+      card: <NewsList items={data.coffee} limit={3} now={now} />, full: <NewsList items={data.coffee} now={now} source="Sprudge · Daily Coffee News · Perfect Daily Grind · Barista Magazine · Fresh Cup · BeanScene" />,
     },
     {
       id: "drones", folio: "07", title: "DRONES", span: "md:col-span-3 lg:col-span-4 md:order-7",

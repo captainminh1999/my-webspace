@@ -1,5 +1,6 @@
 import Image from "next/image";
 import type { SpaceData } from "@/types/dashboard";
+import { Plate, canOptimize } from "@/components/dashboard/Plate";
 import { monthDay, toDate } from "@/lib/time";
 
 function apodImage(s: SpaceData["space"]) {
@@ -26,6 +27,7 @@ export function SpaceCard({ data }: { data: SpaceData | null }) {
           fill
           sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 60vw"
           quality={70}
+          unoptimized={!canOptimize(lead)}
           className="object-cover"
         />
       </div>
@@ -59,8 +61,8 @@ export function SpaceFull({ data }: { data: SpaceData | null }) {
           <p className="stamp text-ink-3">Astronomy picture of the day · {apod.date}</p>
           <h3 className="font-display font-medium text-h2 text-ink mt-1">{apod.title}</h3>
           {lead && (
-            <div className="relative aspect-video overflow-hidden rounded-thumb bg-surface-2 border border-rule mt-4">
-              <Image src={lead} alt={apod.title} fill sizes="(max-width: 960px) 100vw, 900px" quality={75} className="object-contain" />
+            <div className="mt-4">
+              <Plate src={lead} alt={apod.title} width={apod.width} height={apod.height} sizes="(max-width: 960px) 100vw, 900px" />
             </div>
           )}
           <p className="text-body text-ink-2 mt-4 whitespace-pre-line">{apod.explanation}</p>
@@ -77,10 +79,16 @@ export function SpaceFull({ data }: { data: SpaceData | null }) {
       {epic?.url && (
         <section>
           <p className="stamp text-ink-3">Earth · EPIC on DSCOVR · {epic.date.split(" ")[0]}</p>
-          <div className="relative w-full max-w-md aspect-square overflow-hidden rounded-thumb bg-surface-2 border border-rule mt-3">
-            <Image src={epic.url} alt="Earth from the DSCOVR spacecraft" fill sizes="(max-width: 640px) 100vw, 448px" quality={70} className="object-cover" />
+          {/* One row from the text edge: the disc, then its caption — a small square alone under a full-width plate reads as misplaced. */}
+          <div className="mt-3 flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6">
+            <div className="relative w-full sm:w-64 shrink-0 aspect-square overflow-hidden rounded-thumb bg-black border border-rule">
+              <Image src={epic.url} alt="Earth from the DSCOVR spacecraft" fill sizes="(max-width: 640px) 100vw, 256px" quality={70} unoptimized={!canOptimize(epic.url)} className="object-cover" />
+            </div>
+            <div className="min-w-0">
+              <p className="text-item text-ink-2">{epic.caption}</p>
+              <p className="font-mono text-source text-ink-3 mt-2">{epic.date.split(" ")[1]?.slice(0, 5)} UTC · FROM L1, 1.5 MILLION KM AWAY</p>
+            </div>
           </div>
-          <p className="text-item text-ink-2 mt-3">{epic.caption}</p>
         </section>
       )}
       {!apod && !epic && <p className="font-mono text-dense text-ink-3">No items</p>}

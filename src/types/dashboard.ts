@@ -19,6 +19,9 @@ export interface Apod {
   media_type?: string; // "image" | "video" | "other"
   thumbnail_url?: string;
   copyright?: string;
+  /** Pixel size of the picture shown (the thumbnail on video days), measured by the space feed; absent on older documents. */
+  width?: number;
+  height?: number;
 }
 
 export interface SpaceData {

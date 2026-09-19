@@ -5,6 +5,8 @@ export interface PhotographyData {
   id: string;
   thumbnail: string;     // small version (~400px wide)
   full: string;          // full-resolution URL
+  width?: number;        // pixel size of the original; absent on older documents
+  height?: number;
   photographer: string;  // e.g. "John Doe"
   profile: string;       // link to photographer’s Unsplash profile
   alt: string;           // alt description (may be empty)

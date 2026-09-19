@@ -14,8 +14,9 @@ function stripId<T extends Document>(doc: WithId<T> | null): Omit<T, "_id"> | nu
   return rest as Omit<T, "_id">;
 }
 
+/** In the order the feed wrote them: insertMany numbers its _ids in array order, and a bare find() promises no order at all. */
 async function list(db: Db, collection: string) {
-  return (await db.collection(collection).find({}).toArray()).map((d) => stripId(d));
+  return (await db.collection(collection).find({}).sort({ _id: 1 }).toArray()).map((d) => stripId(d));
 }
 
 export async function fetchWidget(db: Db, widget: string): Promise<unknown> {

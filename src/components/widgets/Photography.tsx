@@ -1,5 +1,6 @@
 import Image from "next/image";
 import type { PhotographyData } from "@/types/photography";
+import { Plate } from "@/components/dashboard/Plate";
 import { monthDay, toDate } from "@/lib/time";
 
 export function PhotographyCard({ data }: { data: PhotographyData | null }) {
@@ -23,9 +24,7 @@ export function PhotographyFull({ data }: { data: PhotographyData | null }) {
   const d = toDate(data.createdAt);
   return (
     <div>
-      <div className="relative aspect-[3/2] overflow-hidden rounded-thumb bg-surface-2 border border-rule">
-        <Image src={data.full} alt={data.alt || "Photograph from Unsplash"} fill sizes="(max-width: 960px) 100vw, 900px" quality={80} className="object-contain" />
-      </div>
+      <Plate src={data.full} alt={data.alt || "Photograph from Unsplash"} width={data.width} height={data.height} sizes="(max-width: 960px) 100vw, 900px" quality={80} />
       {data.alt && <p className="font-display font-medium text-headline text-ink mt-4">{data.alt}</p>}
       <p className="font-mono text-source text-ink-3 mt-2">
         Photo by{" "}

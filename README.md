@@ -69,13 +69,14 @@ Each feed is a **Netlify Scheduled Function** (`netlify/functions/feed-*.ts`, lo
 | camera | `feed-camera` | 08:00 | Unsplash random landscape | `singletons/photography` |
 | youtube | `feed-youtube` | 02:00 | YouTube Data API, 9 channels | `singletons/youtubeRecs` |
 | games | `feed-games` | 04:00 | RAWG, last 30 days by rating | `games` |
-| coffee | `feed-coffee` | 05:00 | NewsAPI | `coffee` |
+| coffee | `feed-coffee` | 05:00 | Six coffee papers, read directly — no key (see below) | `coffee` |
 | drones | `feed-drones` | 06:00 | NewsAPI | `droneNews` |
 
 - The functions run only while `FEEDS_VIA_NETLIFY=true` is set on the site. Create environment variables in the Netlify UI (or with all scopes): a variable created through the API with a functions-only scope never reached the functions. A deploy is needed before functions see a new or changed variable.
 - To run a feed by hand: Netlify → Logs → Functions → `feed-<name>` → **Run now**. Outside requests to a scheduled function get a 403.
 - Pages are cached (ISR, 60 s), and a visit to an expired page gets the old copy while a new one renders behind it; on a quiet site that copy is as old as the previous visit. So after a successful write each feed calls `POST /api/revalidate` (bearer `REVALIDATE_SECRET`, falling back to `UPLOAD_SECRET_KEY`), and the next visitor gets a page rendered from the new data. The CV upload does the same for `/about-me`. This is a page refresh inside the running site, not a Netlify build.
-- Every run records itself in `singletons/meta.lastRun.<feed>` (`at`, `ok`, `ms`, the page `refresh` result, and the `error` without any URL), so a failing feed can be diagnosed from the data; the full log stays in Netlify for 24 hours.
+- The coffee card reads specialty-coffee publishers instead of searching the news: Sprudge, Daily Coffee News, Perfect Daily Grind, Barista Magazine, Fresh Cup and BeanScene (`PAPERS` in `feeds/sources.ts`) — each site's WordPress JSON where it has one (it carries a square thumbnail), its RSS otherwise and as the fallback. A title search of NewsAPI matched "Pan-Americano" beach tennis and pumpkin-spice memes; here the publisher is the filter. `src/utils/papers.ts` drops each paper's round-ups and sponsored posts, merges the same story told twice, and keeps 8 items from the last 14 days with at most 2 per paper (1 for BeanScene), different papers first. Only the headline, link, thumbnail URL, date and paper's name are stored. Which papers answered is recorded as `meta.lastRun.coffee.note`.
+- Every run records itself in `singletons/meta.lastRun.<feed>` (`at`, `ok`, `ms`, the page `refresh` result, a feed's own `note`, and the `error` without any URL), so a failing feed can be diagnosed from the data; the full log stays in Netlify for 24 hours.
 - A failed feed leaves the previous data in place, an empty upstream result is treated as a failure, and new items are inserted before old ones are removed, so a page render never sees an empty list. Scheduled functions get 30 s: 8 s to reach MongoDB and 8 s per upstream request.
 
 ## Deploy
