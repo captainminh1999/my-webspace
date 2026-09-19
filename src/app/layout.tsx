@@ -1,9 +1,9 @@
 // src/app/layout.tsx
 import "./globals.css";
 import type { Metadata, Viewport } from "next";
-import Script from "next/script";
 import { Fraunces, IBM_Plex_Mono } from "next/font/google";
 
+import Analytics from "@/components/Analytics";
 import { getCvSection } from "@/lib/cv";
 
 // Two self-hosted families (docs/DESIGN-DIRECTION.md § Typography). Body text
@@ -29,7 +29,9 @@ const plexMono = IBM_Plex_Mono({
 
 // Runs before any stylesheet applies so the first paint is already in the
 // right theme. Dark is the default; the OS preference wins on a first visit;
-// an explicit choice in localStorage wins after that.
+// an explicit choice in localStorage wins after that. It is inline and has no
+// nonce here on purpose: the page is cached, so the nonce is stamped on it at the
+// edge (netlify/edge-functions/csp.ts), per response.
 const themeScript = `try{var t=localStorage.getItem('theme');if(t!=='light'&&t!=='dark')t=matchMedia('(prefers-color-scheme: light)').matches?'light':'dark';document.documentElement.dataset.theme=t;}catch(e){document.documentElement.dataset.theme='dark';}`;
 
 
@@ -75,22 +77,10 @@ export default function RootLayout({
     <html lang="en" data-scroll-behavior="smooth" className={`${fraunces.variable} ${plexMono.variable}`} suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
-        <Script
-          src="https://www.googletagmanager.com/gtag/js?id=G-N8S80ZDYP0"
-          strategy="lazyOnload"
-        />
-        <Script id="google-tag" strategy="lazyOnload">
-          {`
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            gtag('js', new Date());
-
-            gtag('config', 'G-N8S80ZDYP0');
-          `}
-        </Script>
       </head>
       <body className="font-sans bg-bg text-ink">
         {children}
+        <Analytics />
       </body>
     </html>
   );
