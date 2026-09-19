@@ -77,7 +77,7 @@ export default async function Page() {
     },
     {
       id: "youtube", folio: "09", title: "YOUTUBE", span: "md:col-span-6 lg:col-span-12 md:order-9",
-      footer: <span>Source: YouTube Data API</span>,
+      footer: <span>Source: YouTube</span>,
       card: <YouTubeCard data={data.youtube} now={now} />, full: <YouTubeFull data={data.youtube} now={now} />,
     },
   ] as const;
