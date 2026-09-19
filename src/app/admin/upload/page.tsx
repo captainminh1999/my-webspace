@@ -1,6 +1,5 @@
 // src/app/admin/upload/page.tsx
-// This file is now a Server Component.
-// The "use client" directive has been removed.
+// A Server Component: who is looking is worked out here, per request, before anything reaches the browser.
 
 import type { Metadata } from 'next';
 import React from 'react';
@@ -8,8 +7,17 @@ import React from 'react';
 // Import your profile data to use for the title
 import { getCvSection } from "@/lib/cv";
 
-// Import the client component that contains the form
+// What this visitor may see: enrolment, sign-in, or the upload form (src/lib/admin).
+import { adminView } from "@/lib/admin/deps";
+// The sentence travels as a prop: importing http.ts from a client component would pull node:crypto into its chunk.
+import { ENROLMENT_DISABLED } from "@/lib/admin/http";
+
+// Import the client component that contains the passkey panel and the form
 import UploadPortal from './UploadPortal.client';
+
+// Never prerendered and never cached: the answer depends on the visitor's session cookie.
+// The build's route table must show this page as ƒ.
+export const dynamic = "force-dynamic";
 
 // Define a simple interface for the part of profileData we need
 interface ProfileTitleData {
@@ -46,7 +54,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 // This is the main component for the /admin/upload route
-export default function AdminUploadPage() {
-  // This Server Component now renders the Client Component for the form
-  return <UploadPortal />;
+export default async function AdminUploadPage() {
+  const view = await adminView();
+  return <UploadPortal view={view} enrolmentDisabledReason={ENROLMENT_DISABLED} />;
 }

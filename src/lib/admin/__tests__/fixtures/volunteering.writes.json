@@ -1,0 +1,41 @@
+{
+  "status": 200,
+  "message": "Successfully processed CSV for section 'volunteering' and stored to MongoDB.",
+  "writes": [
+    {
+      "coll": "volunteering",
+      "op": "deleteMany",
+      "filter": {}
+    },
+    {
+      "coll": "volunteering",
+      "op": "insertMany",
+      "docs": [
+        {
+          "companyName": "Helpers",
+          "role": "Mentor",
+          "startedOn": "Jan 2020",
+          "finishedOn": null,
+          "cause": "Science and Technology",
+          "description": "Taught things"
+        },
+        {
+          "companyName": "Food Bank",
+          "role": "Driver",
+          "startedOn": "2019",
+          "finishedOn": "2020",
+          "cause": "Economic Empowerment",
+          "description": null
+        },
+        {
+          "companyName": "Shelter",
+          "role": "Cook",
+          "startedOn": "2018",
+          "finishedOn": "2018",
+          "cause": "Animal Welfare",
+          "description": "Cooked"
+        }
+      ]
+    }
+  ]
+}

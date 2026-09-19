@@ -1,0 +1,11 @@
+{
+  "status": 200,
+  "message": "Successfully processed CSV for section 'projects' and stored to MongoDB.",
+  "writes": [
+    {
+      "coll": "projects",
+      "op": "deleteMany",
+      "filter": {}
+    }
+  ]
+}

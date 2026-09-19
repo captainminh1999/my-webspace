@@ -1,0 +1,25 @@
+{
+  "status": 200,
+  "message": "Successfully processed CSV for section 'languages' and stored to MongoDB.",
+  "writes": [
+    {
+      "coll": "languages",
+      "op": "deleteMany",
+      "filter": {}
+    },
+    {
+      "coll": "languages",
+      "op": "insertMany",
+      "docs": [
+        {
+          "name": "English",
+          "proficiency": "Native or bilingual proficiency"
+        },
+        {
+          "name": "Vietnamese",
+          "proficiency": null
+        }
+      ]
+    }
+  ]
+}

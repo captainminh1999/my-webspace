@@ -2,23 +2,12 @@
 "use client"; 
 
 import React, { useState, ChangeEvent, FormEvent, useEffect, useRef } from 'react';
+import { useRouter } from 'next/navigation';
 import Papa, { ParseResult } from 'papaparse'; 
-
-// Define sections for the dropdown
-const cvSections = [
-  { id: "profile", name: "Profile" },
-  { id: "about", name: "About" }, 
-  { id: "experience", name: "Experience" },
-  { id: "education", name: "Education" },
-  { id: "licenses", name: "Licenses & Certifications" },
-  { id: "projects", name: "Projects" },
-  { id: "volunteering", name: "Volunteering" },
-  { id: "skills", name: "Skills" },
-  { id: "recommendationsGiven", name: "Recommendations: Given" },
-  { id: "recommendationsReceived", name: "Recommendations: Received" },
-  { id: "honorsAwards", name: "Honors & Awards" },
-  { id: "languages", name: "Languages" },
-];
+// The dropdown and the server's whitelist read the same list. sections.ts has no imports, so nothing
+// from the server side rides along into this chunk.
+import { CV_SECTIONS } from '@/lib/admin/sections';
+import { SESSION_ENDED } from './PasskeyPanel';
 
 // DEFINE EXPECTED CSV HEADERS FOR EACH SECTION
 const EXPECTED_HEADERS: { [key: string]: string[] } = {
@@ -75,14 +64,14 @@ const PROGRESS_ANIMATION_INTERVAL = 1000; // ms for smooth progress animation
 export default function UploadForm() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isFileValid, setIsFileValid] = useState(false); 
-  const [selectedSection, setSelectedSection] = useState<string>(cvSections[0].id);
+  const [selectedSection, setSelectedSection] = useState<string>(CV_SECTIONS[0].id);
   const [isProcessing, setIsProcessing] = useState(false); 
   const [progress, setProgress] = useState(0);
   const [targetProgress, setTargetProgress] = useState(0); // MODIFIED: For animation target
   const [progressMessage, setProgressMessage] = useState('');
   const [message, setMessage] = useState<{ type: 'success' | 'error' | 'info'; text: string | React.ReactNode } | null>(null);
-  const [secretKey, setSecretKey] = useState('');
-  
+  const router = useRouter();
+
   const progressAnimationIntervalRef = useRef<NodeJS.Timeout | null>(null); // For progress animation
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -156,23 +145,8 @@ export default function UploadForm() {
         preview: 1, header: true, skipEmptyLines: true,
         complete: (results: ParseResult<Record<string, unknown>>) => { /* ... (same validation logic) ... */ 
           const actualHeaders = results.meta.fields || [];
+          // Every section in CV_SECTIONS has an entry in EXPECTED_HEADERS.
           const expected = EXPECTED_HEADERS[selectedSection];
-
-          if (!expected && selectedSection !== "about") {
-            setMessage({ type: 'info', text: `No specific header validation for section: ${selectedSection}. Please ensure format is correct.` });
-            setSelectedFile(csvFile); 
-            setIsFileValid(true);
-            setProgress(5); setTargetProgress(5);
-            setProgressMessage('File selected. Assuming correct format.');
-            return;
-          }
-          
-          if (selectedSection === "about" && !EXPECTED_HEADERS["about"]) {
-             setMessage({ type: 'info', text: `The 'About' section is typically populated from the Profile summary. Direct CSV upload for 'About' is not configured.` });
-             setIsFileValid(false); 
-             if (fileInputRef.current) fileInputRef.current.value = "";
-             return;
-          }
 
           const missingHeaders = expected.filter(h => !actualHeaders.includes(h));
           const extraHeaders = actualHeaders.filter(h => !expected.includes(h)); 
@@ -210,19 +184,10 @@ export default function UploadForm() {
     resetFormOnNewSelection(true); 
   };
 
-  const handleSecretKeyChange = (event: ChangeEvent<HTMLInputElement>) => {
-    setSecretKey(event.target.value);
-  };
-
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (!selectedFile || !isFileValid || !selectedSection) {
       setMessage({ type: 'error', text: 'Please select a valid CSV file for the chosen section.' });
-      return;
-    }
-
-    if (!secretKey) {
-      setMessage({ type: 'error', text: 'Please enter the secret key.' });
       return;
     }
 
@@ -240,20 +205,26 @@ export default function UploadForm() {
         const base64Full = reader.result as string;
         const base64Content = base64Full.split(',')[1];
 
-        const uploadResponse = await fetch('/.netlify/functions/upload-cv-data', {
+        // No secret in the body any more: the session cookie (HttpOnly, set at sign-in) is what authorises this.
+        const uploadResponse = await fetch('/api/admin/upload', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             sectionIdentifier: selectedSection,
             fileName: selectedFile.name,
             fileContentBase64: base64Content,
-            secretKey: secretKey,
           }),
         });
 
         const uploadResult = await uploadResponse.json() as UploadFunctionResponse; 
 
-        if (uploadResponse.ok) {
+        if (uploadResponse.status === 401) {
+          // 12 hours are up, or the passkey behind the session was deleted. The refresh re-renders the page
+          // on the server, which swaps this form for the sign-in panel; the panel repeats the sentence.
+          setMessage({ type: 'error', text: SESSION_ENDED });
+          setIsProcessing(false); setProgress(0); setTargetProgress(0);
+          router.refresh();
+        } else if (uploadResponse.ok) {
           setTargetProgress(100);
           setProgressMessage('Upload successful!');
           setMessage({ type: 'success', text: uploadResult.message || 'File processed successfully!' });
@@ -275,8 +246,8 @@ export default function UploadForm() {
     };
   };
 
+  // Only the card: the page wrapper lives in UploadPortal, which stacks the passkey panel and this form.
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8 bg-white dark:bg-gray-800 p-10 rounded-xl shadow-lg">
         <div><h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900 dark:text-white">Upload CV Section Data (CSV)</h2></div>
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
@@ -285,14 +256,8 @@ export default function UploadForm() {
             <label htmlFor="section" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Select Section</label>
             <select id="section" name="section" value={selectedSection} onChange={handleSectionChange} required disabled={isProcessing}
               className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
-              {cvSections.map((section) => (<option key={section.id} value={section.id}>{section.name}</option>))}
+              {CV_SECTIONS.map((section) => (<option key={section.id} value={section.id}>{section.name}</option>))}
             </select>
-          </div>
-          <div>
-            <label htmlFor="secretKey" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Secret Key</label>
-            <input id="secretKey" name="secretKey" type="password" value={secretKey} onChange={handleSecretKeyChange} required disabled={isProcessing}
-              className="mt-1 appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white bg-white dark:bg-gray-700 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-              placeholder="Enter secret key" />
           </div>
           <div>
             <label htmlFor="cvFile" className="block text-sm font-medium text-gray-700 dark:text-gray-300">CSV Data File</label>
@@ -303,7 +268,11 @@ export default function UploadForm() {
             {selectedFile && (isFileValid || (message && message.type === 'error' && typeof message.text === 'string' && message.text.toLowerCase().includes('file'))) && 
               (<p className="mt-2 text-sm text-gray-600 dark:text-gray-400">Selected: {selectedFile.name}</p>)}
           </div>
-          {message && (<div className={`p-3 rounded-md text-xs mt-4 ${message.type === 'success' ? 'bg-green-100 dark:bg-green-800 text-green-700 dark:text-green-200' : message.type === 'error' ? 'bg-red-100 dark:bg-red-800 text-red-700 dark:text-red-200' : 'bg-blue-100 dark:bg-blue-800 text-blue-700 dark:text-blue-200'}`}>{message.text}</div>)}
+          {/* The live region is always in the page: a region that arrives together with its text is not read out.
+              Empty, it has no height and its margins collapse into its neighbours', so the form looks as before. */}
+          <div role="status" aria-live="polite">
+            {message && (<div className={`p-3 rounded-md text-xs mt-4 ${message.type === 'success' ? 'bg-green-100 dark:bg-green-800 text-green-700 dark:text-green-200' : message.type === 'error' ? 'bg-red-100 dark:bg-red-800 text-red-700 dark:text-red-200' : 'bg-blue-100 dark:bg-blue-800 text-blue-700 dark:text-blue-200'}`}>{message.text}</div>)}
+          </div>
           {isProcessing && (<>
               <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5 mt-4">
                 <div className="bg-indigo-600 h-2.5 rounded-full transition-all duration-300 ease-linear" style={{ width: `${progress}%` }}></div> {/* Changed to ease-linear for smoother visual */}
@@ -318,6 +287,5 @@ export default function UploadForm() {
           </div>
         </form>
       </div>
-    </div>
   );
 }

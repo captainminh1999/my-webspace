@@ -1,0 +1,4 @@
+Name,Url,Authority,Started On,Finished On,License Number,Verified
+Cert A,https://example.com/a,Example Org,2020-01-15T00:00:00Z,,123456,true
+Cert B,,Example Org,Jan 2021,Dec 2022,AB-1,false,unexpected extra
+"Cert, C",https://example.com/c

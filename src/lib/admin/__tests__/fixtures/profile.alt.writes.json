@@ -1,0 +1,37 @@
+{
+  "status": 200,
+  "message": "Successfully processed Profile CSV and stored documents.",
+  "writes": [
+    {
+      "coll": "singletons",
+      "op": "updateOne",
+      "filter": {
+        "_id": "profile"
+      },
+      "update": {
+        "$set": {
+          "firstName": "Ada",
+          "lastName": "Example",
+          "headline": null,
+          "websites": []
+        }
+      },
+      "options": {
+        "upsert": true
+      }
+    },
+    {
+      "coll": "singletons",
+      "op": "replaceOne",
+      "filter": {
+        "_id": "about"
+      },
+      "doc": {
+        "content": ""
+      },
+      "options": {
+        "upsert": true
+      }
+    }
+  ]
+}

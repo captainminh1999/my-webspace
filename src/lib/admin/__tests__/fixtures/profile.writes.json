@@ -1,0 +1,49 @@
+{
+  "status": 200,
+  "message": "Successfully processed Profile CSV and stored documents.",
+  "writes": [
+    {
+      "coll": "singletons",
+      "op": "updateOne",
+      "filter": {
+        "_id": "profile"
+      },
+      "update": {
+        "$set": {
+          "firstName": "Ada",
+          "lastName": "Example",
+          "maidenName": null,
+          "address": "1 Test St",
+          "birthDate": "1 Jan",
+          "headline": "Engineer",
+          "summary": "Line one. Line two.",
+          "industry": "Software",
+          "zipCode": "2000",
+          "geoLocation": "Sydney, Australia",
+          "twitterHandles": null,
+          "websites": [
+            "[PORTFOLIO:https://example.com]",
+            "https://example.org"
+          ],
+          "instantMessengers": null
+        }
+      },
+      "options": {
+        "upsert": true
+      }
+    },
+    {
+      "coll": "singletons",
+      "op": "replaceOne",
+      "filter": {
+        "_id": "about"
+      },
+      "doc": {
+        "content": "Line one. Line two."
+      },
+      "options": {
+        "upsert": true
+      }
+    }
+  ]
+}

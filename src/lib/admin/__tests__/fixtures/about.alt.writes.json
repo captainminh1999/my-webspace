@@ -1,0 +1,26 @@
+{
+  "status": 200,
+  "message": "Successfully processed CSV for section 'about' and stored to MongoDB.",
+  "writes": [
+    {
+      "coll": "singletons",
+      "op": "updateOne",
+      "filter": {
+        "_id": "about"
+      },
+      "update": {
+        "$set": [
+          {
+            "content": "First paragraph."
+          },
+          {
+            "content": "Second paragraph."
+          }
+        ]
+      },
+      "options": {
+        "upsert": true
+      }
+    }
+  ]
+}

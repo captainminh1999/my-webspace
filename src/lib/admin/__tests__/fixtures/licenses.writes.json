@@ -1,0 +1,42 @@
+{
+  "status": 200,
+  "message": "Successfully processed CSV for section 'licenses' and stored to MongoDB.",
+  "writes": [
+    {
+      "coll": "licenses",
+      "op": "deleteMany",
+      "filter": {}
+    },
+    {
+      "coll": "licenses",
+      "op": "insertMany",
+      "docs": [
+        {
+          "name": "Cert A",
+          "url": "https://example.com/a",
+          "authority": "Example Org",
+          "startedOn": {},
+          "finishedOn": null,
+          "licenseNumber": "123456",
+          "verified": "true"
+        },
+        {
+          "name": "Cert B",
+          "url": null,
+          "authority": "Example Org",
+          "startedOn": "Jan 2021",
+          "finishedOn": "Dec 2022",
+          "licenseNumber": "AB-1",
+          "verified": "false",
+          "__parsed_extra": [
+            "unexpected extra"
+          ]
+        },
+        {
+          "name": "Cert, C",
+          "url": "https://example.com/c"
+        }
+      ]
+    }
+  ]
+}

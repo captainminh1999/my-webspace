@@ -1,0 +1,23 @@
+{
+  "status": 200,
+  "message": "Successfully processed CSV for section 'skills' and stored to MongoDB.",
+  "writes": [
+    {
+      "coll": "skills",
+      "op": "deleteMany",
+      "filter": {}
+    },
+    {
+      "coll": "skills",
+      "op": "insertMany",
+      "docs": [
+        {
+          "value": "TypeScript"
+        },
+        {
+          "value": "MongoDB"
+        }
+      ]
+    }
+  ]
+}

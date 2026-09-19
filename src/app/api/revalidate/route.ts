@@ -3,8 +3,9 @@
 // Pages are ISR (revalidate = 60): a visit to an expired page gets the old
 // copy while a new one renders behind it. On a quiet site "old" means "as old
 // as the previous visit", so the first visitor of the day saw yesterday's
-// numbers. The feeds (and the CV upload) call this right after they write, so
-// the next visitor gets a page rendered from the new data instead.
+// numbers. The feeds call this right after they write, so the next visitor
+// gets a page rendered from the new data instead. (The CV upload runs inside
+// Next and calls revalidatePath itself — src/lib/admin/deps.ts.)
 import { timingSafeEqual } from "node:crypto";
 import { revalidatePath } from "next/cache";
 

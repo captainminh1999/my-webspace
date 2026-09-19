@@ -1,0 +1,50 @@
+{
+  "status": 200,
+  "message": "Successfully processed CSV for section 'experience' and stored to MongoDB.",
+  "writes": [
+    {
+      "coll": "experience",
+      "op": "deleteMany",
+      "filter": {}
+    },
+    {
+      "coll": "experience",
+      "op": "insertMany",
+      "docs": [
+        {
+          "companyName": "Gamma",
+          "employmentType": "Part-time",
+          "totalDurationAtCompany": "2 yrs",
+          "location": "Melbourne",
+          "roles": [
+            {
+              "title": "Analyst",
+              "startDate": "2015",
+              "endDate": "2016",
+              "duration": "1 yr",
+              "responsibilities": [
+                "Did this",
+                "did that",
+                "and more"
+              ],
+              "skills": [],
+              "location": null
+            },
+            {
+              "title": "Lead",
+              "startDate": "2016",
+              "endDate": null,
+              "duration": null,
+              "responsibilities": [],
+              "skills": [
+                "SQL",
+                "Python"
+              ],
+              "location": null
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

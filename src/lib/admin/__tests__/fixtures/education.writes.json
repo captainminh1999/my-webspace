@@ -1,0 +1,33 @@
+{
+  "status": 200,
+  "message": "Successfully processed CSV for section 'education' and stored to MongoDB.",
+  "writes": [
+    {
+      "coll": "education",
+      "op": "deleteMany",
+      "filter": {}
+    },
+    {
+      "coll": "education",
+      "op": "insertMany",
+      "docs": [
+        {
+          "schoolName": "Test University",
+          "startDate": "2015",
+          "endDate": "2018",
+          "degreeName": "BSc",
+          "notes": null,
+          "activities": "Chess club"
+        },
+        {
+          "schoolName": "Other School",
+          "startDate": "2010",
+          "endDate": null,
+          "degreeName": "Diploma",
+          "notes": "Some notes",
+          "activities": null
+        }
+      ]
+    }
+  ]
+}
