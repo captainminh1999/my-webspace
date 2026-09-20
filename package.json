@@ -3,13 +3,13 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbopack",
+    "dev": "next dev",
     "dev:netlify": "netlify dev",
     "serve:netlify": "netlify dev --framework '#custom' --command 'next start' --target-port 3000 --no-open",
     "verify:csp": "node scripts/verify-csp.mjs",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "eslint src",
     "typecheck": "tsc --noEmit -p tsconfig.json && tsc --noEmit -p tsconfig.functions.json",
     "test": "node --test \"src/**/*.test.ts\""
   },
@@ -17,30 +17,24 @@
     "@simplewebauthn/browser": "^14.0.0",
     "@simplewebauthn/server": "^14.0.2",
     "mongodb": "^6.17.0",
-    "next": "~15.5.25",
+    "next": "~16.3.5",
     "papaparse": "^5.5.3",
-    "react": "^19.1.0",
-    "react-dom": "^19.1.0"
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0"
   },
   "devDependencies": {
-    "@eslint/eslintrc": "^3",
     "@netlify/edge-functions": "^4.0.0",
     "@netlify/functions": "^6.0.0",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^22",
     "@types/papaparse": "^5.3.16",
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
     "eslint": "^9",
-    "eslint-config-next": "15.5.25",
+    "eslint-config-next": "16.3.5",
     "postcss": "^8.5.28",
     "tailwindcss": "^4.1.8",
     "typescript": "^5.8.3"
   },
-  "type": "module",
-  "overrides": {
-    "next": {
-      "postcss": "$postcss"
-    }
-  }
+  "type": "module"
 }

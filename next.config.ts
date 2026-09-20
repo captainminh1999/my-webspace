@@ -33,6 +33,9 @@ const nextConfig: NextConfig = {
     minimumCacheTTL: 31536000, // 1 year: every remote image URL here changes when its content does
     deviceSizes: [640, 768, 1024, 1280, 1600],
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
+    // Every `quality` the widgets ask for, plus 75 for an <Image> that names none. Since Next 16 a value
+    // that is not listed here is rounded to the nearest one that is — and the list defaults to [75].
+    qualities: [60, 65, 70, 75, 80],
     // Only the hosts the widgets actually render through next/image. News thumbnails
     // (arbitrary publisher hosts) are plain <img> in src/components/widgets/NewsList.tsx,
     // so no wildcard is needed and /_next/image is not an open proxy.

@@ -5,7 +5,7 @@
 // asks "am I signed in?" — it runs a passkey ceremony, then calls router.refresh() and the page is rendered again
 // with the new answer. Only types and src/lib/admin/sections.ts may be imported from src/lib/admin here: the rest
 // of that folder pulls node:crypto or the database into the browser's chunk.
-import { useEffect, useRef, useState, useTransition, type FormEvent } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore, useTransition, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { browserSupportsWebAuthn, startAuthentication, startRegistration, WebAuthnError } from "@simplewebauthn/browser";
 import type { PublicKeyCredentialCreationOptionsJSON, PublicKeyCredentialRequestOptionsJSON } from "@simplewebauthn/browser";
@@ -14,6 +14,9 @@ import type { AdminView } from "@/lib/admin/view";
 /** Said by the upload form on a 401 and by this panel once the form is gone. */
 export const SESSION_ENDED = "Your session has ended — sign in again.";
 const CHECKING = "Checking again…";
+
+/** What the browser can do never changes while the page is open, so there is nothing to subscribe to. */
+const never = () => () => {};
 
 type Message = { type: "success" | "error" | "info"; text: string };
 type Answer = { ok: true; data: unknown } | { ok: false; status: number; message: string };
@@ -71,14 +74,13 @@ export default function PasskeyPanel({ view, enrolmentDisabledReason }: { view: 
   const [message, setMessage] = useState<Message | null>(null);
   const [busy, setBusy] = useState(false);
   const [refreshing, startRefresh] = useTransition();
-  // null until the effect has looked: the server cannot know, and the first client render has to match it.
-  const [supported, setSupported] = useState<boolean | null>(null);
+  // null on the server and for the render that hydrates its HTML: the server cannot know, and the first client
+  // render has to match it. The browser's own answer from the next render on.
+  const supported = useSyncExternalStore<boolean | null>(never, browserSupportsWebAuthn, () => null);
   const heading = useRef<HTMLHeadingElement>(null);
   const shown = useRef(view.state);
   const signingOut = useRef(false);
   const retrying = useRef(false);
-
-  useEffect(() => { setSupported(browserSupportsWebAuthn()); }, []);
 
   // "Try again" is the one control that does not go through run(). When the retry fails at once (no MONGODB_URI
   // locally) the button is grey for a few milliseconds and nothing else changes: it looks dead, and a screen
@@ -99,6 +101,9 @@ export default function PasskeyPanel({ view, enrolmentDisabledReason }: { view: 
     // form says so on its 401 and then leaves the page with the session, so the sentence is repeated here.
     if (was === "upload" && view.state !== "unavailable" && !signingOut.current) setMessage({ type: "error", text: SESSION_ENDED });
     // …and the sentence must not outlive its cause (signed in again from another tab, then a refresh here).
+    // One extra render on a change of view, which is rare, and it belongs with the focus move below: both answer
+    // the same transition, and the ref that tells a sign-out from an expiry may not be read while rendering.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     else if (view.state === "upload") setMessage((m) => (m?.text === SESSION_ENDED ? null : m));
     signingOut.current = false;
     heading.current?.focus();

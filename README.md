@@ -46,7 +46,7 @@ With `MONGODB_URI` set, every page reads that database too — not the live func
 
 Requires Node 22.12 or newer (`@netlify/functions` 6 asks for it). Netlify builds with the Node named in `.nvmrc` and runs the functions on `nodejs22.x`.
 
-`package.json` carries one `overrides` entry. Next 15.5.x pins `postcss` 8.4.31 exactly, which `npm audit` flags (GHSA-qx2v-qp2m-jg93 and three more), so `next` is pointed at the root `postcss` instead; the compiled CSS is byte-identical with and without it. `next` is held to `~15.5` on purpose: maintenance releases of an old major may arrive as minors "even if they are breaking changes". Delete the override when moving to Next 16, which pins a fixed postcss itself.
+`next` is held to `~16.3` on purpose: the edge function stamps nonces on the tags Next.js writes, so a new minor should arrive as a deliberate bump, followed by `npm test` and the local proof below — a new kind of tag shows up there as "tag without the header's nonce". (The `overrides` entry that pointed Next 15's pinned `postcss` at the root one went with the move to Next 16, which pins a fixed `postcss` itself; `npm audit` reads 0 without it.)
 
 ## Scripts
 
@@ -57,7 +57,7 @@ Requires Node 22.12 or newer (`@netlify/functions` 6 asks for it). Netlify build
 | `npm run serve:netlify` | Netlify dev in front of `next start` (the production build) on :8888 — the local Content-Security-Policy proof. Needs `npm run build` first and port 3000 free |
 | `npm run verify:csp -- <origin>` | Checks the policy and the nonces an origin sends (`scripts/verify-csp.mjs`); `--poison` adds the cache-poisoning check |
 | `npm run build` / `npm start` | Production build / serve |
-| `npm run lint` | ESLint (Next.js config) |
+| `npm run lint` | ESLint over `src/` with Next's flat config (`eslint.config.mjs`). Next 16 has no `next lint`, and `next build` no longer lints — this script is the only place it happens |
 | `npm run typecheck` | TypeScript, the site and then `netlify/` (functions and the edge function) |
 | `npm test` | Unit tests (`node --test`) |
 
@@ -126,7 +126,7 @@ How it is put together (the policy itself, directive by directive, is commented 
 - **The baseline** — `object-src 'none'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'` — is sent by `next.config.ts` on every Next response and by `netlify.toml` on static files. It is what a page carries when the edge function is off or bypassed, and what `npm run dev` serves. The edge function replaces it.
 - **Google Analytics** is a client island (`src/components/Analytics.tsx`): no inline snippet, `gtag.js` added by bundled code, which `'strict-dynamic'` trusts. It does not load on `/admin/*`.
 - **The inline theme script** in `layout.tsx` has no nonce in the source on purpose; it gets one at the edge like every other script and still runs before first paint.
-- **Next.js must stay at 15.5.16 or newer.** Before that, the nonce taken from the request header could carry quotes into the cached page (GHSA-ffhc-5mcf-pf4q).
+- **Next.js must stay at 15.5.16 or newer** (every 16.x is). Before that, the nonce taken from the request header could carry quotes into the cached page (GHSA-ffhc-5mcf-pf4q).
 - **Cost.** One edge invocation per request outside `/_next/*`, `/.netlify/*`, `/api/*` and flight requests — pages, plus `favicon.ico` and the files in `public/`; not build assets, images, prefetches or navigations — billed as a web request; no compute. The pass over the 348 KB home page takes 3–8 ms of CPU against Netlify's limit of 50 ms per request — about six times the headroom. If `/` ever doubles in size, measure again. If the function throws, `onError: "bypass"` serves the page with the baseline instead of an error page, and tells nobody — which is what the standing check below is for.
 
 ### Proving it locally
@@ -135,7 +135,7 @@ The gate before any push. `npm run dev` never passes through the edge function, 
 
 ```bash
 npm test && npm run typecheck && npm run lint
-npm run build                 # not while `npm run dev` is up: both write .next/
+npm run build                 # fine next to `npm run dev` since Next 16: dev writes .next/dev
 
 netlify build --offline       # optional: Netlify's own bundler, works unlinked. Expect "Packaging Edge Functions … - csp"
                               # and .netlify/edge-functions-dist/manifest.json with rsc "missing", on_error "bypass", no methods.
