@@ -9,7 +9,7 @@ export default function ThemeToggle() {
     <button
       type="button"
       className="stamp text-ink-3 hover:text-ink transition-colors duration-120"
-      aria-label="Toggle light or dark theme"
+      aria-label="Light/Dark theme"
       onClick={() => {
         const next = document.documentElement.dataset.theme === "light" ? "dark" : "light";
         document.documentElement.dataset.theme = next;

@@ -52,7 +52,7 @@ export default async function Page() {
       footer: data.camera ? (
         <span className="truncate">
           Photo by{" "}
-          <a href={data.camera.profile} target="_blank" rel="noopener noreferrer" className="text-ink-2 hover:text-accent">
+          <a href={data.camera.profile} target="_blank" rel="noopener noreferrer" className="text-ink-2 hover:text-accent underline underline-offset-3">
             {data.camera.photographer}
           </a>{" "}
           on Unsplash
