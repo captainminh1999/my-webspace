@@ -118,34 +118,34 @@ export function landPaths(visited: Iterable<string>): { lit: string; rest: strin
   return { lit: lit.join(""), rest: rest.join("") };
 }
 
-const n2 = (v: number) => +v.toFixed(2);
+// A tenth of a dot is under half a pixel on the widest map.
+const n1 = (v: number) => +v.toFixed(1);
 
 /**
- * The great circle from `a` to `b` as a path, broken where it crosses the antimeridian so the line
- * leaves one edge of the map and comes back at the other (Sydney to San Francisco goes east over the Pacific).
+ * The great circle from `a` to `b` as one unbroken path. Where it crosses the antimeridian it carries on
+ * past the map's edge (x beyond 0 or `GRID.cols`), and `shift` is the translation that brings that part
+ * back in at the other edge: draw the path, and when `shift` is not 0 draw it again moved by `shift`.
+ * The svg clips both, so Sydney to San Francisco leaves on the right and comes back on the left, and the
+ * two copies draw on in step. One point per 4° of arc, at least 2 and at most `maxSteps`.
  */
-export function route(a: { lat: number; lon: number }, b: { lat: number; lon: number }, steps = 48): string {
+export function route(a: { lat: number; lon: number }, b: { lat: number; lon: number }, maxSteps = 48): { d: string; shift: number } {
   const v = (p: { lat: number; lon: number }) => [Math.cos(p.lat * RAD) * Math.cos(p.lon * RAD), Math.cos(p.lat * RAD) * Math.sin(p.lon * RAD), Math.sin(p.lat * RAD)];
   const [p, q] = [v(a), v(b)];
   const d = Math.acos(Math.max(-1, Math.min(1, p[0] * q[0] + p[1] * q[1] + p[2] * q[2])));
-  if (d < 1e-6 || Math.PI - d < 1e-6) return ""; // the same place, or antipodes (no single great circle)
+  if (d < 1e-6 || Math.PI - d < 1e-6) return { d: "", shift: 0 }; // the same place, or antipodes (no single great circle)
+  const steps = Math.min(maxSteps, Math.max(2, Math.ceil(d / RAD / 4)));
   let out = "";
-  let prev: { x: number; y: number } | null = null;
+  let offset = 0;
+  let prev: number | null = null;
   for (let i = 0; i <= steps; i++) {
     const t = i / steps;
     const ka = Math.sin((1 - t) * d) / Math.sin(d);
     const kb = Math.sin(t * d) / Math.sin(d);
     const [x3, y3, z3] = [ka * p[0] + kb * q[0], ka * p[1] + kb * q[1], ka * p[2] + kb * q[2]];
     const { x, y } = project(Math.atan2(z3, Math.hypot(x3, y3)) / RAD, Math.atan2(y3, x3) / RAD);
-    if (!prev) out += `M${n2(x)} ${n2(y)}`;
-    else if (Math.abs(x - prev.x) > GRID.cols / 2) {
-      // Run the line out to the edge it leaves by and back in at the other, at the height it crosses.
-      const edge = x < prev.x ? GRID.cols : 0;
-      const unwrapped = x + (edge ? GRID.cols : -GRID.cols);
-      const yEdge = prev.y + ((edge - prev.x) / (unwrapped - prev.x)) * (y - prev.y);
-      out += `L${edge} ${n2(yEdge)}M${GRID.cols - edge} ${n2(yEdge)}L${n2(x)} ${n2(y)}`;
-    } else out += `L${n2(x)} ${n2(y)}`;
-    prev = { x, y };
+    if (prev !== null && Math.abs(x - prev) > GRID.cols / 2) offset += x < prev ? GRID.cols : -GRID.cols;
+    out += `${i ? "L" : "M"}${n1(x + offset)} ${n1(y)}`;
+    prev = x;
   }
-  return out;
+  return { d: out, shift: offset ? -offset : 0 };
 }

@@ -80,10 +80,30 @@ test('every run of land is drawn exactly once, lit only when its country was vis
   assert.equal(landPaths([]).lit, '');
 });
 
-test('a route over the Pacific leaves by one edge and comes back at the other; one inside the map is a single line', () => {
+test('a route over the Pacific runs on past the right edge and is shifted back in at the left; one inside the map needs no copy', () => {
   const pacific = route(HOME, SF);
-  assert.equal((pacific.match(/M/g) ?? []).length, 2);
-  assert.match(pacific, new RegExp(`L${GRID.cols} [\\d.]+M0 [\\d.]+`));
-  assert.equal((route(HOME, TOKYO_26).match(/M/g) ?? []).length, 1);
-  assert.equal(route(HOME, HOME), '');
+  assert.equal((pacific.d.match(/M/g) ?? []).length, 1);
+  assert.equal(pacific.shift, -GRID.cols);
+  const xs = [...pacific.d.matchAll(/[ML](-?[\d.]+) /g)].map((m) => Number(m[1]));
+  assert.ok(xs.at(-1)! > GRID.cols, 'ends beyond the right edge');
+  assert.ok(Math.abs(xs.at(-1)! + pacific.shift - project(SF.lat, SF.lon).x) < 0.1, 'the shifted copy ends at San Francisco');
+  const tokyo = route(HOME, TOKYO_26);
+  assert.equal(tokyo.shift, 0);
+  assert.ok(Math.max(...[...tokyo.d.matchAll(/[ML](-?[\d.]+) /g)].map((m) => Number(m[1]))) <= GRID.cols);
+  assert.deepEqual(route(HOME, HOME), { d: '', shift: 0 });
+});
+
+test('a short route takes a few points, a long one more, never past the cap', () => {
+  const points = (d: string) => (d.match(/[ML]/g) ?? []).length;
+  const melbourne = route(HOME, { lat: -37.8136, lon: 144.9631 }).d;
+  assert.ok(points(melbourne) <= 4, melbourne);
+  assert.ok(points(route(HOME, LONDON).d) > 30);
+  assert.ok(points(route(HOME, LONDON, 10).d) <= 11);
+});
+
+test('every country Natural Earth draws has at least one dot, and overseas territories are their own', () => {
+  const codes = new Set(RUNS.map((r) => r[3]));
+  for (const c of ['IL', 'PS', 'MK', 'AL', 'JE', 'GG', 'LC', 'VC', 'SG', 'HK', 'MT', 'GF', 'RE', 'BQ', 'TK', 'SJ']) assert.ok(codes.has(c), c);
+  // France's own dots are all in Europe: none west of 30°W
+  assert.deepEqual(RUNS.filter((r) => r[3] === 'FR' && r[1] < (-30 - GRID.west) / GRID.step), []);
 });

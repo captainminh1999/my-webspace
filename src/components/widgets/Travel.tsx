@@ -10,7 +10,7 @@ const DOTS = { fill: "none", strokeWidth: 0.62, strokeLinecap: "round", strokeDa
 /**
  * The dot map: land in --rule-strong, visited countries in the accent, a great-circle line from
  * Sydney to every city (drawn once on load, again on hover), a ring per city, a square for home.
- * Each city's ring carries a native tooltip; the table beside it is the accessible version.
+ * Each city's ring carries a native tooltip; the label names the countries, the table the cities.
  */
 function WorldMap({ stops }: { stops: TravelStop[] }) {
   const sum = summarize(stops);
@@ -23,20 +23,29 @@ function WorldMap({ stops }: { stops: TravelStop[] }) {
       viewBox={`0 0 ${GRID.cols} ${GRID.rows}`}
       className="w-full h-auto block"
       role="img"
-      aria-label={`World map: ${sum.countries.length} countries and ${sum.cities} cities visited, with a line from Sydney to each`}
+      aria-label={`World map of the ${sum.countries.length} countries visited: ${sum.countries.map((c) => countryOf(c).name).join(", ")}; a line runs from Sydney to each of ${sum.cities} cities`}
     >
       <path d={rest} stroke="var(--rule-strong)" {...DOTS} />
-      <path d={lit} stroke="var(--accent)" strokeOpacity={0.6} {...DOTS} />
+      <path d={lit} stroke="var(--accent)" {...DOTS} />
       <g fill="none" stroke="var(--accent)" strokeWidth={0.25} strokeOpacity={0.55}>
-        {pins.map((s, i) => (
-          <path key={`${s.city}|${s.country}`} d={route(HOME, s)} pathLength={1} className="draw" style={{ animationDelay: `${80 + i * 30}ms` }} />
-        ))}
+        {pins.map((s, i) => {
+          // A Pacific crossing runs off one edge; its copy, moved by `shift`, comes in at the other in step.
+          const { d, shift } = route(HOME, s);
+          const style = { animationDelay: `${80 + i * 30}ms` };
+          return (
+            <g key={`${s.city}|${s.country}`}>
+              <path d={d} pathLength={1} className="draw" style={style} />
+              {shift !== 0 && <path d={d} pathLength={1} className="draw" style={style} transform={`translate(${shift} 0)`} />}
+            </g>
+          );
+        })}
       </g>
-      {pins.map((s) => {
+      {/* Oldest first, so a city from the latest year is never covered by an older one beside it */}
+      {[...pins].reverse().map((s) => {
         const p = project(s.lat, s.lon);
         const latest = s.year === newest;
         return (
-          <circle key={`${s.city}|${s.country}`} cx={p.x} cy={p.y} r={0.9} fill={latest ? "var(--accent)" : "var(--surface)"} stroke={latest ? "var(--accent)" : "var(--ink)"} strokeWidth={0.32}>
+          <circle key={`${s.city}|${s.country}`} cx={p.x} cy={p.y} r={0.9} fill={latest ? "var(--accent)" : "var(--surface)"} stroke={latest ? "var(--surface)" : "var(--ink)"} strokeWidth={0.32}>
             <title>{`${s.city}, ${countryOf(s.country).name} · ${s.year} · ${formatKm(distanceKm(HOME, s))} km from Sydney`}</title>
           </circle>
         );
@@ -52,7 +61,7 @@ function Legend() {
   return (
     <p className="mt-3 flex flex-wrap gap-x-4 gap-y-1 font-mono text-source text-ink-3 uppercase" aria-hidden>
       <span className="inline-flex items-center gap-1.5">
-        <i className="size-1.5 rounded-full bg-accent opacity-60" /> Visited country
+        <i className="size-1.5 rounded-full bg-accent" /> Visited country
       </span>
       <span className="inline-flex items-center gap-1.5">
         <i className="size-2 rounded-full border border-ink" /> City
@@ -75,7 +84,16 @@ function Board({ stops, caption, names = false }: { stops: TravelStop[]; caption
       <thead>
         <tr className="stamp text-ink-3 text-left">
           <th scope="col" className="font-normal pb-1.5">City</th>
-          <th scope="col" className="font-normal pb-1.5 pl-3">{names ? "Country" : "Ctry"}</th>
+          <th scope="col" className="font-normal pb-1.5 pl-3">
+            {names ? (
+              <>
+                <span className="md:hidden">Ctry</span>
+                <span className="hidden md:inline">Country</span>
+              </>
+            ) : (
+              "Ctry"
+            )}
+          </th>
           <th scope="col" className="font-normal pb-1.5 pl-3">Year</th>
           <th scope="col" className="font-normal pb-1.5 pl-3 text-right whitespace-nowrap">From SYD</th>
         </tr>
@@ -85,9 +103,17 @@ function Board({ stops, caption, names = false }: { stops: TravelStop[]; caption
           const { name } = countryOf(s.country);
           return (
             <tr key={`${s.city}|${s.country}|${s.year}|${i}`} className="border-b border-rule last:border-b-0">
-              <td className="h-8 max-w-0 w-full truncate uppercase text-ink">{s.city}</td>
-              <td className={`pl-3 text-ink-2 ${names ? "max-w-0 w-1/3 truncate" : ""}`} title={names ? undefined : name}>
-                {names ? name : s.country.toUpperCase()}
+              {/* The city takes the slack and wraps rather than hiding a long name; the other columns size to their content. */}
+              <td className="h-8 py-1 w-full break-words uppercase text-ink">{s.city}</td>
+              <td className="pl-3 text-ink-2 whitespace-nowrap">
+                {names ? (
+                  <>
+                    <span className="md:hidden" title={name}>{s.country.toUpperCase()}</span>
+                    <span className="hidden md:inline">{name}</span>
+                  </>
+                ) : (
+                  <span title={name}>{s.country.toUpperCase()}</span>
+                )}
               </td>
               <td className="pl-3 text-ink-2">{s.year}</td>
               <td className="pl-3 text-right text-ink-2 whitespace-nowrap">{formatKm(distanceKm(HOME, s))} KM</td>
@@ -99,7 +125,10 @@ function Board({ stops, caption, names = false }: { stops: TravelStop[]; caption
   );
 }
 
-/** Card body: the dot map, the country count as the card's numeral, the five latest stops. */
+/**
+ * Card body: the dot map, the country count, the five latest stops. The count is set at the dateline size,
+ * not the numeral: the live temperature stays the biggest number on the page (DESIGN-DIRECTION graft 1).
+ */
 export function TravelCard({ stops }: { stops: TravelStop[] }) {
   if (!stops.length) return NO_ITEMS;
   const sum = summarize(stops);
@@ -107,7 +136,7 @@ export function TravelCard({ stops }: { stops: TravelStop[] }) {
     <div className="grid grow gap-5 lg:grid-cols-12 lg:grid-rows-[auto_1fr] lg:gap-x-6">
       <div className="lg:col-start-8 lg:col-span-5">
         <p className="flex items-baseline gap-3">
-          <span className="font-display font-medium text-ink text-[3.5rem] leading-none lg:text-numeral tracking-tight">{sum.countries.length}</span>
+          <span className="font-display font-medium text-ink text-dateline">{sum.countries.length}</span>
           <span className="text-item text-ink-2">countries</span>
         </p>
         <p className="mt-2 font-mono text-source text-ink-3 uppercase">
@@ -131,11 +160,12 @@ export function TravelFull({ stops }: { stops: TravelStop[] }) {
   const sum = summarize(stops);
   const most = Math.max(...sum.perYear.map((y) => y.stops), 1);
   const widest = Math.max(...sum.byContinent.map((c) => c.countries), 1);
-  const stats = [
+  // The farthest distance is the figure; its city goes on a line of its own, so the number is never cut.
+  const stats: Array<[label: string, value: string, under?: string]> = [
     ["Countries", String(sum.countries.length)],
     ["Cities", String(sum.cities)],
     ["Continents", String(sum.continents.length)],
-    ["Farthest", sum.farthest ? `${sum.farthest.stop.city} · ${formatKm(sum.farthest.km)} km` : "—"],
+    ["Farthest", sum.farthest ? `${formatKm(sum.farthest.km)} KM` : "—", sum.farthest?.stop.city],
   ];
   return (
     <div>
@@ -143,10 +173,13 @@ export function TravelFull({ stops }: { stops: TravelStop[] }) {
       <Legend />
 
       <dl className="raster grid-cols-2 md:grid-cols-4 mt-6">
-        {stats.map(([label, value]) => (
+        {stats.map(([label, value, under]) => (
           <div key={label} className="px-3 py-2.5">
             <dt className="stamp text-ink-3">{label}</dt>
-            <dd className="mt-1 font-mono text-item text-ink truncate">{value}</dd>
+            <dd className="mt-1 font-mono text-item text-ink whitespace-nowrap">
+              {value}
+              {under && <span className="block text-dense text-ink-2 uppercase break-words whitespace-normal">{under}</span>}
+            </dd>
           </div>
         ))}
       </dl>
@@ -168,13 +201,11 @@ export function TravelFull({ stops }: { stops: TravelStop[] }) {
         ))}
         <line x1={0} y1={23.75} x2={sum.perYear.length * 4} y2={23.75} stroke="var(--rule-strong)" strokeWidth={1} vectorEffect="non-scaling-stroke" />
       </svg>
-      <div className="flex justify-between font-mono text-source text-ink-3 mt-1">
+      <div className="flex justify-between font-mono text-source text-ink-3 mt-1" aria-hidden>
         <span>{sum.since}</span>
         <span>{sum.perYear.at(-1)?.year}</span>
       </div>
-      <p className="sr-only">
-        Stops per year: {sum.perYear.map((y) => `${y.year}, ${y.stops}`).join("; ")}.
-      </p>
+      <p className="sr-only">{sum.perYear.map((y) => `${y.year}: ${y.stops} ${y.stops === 1 ? "stop" : "stops"}`).join("; ")}.</p>
 
       <p className="stamp text-ink-3 mt-6">Countries by continent</p>
       <ul className="mt-2 divide-y divide-rule border-y border-rule">

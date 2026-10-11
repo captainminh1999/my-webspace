@@ -98,6 +98,13 @@ Each feed is a **Netlify Scheduled Function** (`netlify/functions/feed-*.ts`, lo
 - Every run records itself in `singletons/meta.lastRun.<feed>` (`at`, `ok`, `ms`, the page `refresh` result — `ok 2875ms; warm ok: …`: the POST's time, which is the server function's start-up when it was cold, then the requests for `/` with their times and `cache-status` (the first two and the last four when there were more) — a feed's own `note`, and the `error` without any URL), so a failing feed can be diagnosed from the data; the full log stays in Netlify for 24 hours.
 - A failed feed leaves the previous data in place, an empty upstream result is treated as a failure, and new items are inserted before old ones are removed, so a page render never sees an empty list. Scheduled functions get 30 s: up to 8 s to find the MongoDB server and 5 s to open a connection (its SCRAM exchange has no limit), 8 s per upstream request, and the home-page warm-up stops 24 s into the run.
 
+## Travel card (mock-up)
+
+Card 10 shows where Minh has been: a dot map with the visited countries lit and a line from Sydney to each city, and a departures board of the latest stops (city, country, year, great-circle distance from Sydney). The dialog adds the counts, stops per year, countries per continent and every stop. **It runs on invented sample data** (`src/lib/travelSample.ts`) and is not a feed, so it has no freshness stamp; replace the list, or move it into MongoDB behind the admin upload, before treating it as real.
+
+- A stop is `{ city, country, year, lat, lon }` (`src/types/travel.ts`), country as ISO 3166-1 alpha-2; a city visited in two years is two stops. The arithmetic is in `src/utils/travel.ts`, with tests.
+- The map is server-rendered SVG with no map host: `src/lib/worldMap.ts` is a 2° grid sampled once from Natural Earth 1:50m, each run of land one dotted subpath. It is generated — rebuild it with `npm i --no-save world-atlas@2.0.2 topojson-client@3.1.0 d3-geo@3.1.1 i18n-iso-countries@7 countries-list@3 && node scripts/build-world-map.mjs` (those packages are not dependencies of the site). The script gives every country at least one dot, splits overseas territories with their own ISO code (French Guiana, Réunion, Svalbard…) from the country that draws them, and fails if a country is left without a dot.
+
 ## Admin sign-in
 
 `/admin/upload` is behind a passkey (WebAuthn, `@simplewebauthn` 14; code and tests in `src/lib/admin/`). The server decides what the page shows: enrolment, sign-in, or the upload form. A session is a 12-hour `HttpOnly`, `SameSite=Strict` cookie and lives only as long as the passkey that opened it. Because of `SameSite=Strict`, arriving from a link on another site shows the sign-in panel once; a reload fixes it.
