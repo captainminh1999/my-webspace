@@ -15,6 +15,8 @@ import { NewsList } from "@/components/widgets/NewsList";
 import { VerseCard, VerseFooter, VerseFull } from "@/components/widgets/Verse";
 import { GamesCard, GamesFull } from "@/components/widgets/Games";
 import { YouTubeCard, YouTubeFull } from "@/components/widgets/YouTube";
+import { TravelCard, TravelFull } from "@/components/widgets/Travel";
+import { SAMPLE_STOPS } from "@/lib/travelSample";
 
 export const revalidate = 60;
 
@@ -79,6 +81,12 @@ export default async function Page() {
       id: "youtube", folio: "09", title: "YOUTUBE", span: "md:col-span-6 lg:col-span-12 md:order-9",
       footer: <span>Source: YouTube</span>,
       card: <YouTubeCard data={data.youtube} now={now} />, full: <YouTubeFull data={data.youtube} now={now} />,
+    },
+    {
+      // A mock-up on sample data: not a feed, so no freshness stamp.
+      id: "travel", folio: "10", title: "TRAVEL", span: "md:col-span-6 lg:col-span-12 md:order-10", width: "wide",
+      footer: <span className="truncate">Sample data · mock-up</span>,
+      card: <TravelCard stops={SAMPLE_STOPS} />, full: <TravelFull stops={SAMPLE_STOPS} />,
     },
   ] as const;
 
