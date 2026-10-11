@@ -15,7 +15,10 @@ export function requireEnv(name: string): string {
   return v;
 }
 
-/** Scheduled functions get 30 s in total: 8 s to reach Mongo (src/lib/mongodb.ts), 8 s per upstream request (made in parallel within a feed). */
+/**
+ * Scheduled functions get 30 s in total: 8 s to reach Mongo (src/lib/mongodb.ts), 8 s per upstream request (made in
+ * parallel within a feed), and whatever is left before WARM_BY for rendering the home page afterwards (feeds/refresh.ts).
+ */
 export async function getJson<T = unknown>(url: string, init?: RequestInit): Promise<T> {
   const res = await fetch(url, { ...init, signal: init?.signal ?? AbortSignal.timeout(8_000) });
   if (!res.ok) throw new Error(`${res.status} ${res.statusText} from ${new URL(url).host}`);
@@ -71,11 +74,17 @@ export async function writeSingleton(db: Db, id: string, doc: Document) {
   await db.collection<{ _id: string }>("singletons").replaceOne({ _id: id }, doc, { upsert: true });
 }
 
-export async function stamp(db: Db, key: string) {
+/** Returns the stamp it wrote: the page prints it, which is how the warm-up recognises a page rendered after this write. */
+export async function stamp(db: Db, key: string): Promise<string> {
+  const at = new Date().toISOString();
   await db
     .collection<{ _id: string }>("singletons")
-    .updateOne({ _id: "meta" }, { $set: { [`fetchedAt.${key}`]: new Date().toISOString() } }, { upsert: true });
+    .updateOne({ _id: "meta" }, { $set: { [`fetchedAt.${key}`]: at } }, { upsert: true });
+  return at;
 }
+
+/** When, after a run starts, the home-page warm-up gives up: leaves 6 s of the 30 s for recording the run. */
+const WARM_BY = 24_000;
 
 /**
  * singletons/meta.lastRun.<key>: when the feed last ran here, whether it worked, why not, whether the site took the refresh, and the feed's own note.
@@ -108,9 +117,10 @@ export async function runFeed(key: string, fn: (db: Db) => Promise<void | string
     const client = await connectToDatabase();
     const db = client.db(process.env.MONGODB_DB || "cv");
     const note = (await fn(db)) || undefined;
-    await stamp(db, key);
-    // New data is in: the cached home page is now out of date, so the next visitor should get a fresh render.
-    const refresh = await refreshPages("home");
+    const fetchedAt = await stamp(db, key);
+    // New data is in: the cached home page is now out of date. Render it from here, so the next visitor
+    // gets the new page from the CDN instead of waiting for a cold render.
+    const refresh = await refreshPages("home", { expect: fetchedAt, deadline: started + WARM_BY });
     console.log(`feed ${key}: ok in ${Date.now() - started}ms (page refresh: ${refresh})`);
     await record(key, { ok: true, ms: Date.now() - started, refresh, ...(note ? { note } : {}) });
     return new Response("ok", { status: 200 });

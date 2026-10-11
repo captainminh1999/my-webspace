@@ -4,7 +4,7 @@ import type { Metadata, Viewport } from "next";
 import { Fraunces, IBM_Plex_Mono } from "next/font/google";
 
 import Analytics from "@/components/Analytics";
-import { getCvSection } from "@/lib/cv";
+import { getProfile } from "@/lib/cv";
 
 // Two self-hosted families (docs/DESIGN-DIRECTION.md § Typography). Body text
 // uses the system stack, so these only carry the display and data registers.
@@ -44,7 +44,7 @@ interface ProfileTitleData {
 export async function generateMetadata(): Promise<Metadata> {
   let profileDataForTitle: ProfileTitleData | null = null;
   try {
-    profileDataForTitle = (await getCvSection('profile')) as ProfileTitleData | null;
+    profileDataForTitle = (await getProfile()) as ProfileTitleData | null;
   } catch (err) {
     console.error('Failed to fetch profile data for metadata', err);
   }

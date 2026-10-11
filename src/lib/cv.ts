@@ -1,9 +1,10 @@
 // Server-side CV data. Same policy as src/lib/dashboard.ts: read MongoDB
 // directly when MONGODB_URI is set, otherwise assemble over HTTP from the
 // deployed functions. Only the sections a page renders are read.
+import { cache } from "react";
 import type { Document } from "mongodb";
 import { connectToDatabase } from "./mongodb";
-import { baseUrl, decodeStrings } from "./dashboard";
+import { baseUrl, decodeStrings } from "./payload";
 import type { FullCvData } from "@/types";
 import { orderSection } from "@/utils/cvOrder";
 
@@ -76,6 +77,13 @@ export async function getCvSection<S extends CvSection>(section: S): Promise<Ful
     return EMPTY_CV[section];
   }
 }
+
+/**
+ * The profile, read once per request: the root layout's title and the Daily Dash both use it.
+ * On a cold connection a second read at the same time would open a second connection to Sydney
+ * (TCP, TLS and SCRAM, about four round trips) rather than wait one round trip for the first.
+ */
+export const getProfile = cache(() => getCvSection("profile"));
 
 /** Everything the /about-me page renders, read in parallel. */
 export async function getFullCv(): Promise<FullCvData> {

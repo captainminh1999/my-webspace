@@ -12,8 +12,10 @@ export async function connectToDatabase(): Promise<MongoClient> {
   }
 
   if (!clientPromise) {
-    // The driver's default is to look for a server for 30 s — longer than any Netlify function may run.
-    clientPromise = new MongoClient(uri, { serverSelectionTimeoutMS: 8_000 }).connect().catch((err) => {
+    // The driver's defaults are 30 s to look for a server and 30 s to open a connection (TCP, TLS,
+    // handshake — not covered by the first) — each longer than any Netlify function may run. A healthy
+    // connection from the functions in us-east-1 to the cluster in Sydney takes about 1 s.
+    clientPromise = new MongoClient(uri, { serverSelectionTimeoutMS: 8_000, connectTimeoutMS: 5_000 }).connect().catch((err) => {
       clientPromise = null;
       throw err;
     });

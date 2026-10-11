@@ -17,6 +17,10 @@ const SECURITY_HEADERS = [
 const nextConfig: NextConfig = {
   reactStrictMode: true,
 
+  // A cold server function loads only the route it is serving, not all of them (the admin's passkey
+  // code included) before it answers: about 0.1-0.3 s off each cold start at the function's 0.5 vCPU.
+  experimental: { preloadEntriesOnStart: false },
+
   // Pages are served by the Next.js runtime on Netlify, which does not apply
   // netlify.toml [[headers]] to them — those only cover static files. The script
   // policy is not here: pages are ISR, so their nonce is added per response at
