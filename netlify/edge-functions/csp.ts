@@ -31,7 +31,7 @@ export default async function csp(request: Request, context: Context) {
   // Whatever the method: `POST /` renders the page too, and a cross-site form can
   // send a visitor there. HEAD, redirects and anything that is not HTML pass through,
   // exactly as context.next() gave them. (Under `netlify dev` that leaves a stale
-  // content-encoding on the two unused SVGs in public/ that `next start` gzips — the
+  // content-encoding on any non-HTML file over 1 KB that `next start` gzips — the
   // CLI's Deno has already decoded the body. Not stripped here: on Netlify the
   // untouched response is the right one. docs/ARCHITECTURE.md § 14b.)
   if (!response.body || !response.headers.get("content-type")?.startsWith("text/html")) return response;

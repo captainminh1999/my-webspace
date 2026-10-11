@@ -1,6 +1,6 @@
 # nhatminh.dev
 
-Minh Nguyen's personal site: a **Daily Dash** of live feeds (Sydney weather, Hacker News, NASA's picture of the day, new game releases, a daily photograph, coffee news, a verse of the day with questions to reflect on, the latest from nine YouTube channels) and a **CV** with the usual sections. Built with Next.js 15 (App Router), React 19 and Tailwind CSS v4, hosted on Netlify, data in MongoDB Atlas.
+Minh Nguyen's personal site: a **Daily Dash** of live feeds (Sydney weather, Hacker News, NASA's picture of the day, new game releases, a daily photograph, coffee news, a verse of the day with questions to reflect on, the latest from nine YouTube channels) and a **CV** with the usual sections. Built with Next.js 16 (App Router), React 19 and Tailwind CSS v4, hosted on Netlify, data in MongoDB Atlas.
 
 The design is documented in [docs/DESIGN-DIRECTION.md](docs/DESIGN-DIRECTION.md) ("Ledger, night edition") and the system in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 
