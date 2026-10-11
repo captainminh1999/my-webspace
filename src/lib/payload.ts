@@ -9,7 +9,7 @@ const ENTITIES: Record<string, string> = {
   "&quot;": '"',
   "&#39;": "'",
   "&apos;": "'",
-  "&nbsp;": " ",
+  "&nbsp;": " ", // a no-break space, as "&#160;" decodes — written as an escape so no editor turns it into a plain one
 };
 
 /** YouTube titles arrive HTML-escaped ("I Couldn&#39;t…"); decode every string in a payload. */

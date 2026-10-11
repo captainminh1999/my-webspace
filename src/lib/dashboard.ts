@@ -6,6 +6,7 @@
 // actually applies. Local development usually has no MONGODB_URI; then the
 // same shape is assembled over HTTP from the deployed functions at
 // NEXT_PUBLIC_BASE_URL (see .env.example).
+import type { MongoClient } from "mongodb";
 import { connectToDatabase } from "./mongodb";
 import { getProfile } from "./cv";
 import { baseUrl, decodeStrings } from "./payload";
@@ -27,8 +28,7 @@ const EMPTY: Feeds = {
   meta: null,
 };
 
-async function fromMongo(): Promise<Feeds> {
-  const client = await connectToDatabase();
+async function fromMongo(client: MongoClient): Promise<Feeds> {
   const db = client.db(process.env.MONGODB_DB || "cv");
   const { widgets, meta } = await fetchHome(db);
   const out: Record<string, unknown> = { ...EMPTY, meta };
@@ -48,12 +48,16 @@ async function fromFunctions(): Promise<Feeds> {
 
 export async function getDashboardData(): Promise<DashboardData> {
   const renderedAt = new Date().toISOString();
-  // First, and on its own: the layout's title asks for the same profile, so this is the one read they
+  // One connection attempt for the whole page: the profile read below (and the layout's title) wait on
+  // this same promise, so if the cluster cannot be reached the page gives up once, not once per reader.
+  const connecting = process.env.MONGODB_URI ? connectToDatabase() : null;
+  connecting?.catch(() => {}); // a failure is handled where it is awaited, below
+  // The profile first, and on its own: the layout's title asks for the same one, so this is the read they
   // share (getProfile never throws). The feeds' read waits for it rather than racing it — on a cold
   // connection a second command at the same time would open a second connection to the cluster.
   const profile = await getProfile();
   try {
-    const data = process.env.MONGODB_URI ? await fromMongo() : await fromFunctions();
+    const data = connecting ? await fromMongo(await connecting) : await fromFunctions();
     // Decode per key so one malformed string in one feed cannot blank the others.
     const out: Record<string, unknown> = {};
     for (const [k, v] of Object.entries(data)) {

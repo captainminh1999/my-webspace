@@ -16,8 +16,9 @@ export function requireEnv(name: string): string {
 }
 
 /**
- * Scheduled functions get 30 s in total: 8 s to reach Mongo (src/lib/mongodb.ts), 8 s per upstream request (made in
- * parallel within a feed), and whatever is left before WARM_BY for rendering the home page afterwards (feeds/refresh.ts).
+ * Scheduled functions get 30 s in total: up to 8 s to find the Mongo server and 5 s to open a connection (src/lib/mongodb.ts),
+ * 8 s per upstream request (made in parallel within a feed), and whatever is left before WARM_BY for rendering the home
+ * page afterwards (feeds/refresh.ts).
  */
 export async function getJson<T = unknown>(url: string, init?: RequestInit): Promise<T> {
   const res = await fetch(url, { ...init, signal: init?.signal ?? AbortSignal.timeout(8_000) });
@@ -83,7 +84,7 @@ export async function stamp(db: Db, key: string): Promise<string> {
   return at;
 }
 
-/** When, after a run starts, the home-page warm-up gives up: leaves 6 s of the 30 s for recording the run. */
+/** When, after a run starts, the home-page warm-up gives up: leaves about 5 s of the 30 s for recording the run. */
 const WARM_BY = 24_000;
 
 /**

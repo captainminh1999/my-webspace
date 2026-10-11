@@ -36,7 +36,7 @@ async function list(db: Db, collection: string) {
 const single = (db: Db, id: string) => db.collection("singletons").findOne({ _id: id as unknown as never });
 
 export async function fetchWidget(db: Db, widget: string): Promise<unknown> {
-  const source = SOURCES[widget as WidgetId];
+  const source = Object.hasOwn(SOURCES, widget) ? SOURCES[widget as WidgetId] : undefined; // not "constructor" & co.
   if (!source) return null;
   if ("list" in source) return list(db, source.list);
   if ("one" in source) return stripId(await single(db, source.one));
@@ -52,7 +52,7 @@ export async function fetchMeta(db: Db) {
 
 /**
  * Every widget and the meta singleton in ONE command — what the Daily Dash renders (the profile
- * comes from src/lib/cv.ts getProfile). Reading them as separate finds sent 13 commands at once,
+ * comes from src/lib/cv.ts getProfile). Read as 12 separate finds they went out at once (13 with the profile),
  * and on a cold connection pool each extra command waits for a connection of its own: TCP, TLS
  * and SCRAM to the cluster in Sydney, about four round trips from the function in us-east-1.
  * Same shapes as fetchWidget: a missing singleton is null, a list keeps the order it was written in.
