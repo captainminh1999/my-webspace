@@ -6,6 +6,7 @@ import { headline, parseFeed, shareImage } from "../../../src/utils/rss";
 import { dayNumber, joinContent, parseReference, rotate, sydneyDate, type Reference } from "../../../src/utils/verse";
 import { METHODS } from "../../../src/utils/reflection";
 import { scripture } from "../../../src/utils/scripture";
+import { apodProblem, cleanExplanation } from "../../../src/utils/apod";
 import type { VerseData, VerseSegment } from "../../../src/types/verse";
 
 type Any = Record<string, any>; // eslint-disable-line @typescript-eslint/no-explicit-any
@@ -258,14 +259,17 @@ export async function space(db: Db) {
     getJson<Any>(`https://api.nasa.gov/planetary/apod?api_key=${key}&thumbs=true`),
     getJson<Any[]>(`https://api.nasa.gov/EPIC/api/natural?api_key=${key}`),
   ]);
-  if (!apod?.date) throw new Error("unexpected APOD payload");
+  // A broken answer is refused before anything is written: the card keeps the last good picture (src/utils/apod.ts).
+  const problem = apodProblem(apod);
+  if (problem) throw new Error(`unexpected APOD payload: ${problem}`);
   const epic = epicList?.[0];
   if (!epic?.image) throw new Error("unexpected EPIC payload");
   const [ymd] = String(epic.date).split(" ");
   // The picture the dashboard will show (a video's thumbnail on video days), measured so it can be framed to its own shape.
   const shown = apod.media_type === "image" ? apod.url : apod.thumbnail_url;
   const size = shown ? await imageSize(shown) : null;
-  await writeSingleton(db, "space", { ...apod, ...(size ?? {}) });
+  const explanation = typeof apod.explanation === "string" ? { explanation: cleanExplanation(apod.explanation) } : {};
+  await writeSingleton(db, "space", { ...apod, ...explanation, ...(size ?? {}) });
   await writeSingleton(db, "epic", {
     date: epic.date,
     image: epic.image,
