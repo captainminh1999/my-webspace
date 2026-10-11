@@ -16,7 +16,6 @@ import { VerseCard, VerseFooter, VerseFull } from "@/components/widgets/Verse";
 import { GamesCard, GamesFull } from "@/components/widgets/Games";
 import { YouTubeCard, YouTubeFull } from "@/components/widgets/YouTube";
 import { TravelCard, TravelFull } from "@/components/widgets/Travel";
-import { SAMPLE_STOPS } from "@/lib/travelSample";
 
 export const revalidate = 60;
 
@@ -83,10 +82,10 @@ export default async function Page() {
       card: <YouTubeCard data={data.youtube} now={now} />, full: <YouTubeFull data={data.youtube} now={now} />,
     },
     {
-      // A mock-up on sample data: not a feed, so no freshness stamp.
+      // Edited by hand, not a feed, so no freshness stamp.
       id: "travel", folio: "10", title: "TRAVEL", span: "md:col-span-6 lg:col-span-12 md:order-10", width: "wide",
-      footer: <span className="truncate">Sample data · mock-up</span>,
-      card: <TravelCard stops={SAMPLE_STOPS} />, full: <TravelFull stops={SAMPLE_STOPS} />,
+      footer: data.travel.length ? <span className="truncate">Source: flight &amp; stay bookings</span> : null,
+      card: <TravelCard stops={data.travel} />, full: <TravelFull stops={data.travel} />,
     },
   ] as const;
 

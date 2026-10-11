@@ -46,9 +46,38 @@ export const formatKm = (km: number) => (Math.round(km / 10) * 10).toLocaleStrin
 
 const placeKey = (s: Pick<TravelStop, "city" | "country">) => `${s.city.trim().toLowerCase()}|${s.country.toUpperCase()}`;
 
-/** Newest year first; stops within a year keep the order they were given in. */
+/** Newest first by year, then month (a stop with no month comes last in its year); ties keep the order given. */
 export function newestFirst(stops: TravelStop[]): TravelStop[] {
-  return stops.map((s, i) => [s, i] as const).sort((a, b) => b[0].year - a[0].year || a[1] - b[1]).map(([s]) => s);
+  return stops
+    .map((s, i) => [s, i] as const)
+    .sort((a, b) => b[0].year - a[0].year || (b[0].month ?? 0) - (a[0].month ?? 0) || a[1] - b[1])
+    .map(([s]) => s);
+}
+
+const MONTHS = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
+
+/** "OCT 2026", or "2026" when the month is not known. */
+export const when = (s: Pick<TravelStop, "year" | "month">) => (s.month ? `${MONTHS[s.month - 1]} ${s.year}` : String(s.year));
+
+/**
+ * The stops as stored (the `travel` collection in MongoDB, edited by hand), checked at the door: anything
+ * that would draw wrongly or throw — a country code the map does not know, a coordinate out of range, a
+ * month that is not 1-12 — is dropped rather than shown. Unknown fields are left behind.
+ */
+export function parseStops(docs: unknown): TravelStop[] {
+  if (!Array.isArray(docs)) return [];
+  const out: TravelStop[] = [];
+  for (const d of docs as Array<Record<string, unknown>>) {
+    if (!d || typeof d !== "object") continue;
+    const { city, country, year, month, lat, lon } = d;
+    if (typeof city !== "string" || !city.trim()) continue;
+    if (typeof country !== "string" || !countryOf(country).continent) continue;
+    if (!Number.isInteger(year) || (year as number) < 1900 || (year as number) > 2100) continue;
+    if (month != null && (!Number.isInteger(month) || (month as number) < 1 || (month as number) > 12)) continue;
+    if (typeof lat !== "number" || typeof lon !== "number" || Math.abs(lat) > 90 || Math.abs(lon) > 180) continue;
+    out.push({ city: city.trim(), country: country.toUpperCase(), year: year as number, ...(month != null ? { month: month as number } : {}), lat, lon });
+  }
+  return out;
 }
 
 /** Each city once, at its most recent visit. */
@@ -112,10 +141,18 @@ export function project(lat: number, lon: number): { x: number; y: number } {
  */
 export function landPaths(visited: Iterable<string>): { lit: string; rest: string } {
   const on = new Set([...visited].map((c) => c.toUpperCase()));
-  const lit: string[] = [];
-  const rest: string[] = [];
-  for (const [row, col, len, code] of RUNS) (code && on.has(code) ? lit : rest).push(`M${col} ${row + 0.5}h${len}`);
-  return { lit: lit.join(""), rest: rest.join("") };
+  // Runs that touch on a row and land in the same path are one subpath: the dashes restart at its integer
+  // start, so the merged run puts its dots exactly where the two did, in fewer bytes.
+  const lit: Array<[number, number, number]> = [];
+  const rest: Array<[number, number, number]> = [];
+  for (const [row, col, len, code] of RUNS) {
+    const runs = code && on.has(code) ? lit : rest;
+    const last = runs.at(-1);
+    if (last && last[0] === row && last[1] + last[2] === col) last[2] += len;
+    else runs.push([row, col, len]);
+  }
+  const d = (runs: Array<[number, number, number]>) => runs.map(([row, col, len]) => `M${col} ${row + 0.5}h${len}`).join("");
+  return { lit: d(lit), rest: d(rest) };
 }
 
 // A tenth of a dot is under half a pixel on the widest map.

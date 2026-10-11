@@ -9,6 +9,7 @@ import type { PhotographyData } from "./photography";
 import type { YouTubeRecData } from "./youtubeRecs";
 import type { EpicData, MarsPhotoData, MarsWeatherData } from "./spaceExtra";
 import type { ProfileData } from "../types";
+import type { TravelStop } from "./travel";
 
 export interface Apod {
   url: string;
@@ -58,6 +59,8 @@ export interface DashboardData {
   games: GameItem[];
   youtube: YouTubeRecData | null;
   meta: MetaData | null;
+  /** The Travel card's stops, checked by parseStops (src/utils/travel.ts); edited by hand, so not a widget. */
+  travel: TravelStop[];
   profile: ProfileData | null;
   /** When the server rendered this payload (ISO). */
   renderedAt: string;

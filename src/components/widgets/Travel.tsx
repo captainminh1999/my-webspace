@@ -1,8 +1,10 @@
 import type { TravelStop } from "@/types/travel";
 import { GRID } from "@/lib/worldMap";
-import { CONTINENT_NAMES, HOME, countryOf, distanceKm, formatKm, landPaths, newestFirst, places, project, route, summarize } from "@/utils/travel";
+import { CONTINENT_NAMES, HOME, countryOf, distanceKm, formatKm, landPaths, newestFirst, places, project, route, summarize, when } from "@/utils/travel";
 
 const NO_ITEMS = <p className="font-mono text-dense text-ink-3">No items</p>;
+
+const count = (n: number, one: string, many: string) => `${n} ${n === 1 ? one : many}`;
 
 // One grid unit is one dot. Round caps on zero-length dashes draw the dots (see landPaths).
 const DOTS = { fill: "none", strokeWidth: 0.62, strokeLinecap: "round", strokeDasharray: "0 1", strokeDashoffset: -0.5 } as const;
@@ -46,7 +48,7 @@ function WorldMap({ stops }: { stops: TravelStop[] }) {
         const latest = s.year === newest;
         return (
           <circle key={`${s.city}|${s.country}`} cx={p.x} cy={p.y} r={0.9} fill={latest ? "var(--accent)" : "var(--surface)"} stroke={latest ? "var(--surface)" : "var(--ink)"} strokeWidth={0.32}>
-            <title>{`${s.city}, ${countryOf(s.country).name} · ${s.year} · ${formatKm(distanceKm(HOME, s))} km from Sydney`}</title>
+            <title>{`${s.city}, ${countryOf(s.country).name} · ${when(s)} · ${formatKm(distanceKm(HOME, s))} km from Sydney`}</title>
           </circle>
         );
       })}
@@ -76,7 +78,7 @@ function Legend() {
   );
 }
 
-/** The departures board: city, country, year, distance from Sydney, newest first. */
+/** The departures board: city, country, month and year, distance from Sydney, newest first. */
 function Board({ stops, caption, names = false }: { stops: TravelStop[]; caption: string; names?: boolean }) {
   return (
     <table className="w-full font-mono text-dense">
@@ -94,7 +96,7 @@ function Board({ stops, caption, names = false }: { stops: TravelStop[]; caption
               "Ctry"
             )}
           </th>
-          <th scope="col" className="font-normal pb-1.5 pl-3">Year</th>
+          <th scope="col" className="font-normal pb-1.5 pl-3">When</th>
           <th scope="col" className="font-normal pb-1.5 pl-3 text-right whitespace-nowrap">From SYD</th>
         </tr>
       </thead>
@@ -102,9 +104,10 @@ function Board({ stops, caption, names = false }: { stops: TravelStop[]; caption
         {stops.map((s, i) => {
           const { name } = countryOf(s.country);
           return (
-            <tr key={`${s.city}|${s.country}|${s.year}|${i}`} className="border-b border-rule last:border-b-0">
-              {/* The city takes the slack and wraps rather than hiding a long name; the other columns size to their content. */}
-              <td className="h-8 py-1 w-full break-words uppercase text-ink">{s.city}</td>
+            <tr key={`${s.city}|${s.country}|${when(s)}|${i}`} className="border-b border-rule last:border-b-0">
+              {/* The city takes the slack and wraps rather than hiding a long name; the other columns size to their content.
+                  wrap-anywhere, not break-words: only it lowers the cell's min-content, so one long word cannot push the table wide. */}
+              <td className="h-8 py-1 w-full wrap-anywhere uppercase text-ink">{s.city}</td>
               <td className="pl-3 text-ink-2 whitespace-nowrap">
                 {names ? (
                   <>
@@ -115,7 +118,7 @@ function Board({ stops, caption, names = false }: { stops: TravelStop[]; caption
                   <span title={name}>{s.country.toUpperCase()}</span>
                 )}
               </td>
-              <td className="pl-3 text-ink-2">{s.year}</td>
+              <td className="pl-3 text-ink-2 whitespace-nowrap">{when(s)}</td>
               <td className="pl-3 text-right text-ink-2 whitespace-nowrap">{formatKm(distanceKm(HOME, s))} KM</td>
             </tr>
           );
@@ -137,10 +140,10 @@ export function TravelCard({ stops }: { stops: TravelStop[] }) {
       <div className="lg:col-start-8 lg:col-span-5">
         <p className="flex items-baseline gap-3">
           <span className="font-display font-medium text-ink text-dateline">{sum.countries.length}</span>
-          <span className="text-item text-ink-2">countries</span>
+          <span className="text-item text-ink-2">{sum.countries.length === 1 ? "country" : "countries"}</span>
         </p>
         <p className="mt-2 font-mono text-source text-ink-3 uppercase">
-          {sum.cities} cities · {sum.continents.length} continents · since {sum.since}
+          {count(sum.cities, "city", "cities")} · {count(sum.continents.length, "continent", "continents")} · since {sum.since}
         </p>
       </div>
       <figure className="lg:col-start-1 lg:col-span-7 lg:row-start-1 lg:row-span-2 flex flex-col justify-center">
@@ -148,7 +151,7 @@ export function TravelCard({ stops }: { stops: TravelStop[] }) {
         <Legend />
       </figure>
       <div className="lg:col-start-8 lg:col-span-5 lg:row-start-2">
-        <Board stops={newestFirst(stops).slice(0, 5)} caption="The five latest stops" />
+        <Board stops={newestFirst(stops).slice(0, 5)} caption={stops.length === 1 ? "The latest stop" : `The ${Math.min(5, stops.length)} latest stops`} />
       </div>
     </div>
   );
@@ -224,7 +227,7 @@ export function TravelFull({ stops }: { stops: TravelStop[] }) {
       <Board stops={newestFirst(stops)} caption="Every stop, newest first" names />
 
       <p className="font-mono text-source text-ink-3 mt-6">
-        Sample data for the mock-up · map: Natural Earth 1:50m on a 2° grid · distances are great-circle from Sydney
+        From flight and stay bookings · map: Natural Earth 1:50m on a 2° grid · distances are great-circle from Sydney
       </p>
     </div>
   );

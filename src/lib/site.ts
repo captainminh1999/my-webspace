@@ -60,8 +60,11 @@ export const ROOT_OPEN_GRAPH = { ...OPEN_GRAPH, url: "/" } as const;
  * Title, description, canonical URL and og:url for one page. Metadata merges shallowly:
  * a page that inherited the layout's `alternates` or `openGraph` would claim `/` as its
  * canonical URL and og:url, and a page that sets `openGraph` replaces the layout's whole
- * object, og:image included — so the image (app/opengraph-image.tsx, with its
- * cache-busting query) is carried over from the parent's resolved metadata.
+ * object, og:image included — so the image (app/opengraph-image.tsx) is carried over
+ * from the parent's resolved metadata, with the query Next adds to its URL. That query
+ * is a hash of opengraph-image.tsx alone: it changes when that file does, not when what
+ * it imports from here (OWNER_NAME, COLORS) does — touch the file too, or crawlers keep
+ * the old card.
  */
 export async function pageMetadata(
   parent: ResolvingMetadata,

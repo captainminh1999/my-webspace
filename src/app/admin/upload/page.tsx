@@ -17,11 +17,15 @@ import UploadPortal from './UploadPortal.client';
 export const dynamic = "force-dynamic";
 
 // The root layout's title template adds the owner's name ("Upload portal — <Name>"),
-// so the page names only itself, and needs no profile read of its own.
+// so the page names only itself, and needs no profile read of its own. The layout's
+// canonical URL and Open Graph block are `/`'s: unset here, the page would claim to be
+// a copy of the home page (see pageMetadata in src/lib/site.ts).
 export const metadata: Metadata = {
   robots: { index: false, follow: false },
   title: "Upload portal",
   description: "Admin portal for uploading CV data sections.",
+  alternates: null,
+  openGraph: null,
 };
 
 // This is the main component for the /admin/upload route

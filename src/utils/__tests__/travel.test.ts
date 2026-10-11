@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { HOME, countryOf, distanceKm, formatKm, landPaths, newestFirst, places, project, route, summarize } from '../travel.ts';
+import { HOME, countryOf, distanceKm, formatKm, landPaths, newestFirst, parseStops, places, project, route, summarize, when } from '../travel.ts';
 import { GRID, RUNS } from '../../lib/worldMap.ts';
 import type { TravelStop } from '../../types/travel.ts';
 
@@ -73,10 +73,14 @@ test('the projection puts the grid corners at the viewBox corners', () => {
 
 test('every run of land is drawn exactly once, lit only when its country was visited', () => {
   const { lit, rest } = landPaths(['jp', 'SG']);
-  const count = (d: string) => (d.match(/M/g) ?? []).length;
-  assert.equal(count(lit) + count(rest), RUNS.length);
-  assert.equal(count(lit), RUNS.filter((r) => r[3] === 'JP' || r[3] === 'SG').length);
-  assert.ok(count(lit) > 0);
+  // Every dot a path draws, as "col,row" cells: touching runs are merged, so compare dots, not subpaths.
+  const dots = (d: string) => [...d.matchAll(/M(\d+) ([\d.]+)h(\d+)/g)].flatMap(([, c, r, n]) => Array.from({ length: +n }, (_, i) => `${+c + i},${+r - 0.5}`)).sort();
+  const want = (keep: (code: string | null) => boolean) => RUNS.filter((r) => keep(r[3])).flatMap(([row, col, len]) => Array.from({ length: len }, (_, i) => `${col + i},${row}`)).sort();
+  const visited = (code: string | null) => code === 'JP' || code === 'SG';
+  assert.deepEqual(dots(lit), want(visited));
+  assert.deepEqual(dots(rest), want((code) => !visited(code)));
+  assert.ok(dots(lit).length > 0);
+  assert.ok((rest.match(/M/g) ?? []).length < RUNS.length, 'touching runs are merged');
   assert.equal(landPaths([]).lit, '');
 });
 
@@ -106,4 +110,37 @@ test('every country Natural Earth draws has at least one dot, and overseas terri
   for (const c of ['IL', 'PS', 'MK', 'AL', 'JE', 'GG', 'LC', 'VC', 'SG', 'HK', 'MT', 'GF', 'RE', 'BQ', 'TK', 'SJ']) assert.ok(codes.has(c), c);
   // France's own dots are all in Europe: none west of 30°W
   assert.deepEqual(RUNS.filter((r) => r[3] === 'FR' && r[1] < (-30 - GRID.west) / GRID.step), []);
+});
+
+test('within a year the later month comes first; a stop with no month comes last; ties keep their order', () => {
+  const osaka = { ...TOKYO_26, city: 'Osaka', month: 10 };
+  const kyoto = { ...TOKYO_26, city: 'Kyoto', month: 10 };
+  const hanoiMar = { ...TOKYO_26, city: 'Hanoi', country: 'VN', month: 3 };
+  assert.deepEqual(newestFirst([hanoiMar, HOBART, osaka, kyoto, TOKYO_19]).map((x) => x.city), ['Osaka', 'Kyoto', 'Hanoi', 'Hobart', 'Tokyo']);
+});
+
+test('a stop reads as month and year when the month is known', () => {
+  assert.equal(when({ year: 2026, month: 10 }), 'OCT 2026');
+  assert.equal(when({ year: 2017, month: 1 }), 'JAN 2017');
+  assert.equal(when({ year: 2019 }), '2019');
+});
+
+test('stored stops are checked at the door: bad ones are dropped, good ones normalised', () => {
+  const good = { city: ' Hanoi ', country: 'vn', year: 2025, month: 11, lat: 21.0285, lon: 105.8542, _id: 'x', basis: 'not shown' };
+  assert.deepEqual(parseStops([good]), [{ city: 'Hanoi', country: 'VN', year: 2025, month: 11, lat: 21.0285, lon: 105.8542 }]);
+  assert.deepEqual(parseStops([{ ...good, month: undefined }])[0], { city: 'Hanoi', country: 'VN', year: 2025, lat: 21.0285, lon: 105.8542 });
+  for (const bad of [
+    { ...good, city: '' },
+    { ...good, country: 'UK' }, // not ISO alpha-2: the map would not know it
+    { ...good, year: 25 },
+    { ...good, year: 2025.5 },
+    { ...good, month: 13 },
+    { ...good, month: 0 },
+    { ...good, lat: 91 },
+    { ...good, lon: '105' },
+    null,
+    'Hanoi',
+  ]) assert.deepEqual(parseStops([bad]), [], JSON.stringify(bad));
+  assert.deepEqual(parseStops(undefined), []);
+  assert.deepEqual(parseStops({ city: 'Hanoi' }), []);
 });

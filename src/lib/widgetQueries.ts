@@ -50,20 +50,24 @@ export async function fetchMeta(db: Db) {
   return stripId(await single(db, "meta"));
 }
 
+/** The Travel card's stops: edited by hand, not written by a feed, so not a widget (no fetch time, no freshness). */
+const TRAVEL = "travel";
+export const fetchTravel = (db: Db) => list(db, TRAVEL);
+
 /**
- * Every widget and the meta singleton in ONE command — what the Daily Dash renders (the profile
- * comes from src/lib/cv.ts getProfile). Read as 12 separate finds they went out at once (13 with the profile),
- * and on a cold connection pool each extra command waits for a connection of its own: TCP, TLS
- * and SCRAM to the cluster in Sydney, about four round trips from the function in us-east-1.
+ * Every widget, the meta singleton and the travel stops in ONE command — what the Daily Dash renders
+ * (the profile comes from src/lib/cv.ts getProfile). Read as 13 separate finds they went out at once,
+ * and on a cold connection pool each extra command waits for a connection of its own: TCP, TLS and
+ * SCRAM to the cluster, several round trips each.
  * Same shapes as fetchWidget: a missing singleton is null, a list keeps the order it was written in.
  */
-export async function fetchHome(db: Db): Promise<{ widgets: Record<WidgetId, unknown>; meta: Document | null }> {
+export async function fetchHome(db: Db): Promise<{ widgets: Record<WidgetId, unknown>; meta: Document | null; travel: unknown[] }> {
   const sources = Object.values(SOURCES);
   const singles = [
     "meta",
     ...sources.flatMap((s) => ("one" in s ? [s.one] : "parts" in s ? Object.values(s.parts) : [])),
   ];
-  const lists = sources.flatMap((s) => ("list" in s ? [s.list] : []));
+  const lists = [...sources.flatMap((s) => ("list" in s ? [s.list] : [])), TRAVEL];
   // Each document travels wrapped with the collection it came from, so no field of its own is touched.
   const rows = await db
     .collection("singletons")
@@ -88,5 +92,5 @@ export async function fetchHome(db: Db): Promise<{ widgets: Record<WidgetId, unk
           ? one(s.one)
           : Object.fromEntries(Object.entries(s.parts).map(([k, singleton]) => [k, one(singleton)]));
   }
-  return { widgets, meta: one("meta") };
+  return { widgets, meta: one("meta"), travel: rows.filter((r) => r.from === TRAVEL).map((r) => stripId(r.doc)) };
 }

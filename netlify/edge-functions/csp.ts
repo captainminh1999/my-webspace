@@ -64,8 +64,8 @@ export const config: Config = {
   // the route handlers — most of the site's requests, and the passkey endpoints'
   // JSON and Set-Cookie have no business passing through here. The price: an unknown
   // URL under one of them (/api/nope) answers Next's 404 document with the baseline
-  // policy only. (favicon.ico and the files in public/ do come through, and are let
-  // go by the content-type test above.)
+  // policy only. (favicon.ico, /icon.svg, /robots.txt and the other metadata routes
+  // do come through, and are let go by the content-type test above.)
   excludedPath: ["/_next/*", "/.netlify/*", "/api/*"],
   // No `method`: every method that can come back as a page gets the policy.
   // Next's client router asks for pages as flight data (RSC: 1) on every

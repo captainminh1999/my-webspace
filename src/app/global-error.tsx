@@ -28,7 +28,7 @@ export default function GlobalError({ error, retry }: { error: Error & { digest?
       <body className="font-sans bg-bg text-ink">
         {/* No metadata export in an error boundary; React hoists this into <head>. */}
         <title>Error — Minh Nguyen</title>
-        <ErrorFrame kicker="ERROR" head="SITE ERROR" reference={error.digest} title="The site failed to load." onRetry={retry} hardLinks>
+        <ErrorFrame kicker="ERROR" head="SITE ERROR" reference={error.digest} title="The site failed to load." onRetry={retry}>
           <p>
             The frame every page is drawn in threw an error, so there is nothing to show. Trying again asks for a fresh copy; if
             that fails too, try again in a few minutes.

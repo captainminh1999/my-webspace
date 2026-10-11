@@ -1,6 +1,6 @@
 import type { Handler } from "@netlify/functions";
 import { connectToDatabase } from "../../src/lib/mongodb";
-import { ALLOWED_WIDGETS, fetchWidget, fetchMeta } from "../../src/lib/widgetQueries";
+import { ALLOWED_WIDGETS, fetchWidget, fetchMeta, fetchTravel } from "../../src/lib/widgetQueries";
 
 const handler: Handler = async (event) => {
   if (event.httpMethod !== "GET") {
@@ -15,14 +15,16 @@ const handler: Handler = async (event) => {
     const client = await connectToDatabase();
     const db = client.db(process.env.MONGODB_DB || "cv");
     const result: Record<string, any> = {};
-    const [docs, meta] = await Promise.all([
+    const [docs, meta, travel] = await Promise.all([
       Promise.all(ALLOWED_WIDGETS.map((widget) => fetchWidget(db, widget))),
       fetchMeta(db),
+      fetchTravel(db),
     ]);
     ALLOWED_WIDGETS.forEach((widget, i) => {
       if (docs[i] !== null) result[widget] = docs[i];
     });
     if (meta) result.meta = meta;
+    result.travel = travel;
     return {
       statusCode: 200,
       body: JSON.stringify(result),

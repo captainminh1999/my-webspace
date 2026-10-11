@@ -4,8 +4,8 @@
 // feeds, no clock — so it renders through a database outage, in the prerendered
 // /_not-found, and in global-error, where the root layout is gone. Not a client
 // component itself: error.tsx pulls it into the browser bundle, not-found.tsx
-// renders it on the server.
-import Link from "next/link";
+// renders it on the server. The links are plain <a>: a full page load, so leaving
+// an error does not carry the client state that failed along with it.
 import type { ReactNode } from "react";
 
 const DESTINATIONS = [
@@ -27,11 +27,9 @@ interface Props {
   children: ReactNode;
   /** Error boundaries only: a "Try again" button that calls this. */
   onRetry?: () => void;
-  /** Plain <a> links (a full page load) for global-error, where the shared layout is what failed. */
-  hardLinks?: boolean;
 }
 
-export default function ErrorFrame({ kicker, folio, head, reference, title, children, onRetry, hardLinks = false }: Props) {
+export default function ErrorFrame({ kicker, folio, head, reference, title, children, onRetry }: Props) {
   return (
     <>
       <header className="border-b border-rule-strong">
@@ -72,10 +70,9 @@ export default function ErrorFrame({ kicker, folio, head, reference, title, chil
             )}
             <nav aria-label="Pages to go to instead" className="mt-10">
               <ul className="border-t border-rule">
-                {DESTINATIONS.map((d) => {
-                  const cls = "group grid grid-cols-[1.5rem_minmax(0,1fr)_auto] items-baseline gap-x-4 py-4 focus-visible:-outline-offset-2";
-                  const body = (
-                    <>
+                {DESTINATIONS.map((d) => (
+                  <li key={d.href} className="border-b border-rule">
+                    <a href={d.href} className="group grid grid-cols-[1.5rem_minmax(0,1fr)_auto] items-baseline gap-x-4 py-4 focus-visible:-outline-offset-2">
                       {/* The folio is ledger furniture; the link is named by its title and note. */}
                       <span aria-hidden className="stamp text-ink-3">
                         {d.folio}
@@ -89,22 +86,9 @@ export default function ErrorFrame({ kicker, folio, head, reference, title, chil
                       <span aria-hidden className="stamp text-ink-3 group-hover:text-accent transition-colors duration-120">
                         →
                       </span>
-                    </>
-                  );
-                  return (
-                    <li key={d.href} className="border-b border-rule">
-                      {hardLinks ? (
-                        <a href={d.href} className={cls}>
-                          {body}
-                        </a>
-                      ) : (
-                        <Link href={d.href} className={cls}>
-                          {body}
-                        </Link>
-                      )}
-                    </li>
-                  );
-                })}
+                    </a>
+                  </li>
+                ))}
               </ul>
             </nav>
           </div>
