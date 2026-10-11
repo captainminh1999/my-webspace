@@ -1,19 +1,26 @@
 // src/app/about-me/page.tsx — the CV as a long-form profile: a sticky index
 // rail and a 720px reading column; structure from rules and type, not cards.
-import type { Metadata } from "next";
-import { getFullCv } from "@/lib/cv";
-import { CvFrame, ProfileHeader, Rail, Section, SECTIONS, fullName } from "@/components/cv/CvShell";
+import type { Metadata, ResolvingMetadata } from "next";
+import { getFullCv, getProfile } from "@/lib/cv";
+import { pageMetadata, ownerName } from "@/lib/site";
+import { CvFrame, ProfileHeader, Rail, Section, SECTIONS } from "@/components/cv/CvShell";
 import { About, AllLink, Education, Experience, Honors, Languages, Licences, Projects, Recommendations, Skills, Volunteering } from "@/components/cv/Sections";
 
 export const revalidate = 60;
 
-export async function generateMetadata(): Promise<Metadata> {
-  const cv = await getFullCv();
-  const name = fullName(cv.profile);
-  return {
-    title: `${name} — CV`,
-    description: cv.profile?.headline ? `${name}, ${cv.profile.headline}.` : `${name}'s curriculum vitae.`,
-  };
+// The profile, not the whole CV: getProfile() is the read the root layout's metadata
+// already made (React cache()), so this costs nothing, where getFullCv() here read all
+// eleven sections a second time per render from MongoDB (fetch would have been
+// deduplicated; a driver call is not). The layout's template adds the name.
+export async function generateMetadata(_props: unknown, parent: ResolvingMetadata): Promise<Metadata> {
+  const profile = await getProfile().catch(() => null);
+  const name = ownerName(profile);
+  const who = profile?.headline ? `${name}, ${profile.headline}` : name;
+  return pageMetadata(parent, {
+    path: "/about-me",
+    title: "CV",
+    description: `CV of ${who}: experience, education, certifications, projects, volunteering, skills, languages and recommendations.`,
+  });
 }
 
 const PREVIEW = 3;

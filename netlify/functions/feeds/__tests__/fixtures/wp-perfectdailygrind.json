@@ -1,0 +1,563 @@
+[
+  {
+    "date_gmt": "2026-10-10T11:15:00",
+    "link": "https://perfectdailygrind.com/2026/10/coffee-news-recap-9-october-2026/",
+    "title": {
+      "rendered": "Coffee News Recap, 9 Oct: Green coffee futures climb again &amp; other stories"
+    },
+    "_links": {
+      "self": [
+        {
+          "href": "https://perfectdailygrind.com/wp-json/wp/v2/posts/117402",
+          "targetHints": {
+            "allow": [
+              "GET"
+            ]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "https://perfectdailygrind.com/wp-json/wp/v2/posts"
+        }
+      ],
+      "about": [
+        {
+          "href": "https://perfectdailygrind.com/wp-json/wp/v2/types/post"
+        }
+      ],
+      "author": [
+        {
+          "embeddable": true,
+          "href": "https://perfectdailygrind.com/wp-json/wp/v2/users/7"
+        }
+      ],
+      "replies": [
+        {
+          "embeddable": true,
+          "href": "https://perfectdailygrind.com/wp-json/wp/v2/comments?post=117402"
+        }
+      ],
+      "version-history": [
+        {
+          "count": 3,
+          "href": "https://perfectdailygrind.com/wp-json/wp/v2/posts/117402/revisions"
+        }
+      ],
+      "predecessor-version": [
+        {
+          "id": 117411,
+          "href": "https://perfectdailygrind.com/wp-json/wp/v2/posts/117402/revisions/117411"
+        }
+      ],
+      "wp:featuredmedia": [
+        {
+          "embeddable": true,
+          "href": "https://perfectdailygrind.com/wp-json/wp/v2/media/117405"
+        }
+      ],
+      "wp:attachment": [
+        {
+          "href": "https://perfectdailygrind.com/wp-json/wp/v2/media?parent=117402"
+        }
+      ],
+      "wp:term": [
+        {
+          "taxonomy": "category",
+          "embeddable": true,
+          "href": "https://perfectdailygrind.com/wp-json/wp/v2/categories?post=117402"
+        },
+        {
+          "taxonomy": "post_tag",
+          "embeddable": true,
+          "href": "https://perfectdailygrind.com/wp-json/wp/v2/tags?post=117402"
+        }
+      ],
+      "curies": [
+        {
+          "name": "wp",
+          "href": "https://api.w.org/{rel}",
+          "templated": true
+        }
+      ]
+    },
+    "_embedded": {
+      "wp:featuredmedia": [
+        {
+          "id": 117405,
+          "date": "2026-10-10T11:15:00",
+          "slug": "recap-header",
+          "type": "attachment",
+          "link": "https://perfectdailygrind.com/2026/10/coffee-news-recap-9-october-2026/recap-header/",
+          "title": {
+            "rendered": "recap-header"
+          },
+          "author": 7,
+          "featured_media": 0,
+          "caption": {
+            "rendered": ""
+          },
+          "alt_text": "",
+          "media_type": "image",
+          "mime_type": "image/webp",
+          "media_details": {
+            "width": 1200,
+            "height": 417,
+            "file": "2026/10/recap-header.webp",
+            "filesize": 100080,
+            "sizes": {
+              "thumbnail": {
+                "file": "recap-header-150x52.webp",
+                "width": 150,
+                "height": 52,
+                "filesize": 867,
+                "mime_type": "image/webp",
+                "source_url": "https://perfectdailygrind.com/wp-content/uploads/2026/10/recap-header-150x52.webp"
+              },
+              "thumblist": {
+                "file": "recap-header-300x300.webp",
+                "width": 300,
+                "height": 300,
+                "filesize": 10000,
+                "mime_type": "image/webp",
+                "source_url": "https://perfectdailygrind.com/wp-content/uploads/2026/10/recap-header-300x300.webp"
+              },
+              "medium": {
+                "file": "recap-header-300x104.webp",
+                "width": 300,
+                "height": 104,
+                "filesize": 3467,
+                "mime_type": "image/webp",
+                "source_url": "https://perfectdailygrind.com/wp-content/uploads/2026/10/recap-header-300x104.webp"
+              },
+              "full": {
+                "file": "recap-header.webp",
+                "width": 1200,
+                "height": 417,
+                "mime_type": "image/webp",
+                "source_url": "https://perfectdailygrind.com/wp-content/uploads/2026/10/recap-header.webp"
+              }
+            },
+            "image_meta": {
+              "aperture": "0",
+              "credit": "",
+              "camera": "",
+              "caption": "",
+              "created_timestamp": "0",
+              "copyright": "",
+              "focal_length": "0",
+              "iso": "0",
+              "shutter_speed": "0",
+              "title": "",
+              "orientation": "0",
+              "keywords": []
+            }
+          },
+          "source_url": "https://perfectdailygrind.com/wp-content/uploads/2026/10/recap-header.webp",
+          "_links": {
+            "self": [
+              {
+                "href": "https://perfectdailygrind.com/wp-json/wp/v2/media/117405",
+                "targetHints": {
+                  "allow": [
+                    "GET"
+                  ]
+                }
+              }
+            ],
+            "collection": [
+              {
+                "href": "https://perfectdailygrind.com/wp-json/wp/v2/media"
+              }
+            ],
+            "about": [
+              {
+                "href": "https://perfectdailygrind.com/wp-json/wp/v2/types/attachment"
+              }
+            ],
+            "author": [
+              {
+                "embeddable": true,
+                "href": "https://perfectdailygrind.com/wp-json/wp/v2/users/7"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  },
+  {
+    "date_gmt": "2026-10-10T08:00:00",
+    "link": "https://perfectdailygrind.com/2026/10/how-are-roasters-responding-to-rising-green-coffee-prices/",
+    "title": {
+      "rendered": "How are roasters responding to rising green coffee prices?"
+    },
+    "_links": {
+      "self": [
+        {
+          "href": "https://perfectdailygrind.com/wp-json/wp/v2/posts/117380",
+          "targetHints": {
+            "allow": [
+              "GET"
+            ]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "https://perfectdailygrind.com/wp-json/wp/v2/posts"
+        }
+      ],
+      "about": [
+        {
+          "href": "https://perfectdailygrind.com/wp-json/wp/v2/types/post"
+        }
+      ],
+      "author": [
+        {
+          "embeddable": true,
+          "href": "https://perfectdailygrind.com/wp-json/wp/v2/users/7"
+        }
+      ],
+      "replies": [
+        {
+          "embeddable": true,
+          "href": "https://perfectdailygrind.com/wp-json/wp/v2/comments?post=117380"
+        }
+      ],
+      "version-history": [
+        {
+          "count": 3,
+          "href": "https://perfectdailygrind.com/wp-json/wp/v2/posts/117380/revisions"
+        }
+      ],
+      "predecessor-version": [
+        {
+          "id": 117389,
+          "href": "https://perfectdailygrind.com/wp-json/wp/v2/posts/117380/revisions/117389"
+        }
+      ],
+      "wp:featuredmedia": [
+        {
+          "embeddable": true,
+          "href": "https://perfectdailygrind.com/wp-json/wp/v2/media/117383"
+        }
+      ],
+      "wp:attachment": [
+        {
+          "href": "https://perfectdailygrind.com/wp-json/wp/v2/media?parent=117380"
+        }
+      ],
+      "wp:term": [
+        {
+          "taxonomy": "category",
+          "embeddable": true,
+          "href": "https://perfectdailygrind.com/wp-json/wp/v2/categories?post=117380"
+        },
+        {
+          "taxonomy": "post_tag",
+          "embeddable": true,
+          "href": "https://perfectdailygrind.com/wp-json/wp/v2/tags?post=117380"
+        }
+      ],
+      "curies": [
+        {
+          "name": "wp",
+          "href": "https://api.w.org/{rel}",
+          "templated": true
+        }
+      ]
+    },
+    "_embedded": {
+      "wp:featuredmedia": [
+        {
+          "id": 117383,
+          "date": "2026-10-10T08:00:00",
+          "slug": "green-coffee-prices",
+          "type": "attachment",
+          "link": "https://perfectdailygrind.com/2026/10/how-are-roasters-responding-to-rising-green-coffee-prices/green-coffee-prices/",
+          "title": {
+            "rendered": "green-coffee-prices"
+          },
+          "author": 7,
+          "featured_media": 0,
+          "caption": {
+            "rendered": ""
+          },
+          "alt_text": "",
+          "media_type": "image",
+          "mime_type": "image/webp",
+          "media_details": {
+            "width": 1200,
+            "height": 417,
+            "file": "2026/10/green-coffee-prices.webp",
+            "filesize": 100080,
+            "sizes": {
+              "thumbnail": {
+                "file": "green-coffee-prices-150x52.webp",
+                "width": 150,
+                "height": 52,
+                "filesize": 867,
+                "mime_type": "image/webp",
+                "source_url": "https://perfectdailygrind.com/wp-content/uploads/2026/10/green-coffee-prices-150x52.webp"
+              },
+              "thumblist": {
+                "file": "green-coffee-prices-300x300.webp",
+                "width": 300,
+                "height": 300,
+                "filesize": 10000,
+                "mime_type": "image/webp",
+                "source_url": "https://perfectdailygrind.com/wp-content/uploads/2026/10/green-coffee-prices-300x300.webp"
+              },
+              "medium": {
+                "file": "green-coffee-prices-300x104.webp",
+                "width": 300,
+                "height": 104,
+                "filesize": 3467,
+                "mime_type": "image/webp",
+                "source_url": "https://perfectdailygrind.com/wp-content/uploads/2026/10/green-coffee-prices-300x104.webp"
+              },
+              "full": {
+                "file": "green-coffee-prices.webp",
+                "width": 1200,
+                "height": 417,
+                "mime_type": "image/webp",
+                "source_url": "https://perfectdailygrind.com/wp-content/uploads/2026/10/green-coffee-prices.webp"
+              }
+            },
+            "image_meta": {
+              "aperture": "0",
+              "credit": "",
+              "camera": "",
+              "caption": "",
+              "created_timestamp": "0",
+              "copyright": "",
+              "focal_length": "0",
+              "iso": "0",
+              "shutter_speed": "0",
+              "title": "",
+              "orientation": "0",
+              "keywords": []
+            }
+          },
+          "source_url": "https://perfectdailygrind.com/wp-content/uploads/2026/10/green-coffee-prices.webp",
+          "_links": {
+            "self": [
+              {
+                "href": "https://perfectdailygrind.com/wp-json/wp/v2/media/117383",
+                "targetHints": {
+                  "allow": [
+                    "GET"
+                  ]
+                }
+              }
+            ],
+            "collection": [
+              {
+                "href": "https://perfectdailygrind.com/wp-json/wp/v2/media"
+              }
+            ],
+            "about": [
+              {
+                "href": "https://perfectdailygrind.com/wp-json/wp/v2/types/attachment"
+              }
+            ],
+            "author": [
+              {
+                "embeddable": true,
+                "href": "https://perfectdailygrind.com/wp-json/wp/v2/users/7"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  },
+  {
+    "date_gmt": "2026-10-06T10:00:00",
+    "link": "https://perfectdailygrind.com/2026/10/exploring-anaerobic-processing-in-colombia/",
+    "title": {
+      "rendered": "Exploring anaerobic processing in Colombia"
+    },
+    "_links": {
+      "self": [
+        {
+          "href": "https://perfectdailygrind.com/wp-json/wp/v2/posts/117311",
+          "targetHints": {
+            "allow": [
+              "GET"
+            ]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "https://perfectdailygrind.com/wp-json/wp/v2/posts"
+        }
+      ],
+      "about": [
+        {
+          "href": "https://perfectdailygrind.com/wp-json/wp/v2/types/post"
+        }
+      ],
+      "author": [
+        {
+          "embeddable": true,
+          "href": "https://perfectdailygrind.com/wp-json/wp/v2/users/7"
+        }
+      ],
+      "replies": [
+        {
+          "embeddable": true,
+          "href": "https://perfectdailygrind.com/wp-json/wp/v2/comments?post=117311"
+        }
+      ],
+      "version-history": [
+        {
+          "count": 3,
+          "href": "https://perfectdailygrind.com/wp-json/wp/v2/posts/117311/revisions"
+        }
+      ],
+      "predecessor-version": [
+        {
+          "id": 117320,
+          "href": "https://perfectdailygrind.com/wp-json/wp/v2/posts/117311/revisions/117320"
+        }
+      ],
+      "wp:featuredmedia": [
+        {
+          "embeddable": true,
+          "href": "https://perfectdailygrind.com/wp-json/wp/v2/media/117314"
+        }
+      ],
+      "wp:attachment": [
+        {
+          "href": "https://perfectdailygrind.com/wp-json/wp/v2/media?parent=117311"
+        }
+      ],
+      "wp:term": [
+        {
+          "taxonomy": "category",
+          "embeddable": true,
+          "href": "https://perfectdailygrind.com/wp-json/wp/v2/categories?post=117311"
+        },
+        {
+          "taxonomy": "post_tag",
+          "embeddable": true,
+          "href": "https://perfectdailygrind.com/wp-json/wp/v2/tags?post=117311"
+        }
+      ],
+      "curies": [
+        {
+          "name": "wp",
+          "href": "https://api.w.org/{rel}",
+          "templated": true
+        }
+      ]
+    },
+    "_embedded": {
+      "wp:featuredmedia": [
+        {
+          "id": 117314,
+          "date": "2026-10-06T10:00:00",
+          "slug": "anaerobic-tanks",
+          "type": "attachment",
+          "link": "https://perfectdailygrind.com/2026/10/exploring-anaerobic-processing-in-colombia/anaerobic-tanks/",
+          "title": {
+            "rendered": "anaerobic-tanks"
+          },
+          "author": 7,
+          "featured_media": 0,
+          "caption": {
+            "rendered": ""
+          },
+          "alt_text": "",
+          "media_type": "image",
+          "mime_type": "image/webp",
+          "media_details": {
+            "width": 1200,
+            "height": 417,
+            "file": "2026/10/anaerobic-tanks.webp",
+            "filesize": 100080,
+            "sizes": {
+              "thumbnail": {
+                "file": "anaerobic-tanks-150x52.webp",
+                "width": 150,
+                "height": 52,
+                "filesize": 867,
+                "mime_type": "image/webp",
+                "source_url": "https://perfectdailygrind.com/wp-content/uploads/2026/10/anaerobic-tanks-150x52.webp"
+              },
+              "thumblist": {
+                "file": "anaerobic-tanks-300x300.webp",
+                "width": 300,
+                "height": 300,
+                "filesize": 10000,
+                "mime_type": "image/webp",
+                "source_url": "https://perfectdailygrind.com/wp-content/uploads/2026/10/anaerobic-tanks-300x300.webp"
+              },
+              "medium": {
+                "file": "anaerobic-tanks-300x104.webp",
+                "width": 300,
+                "height": 104,
+                "filesize": 3467,
+                "mime_type": "image/webp",
+                "source_url": "https://perfectdailygrind.com/wp-content/uploads/2026/10/anaerobic-tanks-300x104.webp"
+              },
+              "full": {
+                "file": "anaerobic-tanks.webp",
+                "width": 1200,
+                "height": 417,
+                "mime_type": "image/webp",
+                "source_url": "https://perfectdailygrind.com/wp-content/uploads/2026/10/anaerobic-tanks.webp"
+              }
+            },
+            "image_meta": {
+              "aperture": "0",
+              "credit": "",
+              "camera": "",
+              "caption": "",
+              "created_timestamp": "0",
+              "copyright": "",
+              "focal_length": "0",
+              "iso": "0",
+              "shutter_speed": "0",
+              "title": "",
+              "orientation": "0",
+              "keywords": []
+            }
+          },
+          "source_url": "https://perfectdailygrind.com/wp-content/uploads/2026/10/anaerobic-tanks.webp",
+          "_links": {
+            "self": [
+              {
+                "href": "https://perfectdailygrind.com/wp-json/wp/v2/media/117314",
+                "targetHints": {
+                  "allow": [
+                    "GET"
+                  ]
+                }
+              }
+            ],
+            "collection": [
+              {
+                "href": "https://perfectdailygrind.com/wp-json/wp/v2/media"
+              }
+            ],
+            "about": [
+              {
+                "href": "https://perfectdailygrind.com/wp-json/wp/v2/types/attachment"
+              }
+            ],
+            "author": [
+              {
+                "embeddable": true,
+                "href": "https://perfectdailygrind.com/wp-json/wp/v2/users/7"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+]

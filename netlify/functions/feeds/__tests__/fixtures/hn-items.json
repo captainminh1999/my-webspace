@@ -1,0 +1,145 @@
+{
+  "47549902": {
+    "by": "ingve",
+    "descendants": 120,
+    "id": 47549902,
+    "kids": [
+      47550001
+    ],
+    "score": 149,
+    "time": 1791614200,
+    "title": "Rust 1.99 released",
+    "type": "story",
+    "url": "https://blog.rust-lang.org/2026/10/09/Rust-1.99.0/"
+  },
+  "47553128": {
+    "by": "beyond_top_ten",
+    "descendants": 5,
+    "id": 47553128,
+    "score": 40,
+    "time": 1791625200,
+    "title": "Not in the top ten",
+    "type": "story",
+    "url": "https://example.com/eleven"
+  },
+  "47555310": {
+    "by": "pg_fan",
+    "id": 47555310,
+    "score": 1,
+    "time": 1791635200,
+    "title": "Acme Robotics (YC W26) is hiring a firmware engineer",
+    "type": "job",
+    "url": "https://www.ycombinator.com/companies/acme-robotics/jobs/firmware"
+  },
+  "47557423": {
+    "by": "dang",
+    "descendants": 42,
+    "id": 47557423,
+    "kids": [
+      47557500
+    ],
+    "score": 177,
+    "time": 1791645300,
+    "title": "Show HN: A 4 KB ray tracer that runs in a QR code",
+    "type": "story",
+    "url": "https://github.com/example/qr-raytracer"
+  },
+  "47558731": {
+    "by": "luu",
+    "descendants": 31,
+    "id": 47558731,
+    "kids": [
+      47558800
+    ],
+    "score": 120,
+    "time": 1791647900,
+    "title": "Why your p99 is lying to you (2019)",
+    "type": "story",
+    "url": "https://danluu.example/p99/"
+  },
+  "47559876": {
+    "by": "tptacek",
+    "descendants": 87,
+    "id": 47559876,
+    "kids": [
+      47560120,
+      47559990
+    ],
+    "score": 341,
+    "time": 1791650820,
+    "title": "A history of the TLS 1.3 downgrade sentinel",
+    "type": "story",
+    "url": "https://example-security-blog.dev/posts/downgrade-sentinel?ref=hn"
+  },
+  "47560002": {
+    "by": "beyond_top_ten",
+    "descendants": 2,
+    "id": 47560002,
+    "score": 33,
+    "time": 1791654200,
+    "title": "Not in the top ten either",
+    "type": "story",
+    "url": "https://example.com/twelve"
+  },
+  "47560987": {
+    "deleted": true,
+    "id": 47560987,
+    "time": 1791670000,
+    "type": "story"
+  },
+  "47561201": {
+    "by": "kmeisthax",
+    "descendants": 214,
+    "id": 47561201,
+    "kids": [
+      47561544,
+      47561390,
+      47561288
+    ],
+    "score": 612,
+    "time": 1791658320,
+    "title": "SQLite's new WAL2 mode is now the default",
+    "type": "story",
+    "url": "https://sqlite.org/wal2.html"
+  },
+  "47561555": {
+    "by": "jgrahamc",
+    "descendants": 63,
+    "id": 47561555,
+    "kids": [
+      47561700
+    ],
+    "score": 154,
+    "time": 1791659500,
+    "title": "The physics of the perfect espresso puck",
+    "type": "story",
+    "url": "https://arxiv.org/abs/2610.01234"
+  },
+  "47562044": {
+    "by": "throwaway_7781",
+    "descendants": 156,
+    "id": 47562044,
+    "kids": [
+      47562101,
+      47562087
+    ],
+    "score": 298,
+    "text": "I&#x27;ve been maintaining a mid-sized open source project for six years &amp; ...<p>How do you decide when to stop?",
+    "time": 1791661260,
+    "title": "Ask HN: How do you hand over an open-source project?",
+    "type": "story"
+  },
+  "47562310": {
+    "by": "rbanffy",
+    "descendants": 9,
+    "id": 47562310,
+    "kids": [
+      47562400
+    ],
+    "score": 58,
+    "time": 1791662200,
+    "title": "The last working UNIVAC, restored",
+    "type": "story",
+    "url": "https://computerhistory.example/univac"
+  }
+}

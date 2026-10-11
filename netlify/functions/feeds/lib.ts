@@ -1,10 +1,10 @@
 // Shared plumbing for the scheduled feed functions. Each feed is a pure
 // `fetch → trim → write` step that replaces the stored data, then writes the
 // meta.fetchedAt stamp the dashboard reads and a meta.lastRun record.
-import { refreshPages } from "./refresh";
+import { refreshPages } from "./refresh.ts";
 import type { Db, Document } from "mongodb";
-import { connectToDatabase } from "../../../src/lib/mongodb";
-import { sizeFromBytes, type PixelSize } from "../../../src/utils/imageSize";
+import { connectToDatabase } from "../../../src/lib/mongodb.ts";
+import { sizeFromBytes, type PixelSize } from "../../../src/utils/imageSize.ts";
 
 /** The switch. Unless it is "true" on Netlify, every scheduled feed is a no-op (the data simply stops updating and the stamps age). */
 export const enabled = () => process.env.FEEDS_VIA_NETLIFY === "true";

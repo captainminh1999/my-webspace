@@ -1,0 +1,795 @@
+[
+  {
+    "date_gmt": "2026-10-10T23:00:00",
+    "link": "https://www.beanscenemag.com.au/kfc-launches-barista-made-coffee-range/",
+    "title": {
+      "rendered": "KFC launches barista-made coffee range"
+    },
+    "_links": {
+      "self": [
+        {
+          "href": "https://www.beanscenemag.com.au/wp-json/wp/v2/posts/90121",
+          "targetHints": {
+            "allow": [
+              "GET"
+            ]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "https://www.beanscenemag.com.au/wp-json/wp/v2/posts"
+        }
+      ],
+      "about": [
+        {
+          "href": "https://www.beanscenemag.com.au/wp-json/wp/v2/types/post"
+        }
+      ],
+      "author": [
+        {
+          "embeddable": true,
+          "href": "https://www.beanscenemag.com.au/wp-json/wp/v2/users/7"
+        }
+      ],
+      "replies": [
+        {
+          "embeddable": true,
+          "href": "https://www.beanscenemag.com.au/wp-json/wp/v2/comments?post=90121"
+        }
+      ],
+      "version-history": [
+        {
+          "count": 3,
+          "href": "https://www.beanscenemag.com.au/wp-json/wp/v2/posts/90121/revisions"
+        }
+      ],
+      "predecessor-version": [
+        {
+          "id": 90130,
+          "href": "https://www.beanscenemag.com.au/wp-json/wp/v2/posts/90121/revisions/90130"
+        }
+      ],
+      "wp:featuredmedia": [
+        {
+          "embeddable": true,
+          "href": "https://www.beanscenemag.com.au/wp-json/wp/v2/media/90124"
+        }
+      ],
+      "wp:attachment": [
+        {
+          "href": "https://www.beanscenemag.com.au/wp-json/wp/v2/media?parent=90121"
+        }
+      ],
+      "wp:term": [
+        {
+          "taxonomy": "category",
+          "embeddable": true,
+          "href": "https://www.beanscenemag.com.au/wp-json/wp/v2/categories?post=90121"
+        },
+        {
+          "taxonomy": "post_tag",
+          "embeddable": true,
+          "href": "https://www.beanscenemag.com.au/wp-json/wp/v2/tags?post=90121"
+        }
+      ],
+      "curies": [
+        {
+          "name": "wp",
+          "href": "https://api.w.org/{rel}",
+          "templated": true
+        }
+      ]
+    },
+    "_embedded": {
+      "wp:featuredmedia": [
+        {
+          "id": 90124,
+          "date": "2026-10-10T23:00:00",
+          "slug": "kfc-coffee",
+          "type": "attachment",
+          "link": "https://www.beanscenemag.com.au/kfc-launches-barista-made-coffee-range/kfc-coffee/",
+          "title": {
+            "rendered": "kfc-coffee"
+          },
+          "author": 7,
+          "featured_media": 0,
+          "caption": {
+            "rendered": ""
+          },
+          "alt_text": "",
+          "media_type": "image",
+          "mime_type": "image/jpeg",
+          "media_details": {
+            "width": 1200,
+            "height": 800,
+            "file": "2026/10/kfc-coffee.jpg",
+            "filesize": 192000,
+            "sizes": {
+              "thumbnail": {
+                "file": "kfc-coffee-150x150.jpg",
+                "width": 150,
+                "height": 150,
+                "filesize": 2500,
+                "mime_type": "image/jpeg",
+                "source_url": "https://www.beanscenemag.com.au/wp-content/uploads/2026/10/kfc-coffee-150x150.jpg"
+              },
+              "medium": {
+                "file": "kfc-coffee-300x200.jpg",
+                "width": 300,
+                "height": 200,
+                "filesize": 6667,
+                "mime_type": "image/jpeg",
+                "source_url": "https://www.beanscenemag.com.au/wp-content/uploads/2026/10/kfc-coffee-300x200.jpg"
+              },
+              "full": {
+                "file": "kfc-coffee.jpg",
+                "width": 1200,
+                "height": 800,
+                "mime_type": "image/jpeg",
+                "source_url": "https://www.beanscenemag.com.au/wp-content/uploads/2026/10/kfc-coffee.jpg"
+              }
+            },
+            "image_meta": {
+              "aperture": "0",
+              "credit": "",
+              "camera": "",
+              "caption": "",
+              "created_timestamp": "0",
+              "copyright": "",
+              "focal_length": "0",
+              "iso": "0",
+              "shutter_speed": "0",
+              "title": "",
+              "orientation": "0",
+              "keywords": []
+            }
+          },
+          "source_url": "https://www.beanscenemag.com.au/wp-content/uploads/2026/10/kfc-coffee.jpg",
+          "_links": {
+            "self": [
+              {
+                "href": "https://www.beanscenemag.com.au/wp-json/wp/v2/media/90124",
+                "targetHints": {
+                  "allow": [
+                    "GET"
+                  ]
+                }
+              }
+            ],
+            "collection": [
+              {
+                "href": "https://www.beanscenemag.com.au/wp-json/wp/v2/media"
+              }
+            ],
+            "about": [
+              {
+                "href": "https://www.beanscenemag.com.au/wp-json/wp/v2/types/attachment"
+              }
+            ],
+            "author": [
+              {
+                "embeddable": true,
+                "href": "https://www.beanscenemag.com.au/wp-json/wp/v2/users/7"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  },
+  {
+    "date_gmt": "2026-10-10T06:00:00",
+    "link": "https://www.beanscenemag.com.au/innovation-in-focus-the-oat-milk-that-foams-like-dairy/",
+    "title": {
+      "rendered": "Innovation in focus: the oat milk that foams like dairy"
+    },
+    "_links": {
+      "self": [
+        {
+          "href": "https://www.beanscenemag.com.au/wp-json/wp/v2/posts/90118",
+          "targetHints": {
+            "allow": [
+              "GET"
+            ]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "https://www.beanscenemag.com.au/wp-json/wp/v2/posts"
+        }
+      ],
+      "about": [
+        {
+          "href": "https://www.beanscenemag.com.au/wp-json/wp/v2/types/post"
+        }
+      ],
+      "author": [
+        {
+          "embeddable": true,
+          "href": "https://www.beanscenemag.com.au/wp-json/wp/v2/users/7"
+        }
+      ],
+      "replies": [
+        {
+          "embeddable": true,
+          "href": "https://www.beanscenemag.com.au/wp-json/wp/v2/comments?post=90118"
+        }
+      ],
+      "version-history": [
+        {
+          "count": 3,
+          "href": "https://www.beanscenemag.com.au/wp-json/wp/v2/posts/90118/revisions"
+        }
+      ],
+      "predecessor-version": [
+        {
+          "id": 90127,
+          "href": "https://www.beanscenemag.com.au/wp-json/wp/v2/posts/90118/revisions/90127"
+        }
+      ],
+      "wp:featuredmedia": [
+        {
+          "embeddable": true,
+          "href": "https://www.beanscenemag.com.au/wp-json/wp/v2/media/90121"
+        }
+      ],
+      "wp:attachment": [
+        {
+          "href": "https://www.beanscenemag.com.au/wp-json/wp/v2/media?parent=90118"
+        }
+      ],
+      "wp:term": [
+        {
+          "taxonomy": "category",
+          "embeddable": true,
+          "href": "https://www.beanscenemag.com.au/wp-json/wp/v2/categories?post=90118"
+        },
+        {
+          "taxonomy": "post_tag",
+          "embeddable": true,
+          "href": "https://www.beanscenemag.com.au/wp-json/wp/v2/tags?post=90118"
+        }
+      ],
+      "curies": [
+        {
+          "name": "wp",
+          "href": "https://api.w.org/{rel}",
+          "templated": true
+        }
+      ]
+    },
+    "_embedded": {
+      "wp:featuredmedia": [
+        {
+          "id": 90121,
+          "date": "2026-10-10T06:00:00",
+          "slug": "oat-milk",
+          "type": "attachment",
+          "link": "https://www.beanscenemag.com.au/innovation-in-focus-the-oat-milk-that-foams-like-dairy/oat-milk/",
+          "title": {
+            "rendered": "oat-milk"
+          },
+          "author": 7,
+          "featured_media": 0,
+          "caption": {
+            "rendered": ""
+          },
+          "alt_text": "",
+          "media_type": "image",
+          "mime_type": "image/jpeg",
+          "media_details": {
+            "width": 1200,
+            "height": 800,
+            "file": "2026/10/oat-milk.jpg",
+            "filesize": 192000,
+            "sizes": {
+              "thumbnail": {
+                "file": "oat-milk-150x150.jpg",
+                "width": 150,
+                "height": 150,
+                "filesize": 2500,
+                "mime_type": "image/jpeg",
+                "source_url": "https://www.beanscenemag.com.au/wp-content/uploads/2026/10/oat-milk-150x150.jpg"
+              },
+              "medium": {
+                "file": "oat-milk-300x200.jpg",
+                "width": 300,
+                "height": 200,
+                "filesize": 6667,
+                "mime_type": "image/jpeg",
+                "source_url": "https://www.beanscenemag.com.au/wp-content/uploads/2026/10/oat-milk-300x200.jpg"
+              },
+              "full": {
+                "file": "oat-milk.jpg",
+                "width": 1200,
+                "height": 800,
+                "mime_type": "image/jpeg",
+                "source_url": "https://www.beanscenemag.com.au/wp-content/uploads/2026/10/oat-milk.jpg"
+              }
+            },
+            "image_meta": {
+              "aperture": "0",
+              "credit": "",
+              "camera": "",
+              "caption": "",
+              "created_timestamp": "0",
+              "copyright": "",
+              "focal_length": "0",
+              "iso": "0",
+              "shutter_speed": "0",
+              "title": "",
+              "orientation": "0",
+              "keywords": []
+            }
+          },
+          "source_url": "https://www.beanscenemag.com.au/wp-content/uploads/2026/10/oat-milk.jpg",
+          "_links": {
+            "self": [
+              {
+                "href": "https://www.beanscenemag.com.au/wp-json/wp/v2/media/90121",
+                "targetHints": {
+                  "allow": [
+                    "GET"
+                  ]
+                }
+              }
+            ],
+            "collection": [
+              {
+                "href": "https://www.beanscenemag.com.au/wp-json/wp/v2/media"
+              }
+            ],
+            "about": [
+              {
+                "href": "https://www.beanscenemag.com.au/wp-json/wp/v2/types/attachment"
+              }
+            ],
+            "author": [
+              {
+                "embeddable": true,
+                "href": "https://www.beanscenemag.com.au/wp-json/wp/v2/users/7"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  },
+  {
+    "date_gmt": "2026-10-10T01:00:00",
+    "link": "https://www.beanscenemag.com.au/retail-group-posts-record-half-year-sales/",
+    "title": {
+      "rendered": "Retail group posts record half-year sales"
+    },
+    "_links": {
+      "self": [
+        {
+          "href": "https://www.beanscenemag.com.au/wp-json/wp/v2/posts/90112",
+          "targetHints": {
+            "allow": [
+              "GET"
+            ]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "https://www.beanscenemag.com.au/wp-json/wp/v2/posts"
+        }
+      ],
+      "about": [
+        {
+          "href": "https://www.beanscenemag.com.au/wp-json/wp/v2/types/post"
+        }
+      ],
+      "author": [
+        {
+          "embeddable": true,
+          "href": "https://www.beanscenemag.com.au/wp-json/wp/v2/users/7"
+        }
+      ],
+      "replies": [
+        {
+          "embeddable": true,
+          "href": "https://www.beanscenemag.com.au/wp-json/wp/v2/comments?post=90112"
+        }
+      ],
+      "version-history": [
+        {
+          "count": 3,
+          "href": "https://www.beanscenemag.com.au/wp-json/wp/v2/posts/90112/revisions"
+        }
+      ],
+      "predecessor-version": [
+        {
+          "id": 90121,
+          "href": "https://www.beanscenemag.com.au/wp-json/wp/v2/posts/90112/revisions/90121"
+        }
+      ],
+      "wp:attachment": [
+        {
+          "href": "https://www.beanscenemag.com.au/wp-json/wp/v2/media?parent=90112"
+        }
+      ],
+      "wp:term": [
+        {
+          "taxonomy": "category",
+          "embeddable": true,
+          "href": "https://www.beanscenemag.com.au/wp-json/wp/v2/categories?post=90112"
+        },
+        {
+          "taxonomy": "post_tag",
+          "embeddable": true,
+          "href": "https://www.beanscenemag.com.au/wp-json/wp/v2/tags?post=90112"
+        }
+      ],
+      "curies": [
+        {
+          "name": "wp",
+          "href": "https://api.w.org/{rel}",
+          "templated": true
+        }
+      ]
+    }
+  },
+  {
+    "date_gmt": "2026-10-09T02:00:00",
+    "link": "https://www.beanscenemag.com.au/australian-barista-championship-heads-to-melbourne/",
+    "title": {
+      "rendered": "Australian Barista Championship heads to Melbourne"
+    },
+    "_links": {
+      "self": [
+        {
+          "href": "https://www.beanscenemag.com.au/wp-json/wp/v2/posts/90104",
+          "targetHints": {
+            "allow": [
+              "GET"
+            ]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "https://www.beanscenemag.com.au/wp-json/wp/v2/posts"
+        }
+      ],
+      "about": [
+        {
+          "href": "https://www.beanscenemag.com.au/wp-json/wp/v2/types/post"
+        }
+      ],
+      "author": [
+        {
+          "embeddable": true,
+          "href": "https://www.beanscenemag.com.au/wp-json/wp/v2/users/7"
+        }
+      ],
+      "replies": [
+        {
+          "embeddable": true,
+          "href": "https://www.beanscenemag.com.au/wp-json/wp/v2/comments?post=90104"
+        }
+      ],
+      "version-history": [
+        {
+          "count": 3,
+          "href": "https://www.beanscenemag.com.au/wp-json/wp/v2/posts/90104/revisions"
+        }
+      ],
+      "predecessor-version": [
+        {
+          "id": 90113,
+          "href": "https://www.beanscenemag.com.au/wp-json/wp/v2/posts/90104/revisions/90113"
+        }
+      ],
+      "wp:featuredmedia": [
+        {
+          "embeddable": true,
+          "href": "https://www.beanscenemag.com.au/wp-json/wp/v2/media/90107"
+        }
+      ],
+      "wp:attachment": [
+        {
+          "href": "https://www.beanscenemag.com.au/wp-json/wp/v2/media?parent=90104"
+        }
+      ],
+      "wp:term": [
+        {
+          "taxonomy": "category",
+          "embeddable": true,
+          "href": "https://www.beanscenemag.com.au/wp-json/wp/v2/categories?post=90104"
+        },
+        {
+          "taxonomy": "post_tag",
+          "embeddable": true,
+          "href": "https://www.beanscenemag.com.au/wp-json/wp/v2/tags?post=90104"
+        }
+      ],
+      "curies": [
+        {
+          "name": "wp",
+          "href": "https://api.w.org/{rel}",
+          "templated": true
+        }
+      ]
+    },
+    "_embedded": {
+      "wp:featuredmedia": [
+        {
+          "id": 90107,
+          "date": "2026-10-09T02:00:00",
+          "slug": "abc-stage",
+          "type": "attachment",
+          "link": "https://www.beanscenemag.com.au/australian-barista-championship-heads-to-melbourne/abc-stage/",
+          "title": {
+            "rendered": "abc-stage"
+          },
+          "author": 7,
+          "featured_media": 0,
+          "caption": {
+            "rendered": ""
+          },
+          "alt_text": "",
+          "media_type": "image",
+          "mime_type": "image/jpeg",
+          "media_details": {
+            "width": 1200,
+            "height": 800,
+            "file": "2026/10/abc-stage.jpg",
+            "filesize": 192000,
+            "sizes": {
+              "thumbnail": {
+                "file": "abc-stage-150x150.jpg",
+                "width": 150,
+                "height": 150,
+                "filesize": 2500,
+                "mime_type": "image/jpeg",
+                "source_url": "https://www.beanscenemag.com.au/wp-content/uploads/2026/10/abc-stage-150x150.jpg"
+              },
+              "medium": {
+                "file": "abc-stage-300x200.jpg",
+                "width": 300,
+                "height": 200,
+                "filesize": 6667,
+                "mime_type": "image/jpeg",
+                "source_url": "https://www.beanscenemag.com.au/wp-content/uploads/2026/10/abc-stage-300x200.jpg"
+              },
+              "full": {
+                "file": "abc-stage.jpg",
+                "width": 1200,
+                "height": 800,
+                "mime_type": "image/jpeg",
+                "source_url": "https://www.beanscenemag.com.au/wp-content/uploads/2026/10/abc-stage.jpg"
+              }
+            },
+            "image_meta": {
+              "aperture": "0",
+              "credit": "",
+              "camera": "",
+              "caption": "",
+              "created_timestamp": "0",
+              "copyright": "",
+              "focal_length": "0",
+              "iso": "0",
+              "shutter_speed": "0",
+              "title": "",
+              "orientation": "0",
+              "keywords": []
+            }
+          },
+          "source_url": "https://www.beanscenemag.com.au/wp-content/uploads/2026/10/abc-stage.jpg",
+          "_links": {
+            "self": [
+              {
+                "href": "https://www.beanscenemag.com.au/wp-json/wp/v2/media/90107",
+                "targetHints": {
+                  "allow": [
+                    "GET"
+                  ]
+                }
+              }
+            ],
+            "collection": [
+              {
+                "href": "https://www.beanscenemag.com.au/wp-json/wp/v2/media"
+              }
+            ],
+            "about": [
+              {
+                "href": "https://www.beanscenemag.com.au/wp-json/wp/v2/types/attachment"
+              }
+            ],
+            "author": [
+              {
+                "embeddable": true,
+                "href": "https://www.beanscenemag.com.au/wp-json/wp/v2/users/7"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  },
+  {
+    "date_gmt": "2026-10-08T05:00:00",
+    "link": "https://www.beanscenemag.com.au/melbourne-roaster-takes-out-espresso-award/",
+    "title": {
+      "rendered": "Melbourne roaster takes out espresso award"
+    },
+    "_links": {
+      "self": [
+        {
+          "href": "https://www.beanscenemag.com.au/wp-json/wp/v2/posts/90097",
+          "targetHints": {
+            "allow": [
+              "GET"
+            ]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "https://www.beanscenemag.com.au/wp-json/wp/v2/posts"
+        }
+      ],
+      "about": [
+        {
+          "href": "https://www.beanscenemag.com.au/wp-json/wp/v2/types/post"
+        }
+      ],
+      "author": [
+        {
+          "embeddable": true,
+          "href": "https://www.beanscenemag.com.au/wp-json/wp/v2/users/7"
+        }
+      ],
+      "replies": [
+        {
+          "embeddable": true,
+          "href": "https://www.beanscenemag.com.au/wp-json/wp/v2/comments?post=90097"
+        }
+      ],
+      "version-history": [
+        {
+          "count": 3,
+          "href": "https://www.beanscenemag.com.au/wp-json/wp/v2/posts/90097/revisions"
+        }
+      ],
+      "predecessor-version": [
+        {
+          "id": 90106,
+          "href": "https://www.beanscenemag.com.au/wp-json/wp/v2/posts/90097/revisions/90106"
+        }
+      ],
+      "wp:featuredmedia": [
+        {
+          "embeddable": true,
+          "href": "https://www.beanscenemag.com.au/wp-json/wp/v2/media/90100"
+        }
+      ],
+      "wp:attachment": [
+        {
+          "href": "https://www.beanscenemag.com.au/wp-json/wp/v2/media?parent=90097"
+        }
+      ],
+      "wp:term": [
+        {
+          "taxonomy": "category",
+          "embeddable": true,
+          "href": "https://www.beanscenemag.com.au/wp-json/wp/v2/categories?post=90097"
+        },
+        {
+          "taxonomy": "post_tag",
+          "embeddable": true,
+          "href": "https://www.beanscenemag.com.au/wp-json/wp/v2/tags?post=90097"
+        }
+      ],
+      "curies": [
+        {
+          "name": "wp",
+          "href": "https://api.w.org/{rel}",
+          "templated": true
+        }
+      ]
+    },
+    "_embedded": {
+      "wp:featuredmedia": [
+        {
+          "id": 90100,
+          "date": "2026-10-08T05:00:00",
+          "slug": "espresso-award",
+          "type": "attachment",
+          "link": "https://www.beanscenemag.com.au/melbourne-roaster-takes-out-espresso-award/espresso-award/",
+          "title": {
+            "rendered": "espresso-award"
+          },
+          "author": 7,
+          "featured_media": 0,
+          "caption": {
+            "rendered": ""
+          },
+          "alt_text": "",
+          "media_type": "image",
+          "mime_type": "image/jpeg",
+          "media_details": {
+            "width": 1200,
+            "height": 800,
+            "file": "2026/10/espresso-award.jpg",
+            "filesize": 192000,
+            "sizes": {
+              "thumbnail": {
+                "file": "espresso-award-150x150.jpg",
+                "width": 150,
+                "height": 150,
+                "filesize": 2500,
+                "mime_type": "image/jpeg",
+                "source_url": "https://www.beanscenemag.com.au/wp-content/uploads/2026/10/espresso-award-150x150.jpg"
+              },
+              "medium": {
+                "file": "espresso-award-300x200.jpg",
+                "width": 300,
+                "height": 200,
+                "filesize": 6667,
+                "mime_type": "image/jpeg",
+                "source_url": "https://www.beanscenemag.com.au/wp-content/uploads/2026/10/espresso-award-300x200.jpg"
+              },
+              "full": {
+                "file": "espresso-award.jpg",
+                "width": 1200,
+                "height": 800,
+                "mime_type": "image/jpeg",
+                "source_url": "https://www.beanscenemag.com.au/wp-content/uploads/2026/10/espresso-award.jpg"
+              }
+            },
+            "image_meta": {
+              "aperture": "0",
+              "credit": "",
+              "camera": "",
+              "caption": "",
+              "created_timestamp": "0",
+              "copyright": "",
+              "focal_length": "0",
+              "iso": "0",
+              "shutter_speed": "0",
+              "title": "",
+              "orientation": "0",
+              "keywords": []
+            }
+          },
+          "source_url": "https://www.beanscenemag.com.au/wp-content/uploads/2026/10/espresso-award.jpg",
+          "_links": {
+            "self": [
+              {
+                "href": "https://www.beanscenemag.com.au/wp-json/wp/v2/media/90100",
+                "targetHints": {
+                  "allow": [
+                    "GET"
+                  ]
+                }
+              }
+            ],
+            "collection": [
+              {
+                "href": "https://www.beanscenemag.com.au/wp-json/wp/v2/media"
+              }
+            ],
+            "about": [
+              {
+                "href": "https://www.beanscenemag.com.au/wp-json/wp/v2/types/attachment"
+              }
+            ],
+            "author": [
+              {
+                "embeddable": true,
+                "href": "https://www.beanscenemag.com.au/wp-json/wp/v2/users/7"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+]

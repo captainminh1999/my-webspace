@@ -1,13 +1,13 @@
 // One function per feed, mirroring .github/workflows/fetch-*.yml step for step.
 import type { Db } from "mongodb";
-import { READER, getJson, getText, imageSize, requireEnv, writeCollection, writeSingleton } from "./lib";
-import { fromWordPress, selectReading, type Article } from "../../../src/utils/papers";
-import { headline, parseFeed, shareImage } from "../../../src/utils/rss";
-import { dayNumber, joinContent, parseReference, rotate, sydneyDate, type Reference } from "../../../src/utils/verse";
-import { METHODS } from "../../../src/utils/reflection";
-import { scripture } from "../../../src/utils/scripture";
-import { apodProblem, cleanExplanation } from "../../../src/utils/apod";
-import type { VerseData, VerseSegment } from "../../../src/types/verse";
+import { READER, getJson, getText, imageSize, requireEnv, writeCollection, writeSingleton } from "./lib.ts";
+import { fromWordPress, selectReading, type Article } from "../../../src/utils/papers.ts";
+import { headline, parseFeed, shareImage } from "../../../src/utils/rss.ts";
+import { dayNumber, joinContent, parseReference, rotate, sydneyDate, type Reference } from "../../../src/utils/verse.ts";
+import { METHODS } from "../../../src/utils/reflection.ts";
+import { scripture } from "../../../src/utils/scripture.ts";
+import { apodProblem, cleanExplanation } from "../../../src/utils/apod.ts";
+import type { VerseData, VerseSegment } from "../../../src/types/verse.ts";
 
 type Any = Record<string, any>; // eslint-disable-line @typescript-eslint/no-explicit-any
 
@@ -27,10 +27,12 @@ export async function weather(db: Db) {
 export async function tech(db: Db) {
   const ids = (await getJson<number[]>("https://hacker-news.firebaseio.com/v0/topstories.json")).slice(0, 10);
   const items = await Promise.all(ids.map((id) => getJson<Any>(`https://hacker-news.firebaseio.com/v0/item/${id}.json`)));
+  // An id that does not exist answers `null`; a deleted story is `{deleted: true, id, time, type}` and a dead one
+  // carries `dead: true` — neither has a title worth a row.
   await writeCollection(
     db,
     "tech",
-    items.filter(Boolean).map((s) => ({ id: s.id, title: s.title, url: s.url ?? null, score: s.score ?? null })),
+    items.filter((s) => s && !s.deleted && !s.dead && s.title).map((s) => ({ id: s.id, title: s.title, url: s.url ?? null, score: s.score ?? null })),
   );
 }
 

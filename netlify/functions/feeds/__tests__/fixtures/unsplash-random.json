@@ -1,0 +1,117 @@
+{
+  "id": "q8XwPz4kLmA",
+  "slug": "a-lighthouse-on-a-rocky-coast-at-dusk-q8XwPz4kLmA",
+  "alternative_slugs": {
+    "en": "a-lighthouse-on-a-rocky-coast-at-dusk-q8XwPz4kLmA",
+    "es": "un-faro-en-una-costa-rocosa-al-atardecer-q8XwPz4kLmA"
+  },
+  "created_at": "2026-09-28T07:41:12Z",
+  "updated_at": "2026-10-10T23:02:45Z",
+  "promoted_at": "2026-09-29T06:00:01Z",
+  "width": 6000,
+  "height": 4000,
+  "color": "#26400c",
+  "blur_hash": "LKD]o8rr4.-p~qIUxuj[9GIU%Mt7",
+  "description": null,
+  "alt_description": "a lighthouse on a rocky coast at dusk",
+  "breadcrumbs": [],
+  "urls": {
+    "raw": "https://images.unsplash.com/photo-1790000000000-0a1b2c3d4e5f?ixid=M3w0MjY2NDN8MHwxfHJhbmRvbXx8fHx8fHx8fDE3OTE2OTQ4MDB8&ixlib=rb-4.1.0",
+    "full": "https://images.unsplash.com/photo-1790000000000-0a1b2c3d4e5f?crop=entropy&cs=srgb&fm=jpg&ixid=M3w0MjY2NDN8MHwxfHJhbmRvbXx8fHx8fHx8fDE3OTE2OTQ4MDB8&ixlib=rb-4.1.0&q=85",
+    "regular": "https://images.unsplash.com/photo-1790000000000-0a1b2c3d4e5f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w0MjY2NDN8MHwxfHJhbmRvbXx8fHx8fHx8fDE3OTE2OTQ4MDB8&ixlib=rb-4.1.0&q=80&w=1080",
+    "small": "https://images.unsplash.com/photo-1790000000000-0a1b2c3d4e5f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w0MjY2NDN8MHwxfHJhbmRvbXx8fHx8fHx8fDE3OTE2OTQ4MDB8&ixlib=rb-4.1.0&q=80&w=400",
+    "thumb": "https://images.unsplash.com/photo-1790000000000-0a1b2c3d4e5f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w0MjY2NDN8MHwxfHJhbmRvbXx8fHx8fHx8fDE3OTE2OTQ4MDB8&ixlib=rb-4.1.0&q=80&w=200",
+    "small_s3": "https://s3.us-west-2.amazonaws.com/images.unsplash.com/small/photo-1790000000000-0a1b2c3d4e5f"
+  },
+  "links": {
+    "self": "https://api.unsplash.com/photos/a-lighthouse-on-a-rocky-coast-at-dusk-q8XwPz4kLmA",
+    "html": "https://unsplash.com/photos/a-lighthouse-on-a-rocky-coast-at-dusk-q8XwPz4kLmA",
+    "download": "https://unsplash.com/photos/q8XwPz4kLmA/download?ixid=M3w0MjY2NDN8MHwxfHJhbmRvbXx8fHx8fHx8fDE3OTE2OTQ4MDB8",
+    "download_location": "https://api.unsplash.com/photos/q8XwPz4kLmA/download?ixid=M3w0MjY2NDN8MHwxfHJhbmRvbXx8fHx8fHx8fDE3OTE2OTQ4MDB8"
+  },
+  "likes": 214,
+  "liked_by_user": false,
+  "current_user_collections": [],
+  "sponsorship": null,
+  "topic_submissions": {
+    "nature": {
+      "status": "approved",
+      "approved_on": "2026-09-29T06:00:01Z"
+    }
+  },
+  "asset_type": "photo",
+  "user": {
+    "id": "Zx9Yw8Vu7Ts",
+    "updated_at": "2026-10-10T22:15:09Z",
+    "username": "coastlines_sample",
+    "name": "Sample Photographer",
+    "first_name": "Sample",
+    "last_name": "Photographer",
+    "twitter_username": null,
+    "portfolio_url": null,
+    "bio": "Coastlines and weather.",
+    "location": "Hobart, Australia",
+    "links": {
+      "self": "https://api.unsplash.com/users/coastlines_sample",
+      "html": "https://unsplash.com/@coastlines_sample",
+      "photos": "https://api.unsplash.com/users/coastlines_sample/photos",
+      "likes": "https://api.unsplash.com/users/coastlines_sample/likes",
+      "portfolio": "https://api.unsplash.com/users/coastlines_sample/portfolio",
+      "following": "https://api.unsplash.com/users/coastlines_sample/following",
+      "followers": "https://api.unsplash.com/users/coastlines_sample/followers"
+    },
+    "profile_image": {
+      "small": "https://images.unsplash.com/profile-1700000000000-abc?ixlib=rb-4.1.0&crop=faces&fit=crop&w=32&h=32",
+      "medium": "https://images.unsplash.com/profile-1700000000000-abc?ixlib=rb-4.1.0&crop=faces&fit=crop&w=64&h=64",
+      "large": "https://images.unsplash.com/profile-1700000000000-abc?ixlib=rb-4.1.0&crop=faces&fit=crop&w=128&h=128"
+    },
+    "instagram_username": null,
+    "total_collections": 2,
+    "total_likes": 51,
+    "total_photos": 318,
+    "total_promoted_photos": 12,
+    "total_illustrations": 0,
+    "total_promoted_illustrations": 0,
+    "accepted_tos": true,
+    "for_hire": false,
+    "social": {
+      "instagram_username": null,
+      "portfolio_url": null,
+      "twitter_username": null,
+      "paypal_email": null
+    }
+  },
+  "exif": {
+    "make": "SONY",
+    "model": "ILCE-7RM5",
+    "name": "SONY, ILCE-7RM5",
+    "exposure_time": "1/60",
+    "aperture": "8.0",
+    "focal_length": "24.0",
+    "iso": 200
+  },
+  "location": {
+    "name": "Tasmania, Australia",
+    "city": null,
+    "country": "Australia",
+    "position": {
+      "latitude": -42.0409,
+      "longitude": 146.8087
+    }
+  },
+  "meta": {
+    "index": true
+  },
+  "public_domain": false,
+  "tags": [],
+  "views": 182301,
+  "downloads": 1204,
+  "topics": [
+    {
+      "id": "6sMVjTLSkeQ",
+      "title": "Nature",
+      "slug": "nature",
+      "visibility": "featured"
+    }
+  ]
+}

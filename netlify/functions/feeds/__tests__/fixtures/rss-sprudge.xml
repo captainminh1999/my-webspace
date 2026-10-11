@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:media="http://search.yahoo.com/mrss/"
+	>
+
+<channel>
+	<title>Sprudge Coffee</title>
+	<atom:link href="https://sprudge.com/feed" rel="self" type="application/rss+xml" />
+	<link>https://sprudge.com</link>
+	<description>Coffee News and Original Content</description>
+	<lastBuildDate>Sat, 10 Oct 2026 19:01:40 +0000</lastBuildDate>
+	<language>en-US</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.8.3</generator>
+	<item>
+		<title>The Sprudge Guide To Coffee In Lisbon</title>
+		<link>https://sprudge.com/the-sprudge-guide-to-coffee-in-lisbon-298765.html</link>
+		<dc:creator><![CDATA[Sprudge Staff]]></dc:creator>
+		<pubDate>Sat, 10 Oct 2026 15:30:00 +0000</pubDate>
+		<category><![CDATA[Guides]]></category>
+		<guid isPermaLink="false">https://sprudge.com/?p=298765</guid>
+		<description><![CDATA[Where to drink coffee in the Portuguese capital.]]></description>
+		<media:content url="https://secure.gravatar.com/avatar/5f2b?s=96&#038;d=identicon&#038;r=g" medium="image">
+			<media:title type="html">sprudge</media:title>
+		</media:content>
+		<media:content url="https://sprudge.com/wp-content/uploads/2026/10/lisbon-cafe-hero.jpg" medium="image" />
+	</item>
+	<item>
+		<title>A Closer Look At The Grinder Everyone&#8217;s Talking About</title>
+		<link>https://sprudge.com/a-closer-look-at-the-grinder-everyones-talking-about-298702.html</link>
+		<dc:creator><![CDATA[Sprudge Staff]]></dc:creator>
+		<pubDate>Thu, 08 Oct 2026 14:00:00 +0000</pubDate>
+		<category><![CDATA[Gear]]></category>
+		<guid isPermaLink="false">https://sprudge.com/?p=298702</guid>
+		<description><![CDATA[A week with the new flat burrs.]]></description>
+		<media:content url="https://sprudge.com/wp-content/uploads/2026/10/grinder-closeup.jpg" medium="image" />
+	</item>
+	</channel>
+</rss>

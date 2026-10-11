@@ -1,0 +1,360 @@
+[
+  {
+    "date_gmt": "2026-10-10T21:00:00",
+    "link": "https://freshcup.com/inside-the-rise-of-coffee-subscriptions/",
+    "title": {
+      "rendered": "Inside the Rise of Coffee Subscriptions"
+    },
+    "_links": {
+      "self": [
+        {
+          "href": "https://freshcup.com/wp-json/wp/v2/posts/64410",
+          "targetHints": {
+            "allow": [
+              "GET"
+            ]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "https://freshcup.com/wp-json/wp/v2/posts"
+        }
+      ],
+      "about": [
+        {
+          "href": "https://freshcup.com/wp-json/wp/v2/types/post"
+        }
+      ],
+      "author": [
+        {
+          "embeddable": true,
+          "href": "https://freshcup.com/wp-json/wp/v2/users/7"
+        }
+      ],
+      "replies": [
+        {
+          "embeddable": true,
+          "href": "https://freshcup.com/wp-json/wp/v2/comments?post=64410"
+        }
+      ],
+      "version-history": [
+        {
+          "count": 3,
+          "href": "https://freshcup.com/wp-json/wp/v2/posts/64410/revisions"
+        }
+      ],
+      "predecessor-version": [
+        {
+          "id": 64419,
+          "href": "https://freshcup.com/wp-json/wp/v2/posts/64410/revisions/64419"
+        }
+      ],
+      "wp:featuredmedia": [
+        {
+          "embeddable": true,
+          "href": "https://freshcup.com/wp-json/wp/v2/media/64413"
+        }
+      ],
+      "wp:attachment": [
+        {
+          "href": "https://freshcup.com/wp-json/wp/v2/media?parent=64410"
+        }
+      ],
+      "wp:term": [
+        {
+          "taxonomy": "category",
+          "embeddable": true,
+          "href": "https://freshcup.com/wp-json/wp/v2/categories?post=64410"
+        },
+        {
+          "taxonomy": "post_tag",
+          "embeddable": true,
+          "href": "https://freshcup.com/wp-json/wp/v2/tags?post=64410"
+        }
+      ],
+      "curies": [
+        {
+          "name": "wp",
+          "href": "https://api.w.org/{rel}",
+          "templated": true
+        }
+      ]
+    },
+    "_embedded": {
+      "wp:featuredmedia": [
+        {
+          "id": 64413,
+          "date": "2026-10-10T21:00:00",
+          "slug": "subscription-boxes",
+          "type": "attachment",
+          "link": "https://freshcup.com/inside-the-rise-of-coffee-subscriptions/subscription-boxes/",
+          "title": {
+            "rendered": "subscription-boxes"
+          },
+          "author": 7,
+          "featured_media": 0,
+          "caption": {
+            "rendered": ""
+          },
+          "alt_text": "",
+          "media_type": "image",
+          "mime_type": "image/jpeg",
+          "media_details": {
+            "width": 2000,
+            "height": 1333,
+            "file": "2026/10/subscription-boxes.jpg",
+            "filesize": 533200,
+            "sizes": {
+              "medium": {
+                "file": "subscription-boxes-300x200.jpg",
+                "width": 300,
+                "height": 200,
+                "filesize": 6667,
+                "mime_type": "image/jpeg",
+                "source_url": "https://freshcup.com/wp-content/uploads/2026/10/subscription-boxes-300x200.jpg"
+              },
+              "large": {
+                "file": "subscription-boxes-1024x683.jpg",
+                "width": 1024,
+                "height": 683,
+                "filesize": 77710,
+                "mime_type": "image/jpeg",
+                "source_url": "https://freshcup.com/wp-content/uploads/2026/10/subscription-boxes-1024x683.jpg"
+              },
+              "full": {
+                "file": "subscription-boxes.jpg",
+                "width": 2000,
+                "height": 1333,
+                "mime_type": "image/jpeg",
+                "source_url": "https://freshcup.com/wp-content/uploads/2026/10/subscription-boxes.jpg"
+              }
+            },
+            "image_meta": {
+              "aperture": "0",
+              "credit": "",
+              "camera": "",
+              "caption": "",
+              "created_timestamp": "0",
+              "copyright": "",
+              "focal_length": "0",
+              "iso": "0",
+              "shutter_speed": "0",
+              "title": "",
+              "orientation": "0",
+              "keywords": []
+            }
+          },
+          "source_url": "https://freshcup.com/wp-content/uploads/2026/10/subscription-boxes.jpg",
+          "_links": {
+            "self": [
+              {
+                "href": "https://freshcup.com/wp-json/wp/v2/media/64413",
+                "targetHints": {
+                  "allow": [
+                    "GET"
+                  ]
+                }
+              }
+            ],
+            "collection": [
+              {
+                "href": "https://freshcup.com/wp-json/wp/v2/media"
+              }
+            ],
+            "about": [
+              {
+                "href": "https://freshcup.com/wp-json/wp/v2/types/attachment"
+              }
+            ],
+            "author": [
+              {
+                "embeddable": true,
+                "href": "https://freshcup.com/wp-json/wp/v2/users/7"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  },
+  {
+    "date_gmt": "2026-09-25T16:00:00",
+    "link": "https://freshcup.com/a-growing-taste-for-zambian-coffee/",
+    "title": {
+      "rendered": "A Growing Taste for Zambian Coffee"
+    },
+    "_links": {
+      "self": [
+        {
+          "href": "https://freshcup.com/wp-json/wp/v2/posts/64102",
+          "targetHints": {
+            "allow": [
+              "GET"
+            ]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "https://freshcup.com/wp-json/wp/v2/posts"
+        }
+      ],
+      "about": [
+        {
+          "href": "https://freshcup.com/wp-json/wp/v2/types/post"
+        }
+      ],
+      "author": [
+        {
+          "embeddable": true,
+          "href": "https://freshcup.com/wp-json/wp/v2/users/7"
+        }
+      ],
+      "replies": [
+        {
+          "embeddable": true,
+          "href": "https://freshcup.com/wp-json/wp/v2/comments?post=64102"
+        }
+      ],
+      "version-history": [
+        {
+          "count": 3,
+          "href": "https://freshcup.com/wp-json/wp/v2/posts/64102/revisions"
+        }
+      ],
+      "predecessor-version": [
+        {
+          "id": 64111,
+          "href": "https://freshcup.com/wp-json/wp/v2/posts/64102/revisions/64111"
+        }
+      ],
+      "wp:featuredmedia": [
+        {
+          "embeddable": true,
+          "href": "https://freshcup.com/wp-json/wp/v2/media/64105"
+        }
+      ],
+      "wp:attachment": [
+        {
+          "href": "https://freshcup.com/wp-json/wp/v2/media?parent=64102"
+        }
+      ],
+      "wp:term": [
+        {
+          "taxonomy": "category",
+          "embeddable": true,
+          "href": "https://freshcup.com/wp-json/wp/v2/categories?post=64102"
+        },
+        {
+          "taxonomy": "post_tag",
+          "embeddable": true,
+          "href": "https://freshcup.com/wp-json/wp/v2/tags?post=64102"
+        }
+      ],
+      "curies": [
+        {
+          "name": "wp",
+          "href": "https://api.w.org/{rel}",
+          "templated": true
+        }
+      ]
+    },
+    "_embedded": {
+      "wp:featuredmedia": [
+        {
+          "id": 64105,
+          "date": "2026-09-25T16:00:00",
+          "slug": "zambia-farm",
+          "type": "attachment",
+          "link": "https://freshcup.com/a-growing-taste-for-zambian-coffee/zambia-farm/",
+          "title": {
+            "rendered": "zambia-farm"
+          },
+          "author": 7,
+          "featured_media": 0,
+          "caption": {
+            "rendered": ""
+          },
+          "alt_text": "",
+          "media_type": "image",
+          "mime_type": "image/jpeg",
+          "media_details": {
+            "width": 2000,
+            "height": 1333,
+            "file": "2026/09/zambia-farm.jpg",
+            "filesize": 533200,
+            "sizes": {
+              "medium": {
+                "file": "zambia-farm-300x200.jpg",
+                "width": 300,
+                "height": 200,
+                "filesize": 6667,
+                "mime_type": "image/jpeg",
+                "source_url": "https://freshcup.com/wp-content/uploads/2026/09/zambia-farm-300x200.jpg"
+              },
+              "large": {
+                "file": "zambia-farm-1024x683.jpg",
+                "width": 1024,
+                "height": 683,
+                "filesize": 77710,
+                "mime_type": "image/jpeg",
+                "source_url": "https://freshcup.com/wp-content/uploads/2026/09/zambia-farm-1024x683.jpg"
+              },
+              "full": {
+                "file": "zambia-farm.jpg",
+                "width": 2000,
+                "height": 1333,
+                "mime_type": "image/jpeg",
+                "source_url": "https://freshcup.com/wp-content/uploads/2026/09/zambia-farm.jpg"
+              }
+            },
+            "image_meta": {
+              "aperture": "0",
+              "credit": "",
+              "camera": "",
+              "caption": "",
+              "created_timestamp": "0",
+              "copyright": "",
+              "focal_length": "0",
+              "iso": "0",
+              "shutter_speed": "0",
+              "title": "",
+              "orientation": "0",
+              "keywords": []
+            }
+          },
+          "source_url": "https://freshcup.com/wp-content/uploads/2026/09/zambia-farm.jpg",
+          "_links": {
+            "self": [
+              {
+                "href": "https://freshcup.com/wp-json/wp/v2/media/64105",
+                "targetHints": {
+                  "allow": [
+                    "GET"
+                  ]
+                }
+              }
+            ],
+            "collection": [
+              {
+                "href": "https://freshcup.com/wp-json/wp/v2/media"
+              }
+            ],
+            "about": [
+              {
+                "href": "https://freshcup.com/wp-json/wp/v2/types/attachment"
+              }
+            ],
+            "author": [
+              {
+                "embeddable": true,
+                "href": "https://freshcup.com/wp-json/wp/v2/users/7"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+]

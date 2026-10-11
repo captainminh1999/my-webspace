@@ -5,6 +5,7 @@ import { Fraunces, IBM_Plex_Mono } from "next/font/google";
 
 import Analytics from "@/components/Analytics";
 import { getProfile } from "@/lib/cv";
+import { COLORS, OWNER_NAME, ROOT_OPEN_GRAPH, SITE_URL, dashDescription, ownerName } from "@/lib/site";
 
 // Two self-hosted families (docs/DESIGN-DIRECTION.md § Typography). Body text
 // uses the system stack, so these only carry the display and data registers.
@@ -35,36 +36,43 @@ const plexMono = IBM_Plex_Mono({
 const themeScript = `try{var t=localStorage.getItem('theme');if(t!=='light'&&t!=='dark')t=matchMedia('(prefers-color-scheme: light)').matches?'light':'dark';document.documentElement.dataset.theme=t;}catch(e){document.documentElement.dataset.theme='dark';}`;
 
 
-interface ProfileTitleData {
-  firstName?: string | null;
-  lastName?: string | null;
-}
-
-
+// Everything here is also `/`'s metadata, which page.tsx does not set. Pages below
+// set their own title, description, canonical URL and og:url through pageMetadata()
+// in src/lib/site.ts; one that does not inherits `/` for both — a claim that it is a
+// copy of the home page. Icons, og:image and the manifest come from the file
+// conventions in this directory.
 export async function generateMetadata(): Promise<Metadata> {
-  let profileDataForTitle: ProfileTitleData | null = null;
+  let name = OWNER_NAME;
   try {
-    profileDataForTitle = (await getProfile()) as ProfileTitleData | null;
+    name = ownerName(await getProfile());
   } catch (err) {
-    console.error('Failed to fetch profile data for metadata', err);
-  }
-  const firstName = profileDataForTitle?.firstName;
-  const lastName = profileDataForTitle?.lastName;
-  let siteTitle = "My Space - Interactive CV";
-  if (firstName && lastName) {
-    siteTitle = `${firstName} ${lastName} - My Space`;
-  } else if (firstName) {
-    siteTitle = `${firstName} - My Space`;
-  } else if (lastName) {
-    siteTitle = `${lastName} - My Space`;
+    console.error("Failed to fetch profile data for metadata", err);
   }
   return {
-    title: siteTitle,
-    description: "My interactive online curriculum vitae and personal space.",
+    metadataBase: new URL(SITE_URL),
+    title: { default: `${name} — Daily Dash`, template: `%s — ${name}` },
+    description: dashDescription(name),
+    alternates: { canonical: "/" },
+    openGraph: ROOT_OPEN_GRAPH,
+    // Title, description and image are filled in from the Open Graph fields.
+    twitter: { card: "summary_large_image" },
   };
 }
 
-export const viewport: Viewport = { /* ... (your viewport settings) ... */ }
+// The browser's chrome follows the OS, by the first-visit rule in themeScript: light
+// only when the OS asks for it, dark otherwise (the entry without a media query).
+// It does not follow the toggle: that would take script in two places — before paint
+// for a stored choice, and in the toggle — and a guard against Next rendering these
+// tags again on navigation, for a tint. colorScheme lists dark first for the same
+// rule (a UA picks the OS's scheme if listed, else the first); globals.css sets the
+// scheme the page actually uses once data-theme is known.
+export const viewport: Viewport = {
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: COLORS.bgLight },
+    { color: COLORS.bg },
+  ],
+  colorScheme: "dark light",
+};
 
 export default function RootLayout({
   children,

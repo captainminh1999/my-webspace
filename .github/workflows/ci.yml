@@ -1,0 +1,38 @@
+# .github/workflows/ci.yml — lint, typecheck, test and build every pull request and every push to main.
+# Not ingestion: the feeds are Netlify Scheduled Functions (README § Feeds).
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+# A newer push to the same branch or pull request makes the running check moot.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      NEXT_TELEMETRY_DISABLED: 1
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false # nothing here pushes
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm test
+      # No MONGODB_URI, NEXT_PUBLIC_BASE_URL, URL or secret reaches this job: every page's read goes to
+      # localhost:8888 (src/lib/payload.ts), is refused and prerenders empty. Never production data.
+      - run: npm run build

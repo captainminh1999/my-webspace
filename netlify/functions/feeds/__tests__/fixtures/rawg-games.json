@@ -1,0 +1,399 @@
+{
+  "count": 5821,
+  "next": "https://api.rawg.io/api/games?dates=2026-09-11%2C2026-10-11&key=REDACTED&ordering=-rating&page=2&page_size=10",
+  "previous": null,
+  "results": [
+    {
+      "slug": "hollow-lantern",
+      "name": "Hollow Lantern",
+      "playtime": 14,
+      "platforms": [
+        {
+          "platform": {
+            "id": 4,
+            "name": "PC",
+            "slug": "pc",
+            "image": null,
+            "year_end": null,
+            "year_start": null,
+            "games_count": 1004,
+            "image_background": "https://media.rawg.io/media/games/4a/4a4.jpg"
+          },
+          "released_at": "2026-09-18",
+          "requirements_en": null,
+          "requirements_ru": null
+        },
+        {
+          "platform": {
+            "id": 187,
+            "name": "PlayStation 5",
+            "slug": "playstation5",
+            "image": null,
+            "year_end": null,
+            "year_start": null,
+            "games_count": 1187,
+            "image_background": "https://media.rawg.io/media/games/187a/187a187.jpg"
+          },
+          "released_at": "2026-09-18",
+          "requirements_en": null,
+          "requirements_ru": null
+        }
+      ],
+      "stores": [
+        {
+          "id": 1011202,
+          "store": {
+            "id": 1,
+            "name": "Steam",
+            "slug": "steam",
+            "domain": "store.steampowered.com",
+            "games_count": 112000,
+            "image_background": "https://media.rawg.io/media/games/steam.jpg"
+          }
+        }
+      ],
+      "released": "2026-09-18",
+      "tba": false,
+      "background_image": "https://media.rawg.io/media/games/3f1/3f1a7c0a1c0f5e2b9d8e7c6b5a4f3e2d.jpg",
+      "rating": 4.58,
+      "rating_top": 5,
+      "ratings": [
+        {
+          "id": 5,
+          "title": "exceptional",
+          "count": 31,
+          "percent": 64.58
+        },
+        {
+          "id": 4,
+          "title": "recommended",
+          "count": 14,
+          "percent": 29.17
+        },
+        {
+          "id": 3,
+          "title": "meh",
+          "count": 3,
+          "percent": 6.25
+        }
+      ],
+      "ratings_count": 48,
+      "reviews_text_count": 2,
+      "added": 412,
+      "added_by_status": {
+        "yet": 40,
+        "owned": 310,
+        "beaten": 22,
+        "toplay": 35,
+        "dropped": 5
+      },
+      "metacritic": 89,
+      "suggestions_count": 380,
+      "updated": "2026-10-10T21:14:03",
+      "id": 1011201,
+      "score": null,
+      "clip": null,
+      "tags": [
+        {
+          "id": 31,
+          "name": "Singleplayer",
+          "slug": "singleplayer",
+          "language": "eng",
+          "games_count": 240000,
+          "image_background": "https://media.rawg.io/media/games/tag.jpg"
+        }
+      ],
+      "esrb_rating": null,
+      "user_game": null,
+      "reviews_count": 48,
+      "saturated_color": "0f0f0f",
+      "dominant_color": "0f0f0f",
+      "short_screenshots": [
+        {
+          "id": -1,
+          "image": "https://media.rawg.io/media/games/3f1/3f1a7c0a1c0f5e2b9d8e7c6b5a4f3e2d.jpg"
+        },
+        {
+          "id": 10112010,
+          "image": "https://media.rawg.io/media/screenshots/hollow-lantern-1.jpg"
+        }
+      ],
+      "parent_platforms": [
+        {
+          "platform": {
+            "id": 1,
+            "name": "PC",
+            "slug": "pc"
+          }
+        }
+      ],
+      "genres": [
+        {
+          "id": 4,
+          "name": "Action",
+          "slug": "action",
+          "games_count": 190000,
+          "image_background": "https://media.rawg.io/media/games/genre.jpg"
+        }
+      ]
+    },
+    {
+      "slug": "star-freight-tycoon",
+      "name": "Star Freight Tycoon",
+      "playtime": 0,
+      "platforms": [
+        {
+          "platform": {
+            "id": 4,
+            "name": "PC",
+            "slug": "pc",
+            "image": null,
+            "year_end": null,
+            "year_start": null,
+            "games_count": 1004,
+            "image_background": "https://media.rawg.io/media/games/4a/4a4.jpg"
+          },
+          "released_at": "2026-10-02",
+          "requirements_en": null,
+          "requirements_ru": null
+        }
+      ],
+      "stores": [
+        {
+          "id": 1009877,
+          "store": {
+            "id": 1,
+            "name": "Steam",
+            "slug": "steam",
+            "domain": "store.steampowered.com",
+            "games_count": 112000,
+            "image_background": "https://media.rawg.io/media/games/steam.jpg"
+          }
+        }
+      ],
+      "released": "2026-10-02",
+      "tba": false,
+      "background_image": "https://media.rawg.io/media/games/9b2/9b2c4e6f8a0b1c2d3e4f5a6b7c8d9e0f.jpg",
+      "rating": 4.41,
+      "rating_top": 5,
+      "ratings": [
+        {
+          "id": 5,
+          "title": "exceptional",
+          "count": 31,
+          "percent": 64.58
+        },
+        {
+          "id": 4,
+          "title": "recommended",
+          "count": 14,
+          "percent": 29.17
+        },
+        {
+          "id": 3,
+          "title": "meh",
+          "count": 3,
+          "percent": 6.25
+        }
+      ],
+      "ratings_count": 48,
+      "reviews_text_count": 2,
+      "added": 412,
+      "added_by_status": {
+        "yet": 40,
+        "owned": 310,
+        "beaten": 22,
+        "toplay": 35,
+        "dropped": 5
+      },
+      "metacritic": null,
+      "suggestions_count": 380,
+      "updated": "2026-10-10T21:14:03",
+      "id": 1009876,
+      "score": null,
+      "clip": null,
+      "tags": [
+        {
+          "id": 31,
+          "name": "Singleplayer",
+          "slug": "singleplayer",
+          "language": "eng",
+          "games_count": 240000,
+          "image_background": "https://media.rawg.io/media/games/tag.jpg"
+        }
+      ],
+      "esrb_rating": null,
+      "user_game": null,
+      "reviews_count": 48,
+      "saturated_color": "0f0f0f",
+      "dominant_color": "0f0f0f",
+      "short_screenshots": [
+        {
+          "id": -1,
+          "image": "https://media.rawg.io/media/games/9b2/9b2c4e6f8a0b1c2d3e4f5a6b7c8d9e0f.jpg"
+        },
+        {
+          "id": 10098760,
+          "image": "https://media.rawg.io/media/screenshots/star-freight-tycoon-1.jpg"
+        }
+      ],
+      "parent_platforms": [
+        {
+          "platform": {
+            "id": 1,
+            "name": "PC",
+            "slug": "pc"
+          }
+        }
+      ],
+      "genres": [
+        {
+          "id": 4,
+          "name": "Action",
+          "slug": "action",
+          "games_count": 190000,
+          "image_background": "https://media.rawg.io/media/games/genre.jpg"
+        }
+      ]
+    },
+    {
+      "slug": "tidepool",
+      "name": "Tidepool",
+      "playtime": 0,
+      "platforms": [
+        {
+          "platform": {
+            "id": 7,
+            "name": "Nintendo Switch",
+            "slug": "nintendo-switch",
+            "image": null,
+            "year_end": null,
+            "year_start": null,
+            "games_count": 1007,
+            "image_background": "https://media.rawg.io/media/games/7a/7a7.jpg"
+          },
+          "released_at": "2026-10-09",
+          "requirements_en": null,
+          "requirements_ru": null
+        }
+      ],
+      "stores": [
+        {
+          "id": 1012346,
+          "store": {
+            "id": 1,
+            "name": "Steam",
+            "slug": "steam",
+            "domain": "store.steampowered.com",
+            "games_count": 112000,
+            "image_background": "https://media.rawg.io/media/games/steam.jpg"
+          }
+        }
+      ],
+      "released": "2026-10-09",
+      "tba": false,
+      "background_image": null,
+      "rating": 4.2,
+      "rating_top": 5,
+      "ratings": [
+        {
+          "id": 5,
+          "title": "exceptional",
+          "count": 31,
+          "percent": 64.58
+        },
+        {
+          "id": 4,
+          "title": "recommended",
+          "count": 14,
+          "percent": 29.17
+        },
+        {
+          "id": 3,
+          "title": "meh",
+          "count": 3,
+          "percent": 6.25
+        }
+      ],
+      "ratings_count": 48,
+      "reviews_text_count": 2,
+      "added": 412,
+      "added_by_status": {
+        "yet": 40,
+        "owned": 310,
+        "beaten": 22,
+        "toplay": 35,
+        "dropped": 5
+      },
+      "metacritic": null,
+      "suggestions_count": 380,
+      "updated": "2026-10-10T21:14:03",
+      "id": 1012345,
+      "score": null,
+      "clip": null,
+      "tags": [
+        {
+          "id": 31,
+          "name": "Singleplayer",
+          "slug": "singleplayer",
+          "language": "eng",
+          "games_count": 240000,
+          "image_background": "https://media.rawg.io/media/games/tag.jpg"
+        }
+      ],
+      "esrb_rating": null,
+      "user_game": null,
+      "reviews_count": 48,
+      "saturated_color": "0f0f0f",
+      "dominant_color": "0f0f0f",
+      "short_screenshots": [],
+      "parent_platforms": [
+        {
+          "platform": {
+            "id": 1,
+            "name": "PC",
+            "slug": "pc"
+          }
+        }
+      ],
+      "genres": [
+        {
+          "id": 4,
+          "name": "Action",
+          "slug": "action",
+          "games_count": 190000,
+          "image_background": "https://media.rawg.io/media/games/genre.jpg"
+        }
+      ]
+    }
+  ],
+  "seo_title": "All Games",
+  "seo_description": "",
+  "seo_keywords": "",
+  "seo_h1": "All Games",
+  "noindex": false,
+  "nofollow": false,
+  "description": "",
+  "filters": {
+    "years": [
+      {
+        "from": 2020,
+        "to": 2026,
+        "filter": "2020-01-01,2026-12-31",
+        "decade": 2020,
+        "years": [
+          {
+            "year": 2026,
+            "count": 5821,
+            "nofollow": false
+          }
+        ],
+        "nofollow": true,
+        "count": 5821
+      }
+    ]
+  },
+  "nofollow_collections": [
+    "stores"
+  ]
+}

@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
+  <!-- src/app/icon.svg — the tab icon: the masthead in miniature (MARK in src/lib/site.ts draws the same rectangles). A dark tile on every tab strip: it stands out on a light one, and the mark and rules carry it on a dark one. Whole units, so edges fall on pixels at 16, 32 and 48 px. -->
+  <rect width="16" height="16" rx="3" fill="#0E0F12"/>
+  <g shape-rendering="crispEdges">
+    <rect x="3" y="3" width="5" height="5" fill="#FF6A3D"/>
+    <rect x="9" y="5" width="4" height="1" fill="#A7ABB3"/>
+    <rect x="3" y="10" width="10" height="2" fill="#ECEAE4"/>
+    <rect x="3" y="13" width="6" height="1" fill="#A7ABB3"/>
+  </g>
+</svg>

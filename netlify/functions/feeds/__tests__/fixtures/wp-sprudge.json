@@ -1,0 +1,587 @@
+[
+  {
+    "date_gmt": "2026-10-10T19:00:00",
+    "link": "https://sprudge.com/build-outs-of-coffee-larkspur-in-portland-or-298811.html",
+    "title": {
+      "rendered": "Build-Outs Of Coffee: Larkspur In Portland, OR"
+    },
+    "_links": {
+      "self": [
+        {
+          "href": "https://sprudge.com/wp-json/wp/v2/posts/298811",
+          "targetHints": {
+            "allow": [
+              "GET"
+            ]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "https://sprudge.com/wp-json/wp/v2/posts"
+        }
+      ],
+      "about": [
+        {
+          "href": "https://sprudge.com/wp-json/wp/v2/types/post"
+        }
+      ],
+      "author": [
+        {
+          "embeddable": true,
+          "href": "https://sprudge.com/wp-json/wp/v2/users/7"
+        }
+      ],
+      "replies": [
+        {
+          "embeddable": true,
+          "href": "https://sprudge.com/wp-json/wp/v2/comments?post=298811"
+        }
+      ],
+      "version-history": [
+        {
+          "count": 3,
+          "href": "https://sprudge.com/wp-json/wp/v2/posts/298811/revisions"
+        }
+      ],
+      "predecessor-version": [
+        {
+          "id": 298820,
+          "href": "https://sprudge.com/wp-json/wp/v2/posts/298811/revisions/298820"
+        }
+      ],
+      "wp:featuredmedia": [
+        {
+          "embeddable": true,
+          "href": "https://sprudge.com/wp-json/wp/v2/media/298814"
+        }
+      ],
+      "wp:attachment": [
+        {
+          "href": "https://sprudge.com/wp-json/wp/v2/media?parent=298811"
+        }
+      ],
+      "wp:term": [
+        {
+          "taxonomy": "category",
+          "embeddable": true,
+          "href": "https://sprudge.com/wp-json/wp/v2/categories?post=298811"
+        },
+        {
+          "taxonomy": "post_tag",
+          "embeddable": true,
+          "href": "https://sprudge.com/wp-json/wp/v2/tags?post=298811"
+        }
+      ],
+      "curies": [
+        {
+          "name": "wp",
+          "href": "https://api.w.org/{rel}",
+          "templated": true
+        }
+      ]
+    },
+    "_embedded": {
+      "wp:featuredmedia": [
+        {
+          "id": 298814,
+          "date": "2026-10-10T19:00:00",
+          "slug": "larkspur-buildout",
+          "type": "attachment",
+          "link": "https://sprudge.com/build-outs-of-coffee-larkspur-in-portland-or-298811.htmllarkspur-buildout/",
+          "title": {
+            "rendered": "larkspur-buildout"
+          },
+          "author": 7,
+          "featured_media": 0,
+          "caption": {
+            "rendered": ""
+          },
+          "alt_text": "",
+          "media_type": "image",
+          "mime_type": "image/jpeg",
+          "media_details": {
+            "width": 1600,
+            "height": 1067,
+            "file": "2026/10/larkspur-buildout.jpg",
+            "filesize": 341440,
+            "sizes": {
+              "medium": {
+                "file": "larkspur-buildout-300x200.jpg",
+                "width": 300,
+                "height": 200,
+                "filesize": 6667,
+                "mime_type": "image/jpeg",
+                "source_url": "https://sprudge.com/wp-content/uploads/2026/10/larkspur-buildout-300x200.jpg"
+              },
+              "thumbnail": {
+                "file": "larkspur-buildout-150x150.jpg",
+                "width": 150,
+                "height": 150,
+                "filesize": 2500,
+                "mime_type": "image/jpeg",
+                "source_url": "https://sprudge.com/wp-content/uploads/2026/10/larkspur-buildout-150x150.jpg"
+              },
+              "medium_large": {
+                "file": "larkspur-buildout-768x512.jpg",
+                "width": 768,
+                "height": 512,
+                "filesize": 43691,
+                "mime_type": "image/jpeg",
+                "source_url": "https://sprudge.com/wp-content/uploads/2026/10/larkspur-buildout-768x512.jpg"
+              },
+              "large": {
+                "file": "larkspur-buildout-1024x683.jpg",
+                "width": 1024,
+                "height": 683,
+                "filesize": 77710,
+                "mime_type": "image/jpeg",
+                "source_url": "https://sprudge.com/wp-content/uploads/2026/10/larkspur-buildout-1024x683.jpg"
+              },
+              "full": {
+                "file": "larkspur-buildout.jpg",
+                "width": 1600,
+                "height": 1067,
+                "mime_type": "image/jpeg",
+                "source_url": "https://sprudge.com/wp-content/uploads/2026/10/larkspur-buildout.jpg"
+              }
+            },
+            "image_meta": {
+              "aperture": "0",
+              "credit": "",
+              "camera": "",
+              "caption": "",
+              "created_timestamp": "0",
+              "copyright": "",
+              "focal_length": "0",
+              "iso": "0",
+              "shutter_speed": "0",
+              "title": "",
+              "orientation": "0",
+              "keywords": []
+            }
+          },
+          "source_url": "https://sprudge.com/wp-content/uploads/2026/10/larkspur-buildout.jpg",
+          "_links": {
+            "self": [
+              {
+                "href": "https://sprudge.com/wp-json/wp/v2/media/298814",
+                "targetHints": {
+                  "allow": [
+                    "GET"
+                  ]
+                }
+              }
+            ],
+            "collection": [
+              {
+                "href": "https://sprudge.com/wp-json/wp/v2/media"
+              }
+            ],
+            "about": [
+              {
+                "href": "https://sprudge.com/wp-json/wp/v2/types/attachment"
+              }
+            ],
+            "author": [
+              {
+                "embeddable": true,
+                "href": "https://sprudge.com/wp-json/wp/v2/users/7"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  },
+  {
+    "date_gmt": "2026-10-10T15:30:00",
+    "link": "https://sprudge.com/the-sprudge-guide-to-coffee-in-lisbon-298765.html",
+    "title": {
+      "rendered": "The Sprudge Guide To Coffee In Lisbon"
+    },
+    "_links": {
+      "self": [
+        {
+          "href": "https://sprudge.com/wp-json/wp/v2/posts/298765",
+          "targetHints": {
+            "allow": [
+              "GET"
+            ]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "https://sprudge.com/wp-json/wp/v2/posts"
+        }
+      ],
+      "about": [
+        {
+          "href": "https://sprudge.com/wp-json/wp/v2/types/post"
+        }
+      ],
+      "author": [
+        {
+          "embeddable": true,
+          "href": "https://sprudge.com/wp-json/wp/v2/users/7"
+        }
+      ],
+      "replies": [
+        {
+          "embeddable": true,
+          "href": "https://sprudge.com/wp-json/wp/v2/comments?post=298765"
+        }
+      ],
+      "version-history": [
+        {
+          "count": 3,
+          "href": "https://sprudge.com/wp-json/wp/v2/posts/298765/revisions"
+        }
+      ],
+      "predecessor-version": [
+        {
+          "id": 298774,
+          "href": "https://sprudge.com/wp-json/wp/v2/posts/298765/revisions/298774"
+        }
+      ],
+      "wp:featuredmedia": [
+        {
+          "embeddable": true,
+          "href": "https://sprudge.com/wp-json/wp/v2/media/298768"
+        }
+      ],
+      "wp:attachment": [
+        {
+          "href": "https://sprudge.com/wp-json/wp/v2/media?parent=298765"
+        }
+      ],
+      "wp:term": [
+        {
+          "taxonomy": "category",
+          "embeddable": true,
+          "href": "https://sprudge.com/wp-json/wp/v2/categories?post=298765"
+        },
+        {
+          "taxonomy": "post_tag",
+          "embeddable": true,
+          "href": "https://sprudge.com/wp-json/wp/v2/tags?post=298765"
+        }
+      ],
+      "curies": [
+        {
+          "name": "wp",
+          "href": "https://api.w.org/{rel}",
+          "templated": true
+        }
+      ]
+    },
+    "_embedded": {
+      "wp:featuredmedia": [
+        {
+          "id": 298768,
+          "date": "2026-10-10T15:30:00",
+          "slug": "lisbon-cafe-hero",
+          "type": "attachment",
+          "link": "https://sprudge.com/the-sprudge-guide-to-coffee-in-lisbon-298765.htmllisbon-cafe-hero/",
+          "title": {
+            "rendered": "lisbon-cafe-hero"
+          },
+          "author": 7,
+          "featured_media": 0,
+          "caption": {
+            "rendered": ""
+          },
+          "alt_text": "",
+          "media_type": "image",
+          "mime_type": "image/jpeg",
+          "media_details": {
+            "width": 1600,
+            "height": 1067,
+            "file": "2026/10/lisbon-cafe-hero.jpg",
+            "filesize": 341440,
+            "sizes": {
+              "medium": {
+                "file": "lisbon-cafe-hero-300x200.jpg",
+                "width": 300,
+                "height": 200,
+                "filesize": 6667,
+                "mime_type": "image/jpeg",
+                "source_url": "https://sprudge.com/wp-content/uploads/2026/10/lisbon-cafe-hero-300x200.jpg"
+              },
+              "thumbnail": {
+                "file": "lisbon-cafe-hero-150x150.jpg",
+                "width": 150,
+                "height": 150,
+                "filesize": 2500,
+                "mime_type": "image/jpeg",
+                "source_url": "https://sprudge.com/wp-content/uploads/2026/10/lisbon-cafe-hero-150x150.jpg"
+              },
+              "medium_large": {
+                "file": "lisbon-cafe-hero-768x512.jpg",
+                "width": 768,
+                "height": 512,
+                "filesize": 43691,
+                "mime_type": "image/jpeg",
+                "source_url": "https://sprudge.com/wp-content/uploads/2026/10/lisbon-cafe-hero-768x512.jpg"
+              },
+              "large": {
+                "file": "lisbon-cafe-hero-1024x683.jpg",
+                "width": 1024,
+                "height": 683,
+                "filesize": 77710,
+                "mime_type": "image/jpeg",
+                "source_url": "https://sprudge.com/wp-content/uploads/2026/10/lisbon-cafe-hero-1024x683.jpg"
+              },
+              "full": {
+                "file": "lisbon-cafe-hero.jpg",
+                "width": 1600,
+                "height": 1067,
+                "mime_type": "image/jpeg",
+                "source_url": "https://sprudge.com/wp-content/uploads/2026/10/lisbon-cafe-hero.jpg"
+              }
+            },
+            "image_meta": {
+              "aperture": "0",
+              "credit": "",
+              "camera": "",
+              "caption": "",
+              "created_timestamp": "0",
+              "copyright": "",
+              "focal_length": "0",
+              "iso": "0",
+              "shutter_speed": "0",
+              "title": "",
+              "orientation": "0",
+              "keywords": []
+            }
+          },
+          "source_url": "https://sprudge.com/wp-content/uploads/2026/10/lisbon-cafe-hero.jpg",
+          "_links": {
+            "self": [
+              {
+                "href": "https://sprudge.com/wp-json/wp/v2/media/298768",
+                "targetHints": {
+                  "allow": [
+                    "GET"
+                  ]
+                }
+              }
+            ],
+            "collection": [
+              {
+                "href": "https://sprudge.com/wp-json/wp/v2/media"
+              }
+            ],
+            "about": [
+              {
+                "href": "https://sprudge.com/wp-json/wp/v2/types/attachment"
+              }
+            ],
+            "author": [
+              {
+                "embeddable": true,
+                "href": "https://sprudge.com/wp-json/wp/v2/users/7"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  },
+  {
+    "date_gmt": "2026-10-08T14:00:00",
+    "link": "https://sprudge.com/a-closer-look-at-the-grinder-everyones-talking-about-298702.html",
+    "title": {
+      "rendered": "A Closer Look At The Grinder Everyone&#8217;s Talking About"
+    },
+    "_links": {
+      "self": [
+        {
+          "href": "https://sprudge.com/wp-json/wp/v2/posts/298702",
+          "targetHints": {
+            "allow": [
+              "GET"
+            ]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "https://sprudge.com/wp-json/wp/v2/posts"
+        }
+      ],
+      "about": [
+        {
+          "href": "https://sprudge.com/wp-json/wp/v2/types/post"
+        }
+      ],
+      "author": [
+        {
+          "embeddable": true,
+          "href": "https://sprudge.com/wp-json/wp/v2/users/7"
+        }
+      ],
+      "replies": [
+        {
+          "embeddable": true,
+          "href": "https://sprudge.com/wp-json/wp/v2/comments?post=298702"
+        }
+      ],
+      "version-history": [
+        {
+          "count": 3,
+          "href": "https://sprudge.com/wp-json/wp/v2/posts/298702/revisions"
+        }
+      ],
+      "predecessor-version": [
+        {
+          "id": 298711,
+          "href": "https://sprudge.com/wp-json/wp/v2/posts/298702/revisions/298711"
+        }
+      ],
+      "wp:featuredmedia": [
+        {
+          "embeddable": true,
+          "href": "https://sprudge.com/wp-json/wp/v2/media/298705"
+        }
+      ],
+      "wp:attachment": [
+        {
+          "href": "https://sprudge.com/wp-json/wp/v2/media?parent=298702"
+        }
+      ],
+      "wp:term": [
+        {
+          "taxonomy": "category",
+          "embeddable": true,
+          "href": "https://sprudge.com/wp-json/wp/v2/categories?post=298702"
+        },
+        {
+          "taxonomy": "post_tag",
+          "embeddable": true,
+          "href": "https://sprudge.com/wp-json/wp/v2/tags?post=298702"
+        }
+      ],
+      "curies": [
+        {
+          "name": "wp",
+          "href": "https://api.w.org/{rel}",
+          "templated": true
+        }
+      ]
+    },
+    "_embedded": {
+      "wp:featuredmedia": [
+        {
+          "id": 298705,
+          "date": "2026-10-08T14:00:00",
+          "slug": "grinder-closeup",
+          "type": "attachment",
+          "link": "https://sprudge.com/a-closer-look-at-the-grinder-everyones-talking-about-298702.htmlgrinder-closeup/",
+          "title": {
+            "rendered": "grinder-closeup"
+          },
+          "author": 7,
+          "featured_media": 0,
+          "caption": {
+            "rendered": ""
+          },
+          "alt_text": "",
+          "media_type": "image",
+          "mime_type": "image/jpeg",
+          "media_details": {
+            "width": 1600,
+            "height": 1067,
+            "file": "2026/10/grinder-closeup.jpg",
+            "filesize": 341440,
+            "sizes": {
+              "medium": {
+                "file": "grinder-closeup-300x200.jpg",
+                "width": 300,
+                "height": 200,
+                "filesize": 6667,
+                "mime_type": "image/jpeg",
+                "source_url": "https://sprudge.com/wp-content/uploads/2026/10/grinder-closeup-300x200.jpg"
+              },
+              "thumbnail": {
+                "file": "grinder-closeup-150x150.jpg",
+                "width": 150,
+                "height": 150,
+                "filesize": 2500,
+                "mime_type": "image/jpeg",
+                "source_url": "https://sprudge.com/wp-content/uploads/2026/10/grinder-closeup-150x150.jpg"
+              },
+              "medium_large": {
+                "file": "grinder-closeup-768x512.jpg",
+                "width": 768,
+                "height": 512,
+                "filesize": 43691,
+                "mime_type": "image/jpeg",
+                "source_url": "https://sprudge.com/wp-content/uploads/2026/10/grinder-closeup-768x512.jpg"
+              },
+              "large": {
+                "file": "grinder-closeup-1024x683.jpg",
+                "width": 1024,
+                "height": 683,
+                "filesize": 77710,
+                "mime_type": "image/jpeg",
+                "source_url": "https://sprudge.com/wp-content/uploads/2026/10/grinder-closeup-1024x683.jpg"
+              },
+              "full": {
+                "file": "grinder-closeup.jpg",
+                "width": 1600,
+                "height": 1067,
+                "mime_type": "image/jpeg",
+                "source_url": "https://sprudge.com/wp-content/uploads/2026/10/grinder-closeup.jpg"
+              }
+            },
+            "image_meta": {
+              "aperture": "0",
+              "credit": "",
+              "camera": "",
+              "caption": "",
+              "created_timestamp": "0",
+              "copyright": "",
+              "focal_length": "0",
+              "iso": "0",
+              "shutter_speed": "0",
+              "title": "",
+              "orientation": "0",
+              "keywords": []
+            }
+          },
+          "source_url": "https://sprudge.com/wp-content/uploads/2026/10/grinder-closeup.jpg",
+          "_links": {
+            "self": [
+              {
+                "href": "https://sprudge.com/wp-json/wp/v2/media/298705",
+                "targetHints": {
+                  "allow": [
+                    "GET"
+                  ]
+                }
+              }
+            ],
+            "collection": [
+              {
+                "href": "https://sprudge.com/wp-json/wp/v2/media"
+              }
+            ],
+            "about": [
+              {
+                "href": "https://sprudge.com/wp-json/wp/v2/types/attachment"
+              }
+            ],
+            "author": [
+              {
+                "embeddable": true,
+                "href": "https://sprudge.com/wp-json/wp/v2/users/7"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+]

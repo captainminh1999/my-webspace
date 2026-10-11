@@ -59,7 +59,7 @@ Requires Node 22.12 or newer (`@netlify/functions` 6 asks for it). Netlify build
 | `npm run build` / `npm start` | Production build / serve |
 | `npm run lint` | ESLint over `src/` with Next's flat config (`eslint.config.mjs`). Next 16 has no `next lint`, and `next build` no longer lints — this script is the only place it happens |
 | `npm run typecheck` | TypeScript, the site and then `netlify/` (functions and the edge function) |
-| `npm test` | Unit tests (`node --test`) |
+| `npm test` | Unit tests (`node --test`): `src/` and the scheduled feeds in `netlify/functions/feeds/__tests__/`, which run each feed offline against saved upstream responses |
 
 ## Environment
 
@@ -176,6 +176,6 @@ The browser half, in a clean profile (extensions log violations of their own), o
 
 ## Deploy
 
-Push to `main`. Netlify builds with `next build` (fonts are self-hosted through `next/font` and downloaded at build time), deploys the functions in `netlify/functions/` and the edge function in `netlify/edge-functions/`, and reports a Lighthouse score on each deploy. Straight after, run `npm run verify:csp -- https://nhatminh.dev` (see [Content-Security-Policy](#rollout-brake-repair-and-the-standing-check)).
+Every pull request and push to `main` runs lint, typecheck, tests and a build in GitHub Actions (`.github/workflows/ci.yml`; no database, no secrets). Push to `main`. Netlify builds with `next build` (fonts are self-hosted through `next/font` and downloaded at build time), deploys the functions in `netlify/functions/` and the edge function in `netlify/edge-functions/`, and reports a Lighthouse score on each deploy. Straight after, run `npm run verify:csp -- https://nhatminh.dev` (see [Content-Security-Policy](#rollout-brake-repair-and-the-standing-check)).
 
 To undo a bad deploy: Netlify → Deploys → the last good production deploy → **Publish deploy**. It is instant, does not rebuild and costs no credits. Not to a deploy from before the database user was rotated, though — see the last-but-one point of [Admin sign-in](#admin-sign-in). The next push to `main` publishes over it again unless **Lock to stop auto publishing** is on.
