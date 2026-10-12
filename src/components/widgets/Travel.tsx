@@ -1,7 +1,7 @@
 import { Fragment, type CSSProperties } from "react";
 import type { Journey } from "@/types/travel";
 import { HOME, STAY_MONTHS, SIDE_KM, formatKm, itinerary, legKm, placeKey, placeVisits, quietYears, railMarks, span, summarize, trips, when, type Trip, type TravelSummary } from "@/utils/travel";
-import { LABEL_TRANSFORM, mapModel, type MapModel } from "@/utils/travelMap";
+import { LABEL_BREAKS, LABEL_TRANSFORM, NARROWEST, mapModel, type MapModel } from "@/utils/travelMap";
 
 const NO_ITEMS = <p className="font-mono text-dense text-ink-3">No items</p>;
 
@@ -16,6 +16,10 @@ const MODE_LABEL = { air: "Air", land: "Land", sea: "Sea" } as const;
  * once on load, again on hover), and the places as HTML marks and labels over the svg, so they keep their px
  * size at every width. A map with two label layers switches between them with a container query.
  */
+/** Show a set of labels only across its range of map widths (the container queries in globals.css). */
+const layerClass = (l: { minW: number; maxW: number }) =>
+  [(LABEL_BREAKS as readonly number[]).includes(l.minW) && `tmap-from-${l.minW}`, (LABEL_BREAKS as readonly number[]).includes(l.maxW + 1) && `tmap-to-${l.maxW + 1}`].filter(Boolean).join(" ") || undefined;
+
 function TravelMap({ model }: { model: MapModel }) {
   const style = {
     aspectRatio: `${model.w} / ${model.h}`,
@@ -45,8 +49,8 @@ function TravelMap({ model }: { model: MapModel }) {
           )}
         </g>
       </svg>
-      {model.layers.map((layer, li) => (
-        <div key={`${layer.minW}-${layer.maxW}`} className={model.layers.length > 1 ? (li === 0 ? "tmap-narrow" : "tmap-wide") : undefined}>
+      {model.layers.map((layer) => (
+        <div key={`${layer.minW}-${layer.maxW}`} className={layerClass(layer)}>
           {layer.marks.map((m) => (
             <i key={m.key} className={`tmap-mk ${m.kind}`} style={{ left: pct(m.left), top: pct(m.top) }} title={m.title} />
           ))}
@@ -86,7 +90,8 @@ function Legend({ earlier, land }: { earlier: boolean; land: boolean }) {
 
 /**
  * A trip's stops in order. The start (and the end of a round trip) are dimmed, a there-and-back side trip is
- * bracketed after the stop it left from, and a line only breaks before an arrow unless a name is too long to keep.
+ * bracketed after the stop it left from, and a line only breaks before an arrow or a bracket unless a name is too
+ * long to keep whole.
  */
 function Route({ trip, className = "" }: { trip: Trip; className?: string }) {
   const stops = itinerary(trip);
@@ -95,6 +100,7 @@ function Route({ trip, className = "" }: { trip: Trip; className?: string }) {
     <span className={`uppercase text-ink wrap-anywhere ${className}`}>
       {stops.map((s, i) => {
         const dim = i === 0 || (round && i === stops.length - 1) ? "text-ink-3" : "";
+        const side = s.side.map((p) => p.city).join(", ");
         return (
           <Fragment key={`${placeKey(s.place)}|${i}`}>
             {i > 0 && " "}
@@ -102,7 +108,7 @@ function Route({ trip, className = "" }: { trip: Trip; className?: string }) {
               {i > 0 && "→ "}
               {s.place.city}
             </span>
-            {s.side.length > 0 && <span className={dim}> ({s.side.map((p) => p.city).join(", ")})</span>}
+            {side && <span className={`${dim} ${side.length > 20 ? "" : "whitespace-nowrap"}`}> ({side})</span>}
           </Fragment>
         );
       })}
@@ -137,7 +143,7 @@ export function TravelCard({ journeys }: { journeys: Journey[] }) {
   if (!journeys.length) return NO_ITEMS;
   const ts = trips(journeys);
   const sum = summarize(journeys);
-  const model = mapModel(journeys, ts, { aspect: [1.2, 2], drawnAt: 472, layers: [[296, 703]] });
+  const model = mapModel(journeys, ts, { aspect: [1.2, 2], drawnAt: 472, layers: [[NARROWEST, 295], [296, 703]] });
   const longest = Math.max(...ts.map((t) => t.km));
   const latest = [...ts].reverse().slice(0, 4);
   return (
@@ -220,7 +226,7 @@ function Rail({ ts, sum }: { ts: Trip[]; sum: TravelSummary }) {
         </span>
       </figcaption>
       <div role="img" aria-label={label}>
-        <div className="relative h-7">
+        <div className="relative" style={{ height: Math.max(2, ...marks.map((m) => m.lane + 1)) * 13 + 2 }}>
           {marks.map((m, i) => (
             <i
               key={m.trip}
@@ -268,7 +274,7 @@ export function TravelFull({ journeys }: { journeys: Journey[] }) {
   if (!journeys.length) return NO_ITEMS;
   const ts = trips(journeys);
   const sum = summarize(journeys);
-  const model = mapModel(journeys, ts, { aspect: [1.5, 2.6], drawnAt: 768, layers: [[286, 559], [560, 768]] });
+  const model = mapModel(journeys, ts, { aspect: [1.5, 2.6], drawnAt: 768, layers: [[NARROWEST, 295], [296, 559], [560, 768]] });
   const longest = ts.reduce((a, b) => (b.km > a.km ? b : a));
   const most = placeVisits(ts)
     .filter((p) => placeKey(p) !== placeKey(HOME))
@@ -339,7 +345,7 @@ export function TravelFull({ journeys }: { journeys: Journey[] }) {
                 <tr>
                   <th scope="col">Leg</th>
                   <th scope="col">Month</th>
-                  <th scope="col">By</th>
+                  <th scope="col" className="hidden md:table-cell">By</th>
                   <th scope="col">Km</th>
                 </tr>
               </thead>

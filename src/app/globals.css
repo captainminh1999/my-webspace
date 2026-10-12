@@ -180,9 +180,10 @@
   .tmap-lbl { position: absolute; white-space: nowrap; font: 11px/14px var(--font-mono); letter-spacing: 0.04em; padding: 0 3px; border-radius: 2px; background: var(--surface); color: var(--ink-3); pointer-events: none; }
   .tmap-lbl.now { color: var(--ink); }
   .tmap-lbl.home { color: var(--ink-2); }
-  /* The dialog's map has a second set of labels for when it is drawn wide; the card's has one. */
-  .tmap-wide { display: none; }
-  @container tmap (min-width: 560px) { .tmap-narrow { display: none; } .tmap-wide { display: block; } }
+  /* Each set of labels is placed for a range of map widths (LABEL_BREAKS in src/utils/travelMap.ts). */
+  .tmap-from-296, .tmap-from-560 { display: none; }
+  @container tmap (min-width: 296px) { .tmap-from-296 { display: block; } .tmap-to-296 { display: none; } }
+  @container tmap (min-width: 560px) { .tmap-from-560 { display: block; } .tmap-to-560 { display: none; } }
 
   /* A trip's legs as one bar, each segment as long as its leg: land dotted, sea dashed, mode unknown a hairline */
   .trip-strip { display: flex; gap: 2px; height: 3px; color: var(--ink-3); }

@@ -22,7 +22,8 @@ type LatLon = { lat: number; lon: number };
  * The frame: the points' bounding box with longitudes taken on the shortest arc that holds them all (so a
  * Pacific crossing grows the frame east past 180° rather than flipping it to the whole world), padded,
  * grown to at least APAC_MIN, then widened or heightened about its centre to an aspect between `aspectMin`
- * and `aspectMax`, and kept inside the grid's 84°N-56°S. Sydney keeps its own longitude; east may pass 180.
+ * and `aspectMax`, and kept inside the grid's 84°N-56°S unless a point lies further south (there is no land
+ * drawn there, but the place and its route still need room). Sydney keeps its own longitude; east may pass 180.
  */
 export function fitFrame(points: LatLon[], aspectMin: number, aspectMax: number): Frame {
   const all = [...points, HOME];
@@ -63,25 +64,26 @@ export function fitFrame(points: LatLon[], aspectMin: number, aspectMax: number)
     south -= d / 2;
     north += d / 2;
   }
+  const floor = Math.min(-56, Math.min(...lats) - PAD_DEG);
   if (north > 84) {
     south -= north - 84;
     north = 84;
   }
-  if (south < -56) {
-    north = Math.min(84, north + (-56 - south));
-    south = -56;
+  if (south < floor) {
+    north = Math.min(84, north + (floor - south));
+    south = floor;
   }
   return { west, east, south, north };
 }
 
 export type Cells = { x0: number; x1: number; y0: number; y1: number; w: number; h: number };
 
-/** The frame in whole grid cells: x from the grid's west edge (it may run past the grid's last column), y from its top. */
+/** The frame in whole grid cells: x from the grid's west edge (it may run past the grid's last column), y from its top (it may run past the last row). */
 export function cells(f: Frame): Cells {
   const x0 = Math.floor((f.west - GRID.west) / GRID.step);
   const x1 = Math.ceil((f.east - GRID.west) / GRID.step);
   const y0 = Math.max(0, Math.floor((GRID.north - f.north) / GRID.step));
-  const y1 = Math.min(GRID.rows, Math.ceil((GRID.north - f.south) / GRID.step));
+  const y1 = Math.ceil((GRID.north - f.south) / GRID.step);
   return { x0, x1, y0, y1, w: x1 - x0, h: y1 - y0 };
 }
 
@@ -149,22 +151,20 @@ export const arcPoints = (a: LatLon, b: LatLon) => slerp(a, b, (deg) => Math.max
 // A tenth of a cell is under half a pixel on the widest map.
 const n1 = (v: number) => +v.toFixed(1);
 
-/** The great circle a → b in frame units, one point per 2° (2 to 64): it starts at a's place and runs on unbroken across 180°. */
+/**
+ * The great circle a → b in frame units, one point per 2° (2 to 64), each placed in the frame as the places
+ * are (at()), so it starts and ends at their marks. A frame past 180° holds a Pacific crossing whole; where a
+ * route crosses the frame's own seam, or a pole, it starts a new subpath at the other side instead of a line
+ * across the map.
+ */
 export function arc(a: LatLon, b: LatLon, c: Cells): string {
   const pts = slerp(a, b, (deg) => Math.min(64, Math.max(2, Math.ceil(deg / 2))));
-  if (!pts.length) return "";
-  const start = at(a, c);
   let out = "";
-  let prev: number | null = null;
-  let unwrap = 0;
-  let x0 = 0;
+  let px = 0;
   pts.forEach((p, i) => {
-    if (prev !== null && Math.abs(p.lon - prev) > 180) unwrap += p.lon < prev ? 360 : -360;
-    prev = p.lon;
-    let x = (p.lon + unwrap - GRID.west) / GRID.step - c.x0;
-    if (i === 0) x0 = x;
-    x += start.x - x0;
-    out += `${i ? "L" : "M"}${n1(x)} ${n1((GRID.north - p.lat) / GRID.step - c.y0)}`;
+    const { x, y } = at(p, c);
+    out += `${i && Math.abs(x - px) < c.w / 2 ? "L" : "M"}${n1(x)} ${n1(y)}`;
+    px = x;
   });
   return out;
 }
@@ -276,6 +276,15 @@ function cluster<T extends { x: number; y: number }>(pts: T[], px: number, frame
 // ---- The whole map, as data ----
 
 export type MarkKind = "now" | "home" | "was";
+
+/**
+ * The map widths at which a map switches to its next set of labels, by container query (globals.css,
+ * `.tmap-from-*` / `.tmap-to-*`). A layer's range must start at the narrowest width or at one of these, and
+ * end just before one of them or at the widest.
+ */
+export const LABEL_BREAKS = [296, 560] as const;
+/** The narrowest map drawn: the dialog's on a 320px phone (the card's is 254px there). */
+export const NARROWEST = 240;
 
 export interface MapModel {
   /** viewBox width and height, in grid cells. */

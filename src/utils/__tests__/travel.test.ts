@@ -137,6 +137,12 @@ test('months between journeys; with a month missing, the gap is the smallest it 
   assert.equal(monthsBetween({ year: 2026 }, { year: 2026, month: 12 }), 0);
   assert.equal(monthsBetween({ year: 2026, month: 12 }, { year: 2027 }), 1);
   assert.equal(monthsBetween({ year: 2024 }, { year: 2026 }), 13);
+  // One month known: the missing one is the one that makes the gap smallest.
+  assert.equal(monthsBetween({ year: 2017, month: 1 }, { year: 2018 }), 12);
+  assert.equal(monthsBetween({ year: 2017 }, { year: 2018, month: 12 }), 12);
+  assert.equal(monthsBetween({ year: 2017, month: 8 }, { year: 2019 }), 17);
+  const cut = trips([j(SYD, HANOI, 2017, 1), j(HANOI, SAIGON, 2018), j(SAIGON, SYD, 2018)]);
+  assert.deepEqual(cut.map((t) => [t.end, t.stay?.months]), [['stay', 12], ['home', undefined]]);
 });
 
 test('round trips from Sydney are one trip each, closed when they get home', () => {
@@ -196,6 +202,10 @@ test('trips sit on the month rail without touching, a missing month covering its
     [4, 1, 1, true], // starts the month after the last one ended: the other lane
     [12, 12, 0, false],
   ]);
+  const busy = trips([SINGAPORE, SINGAPORE, SINGAPORE, SINGAPORE].flatMap((_, i) => [j(SINGAPORE, i % 2 ? JOHOR : HANOI, 2018, i < 3 ? 3 : 4), j(i % 2 ? JOHOR : HANOI, SINGAPORE, 2018, i < 3 ? 3 : 4)]));
+  const lanes = railMarks(busy, 2018, 2018);
+  assert.deepEqual(lanes.map((m) => m.lane), [0, 1, 2, 3], 'a third trip in one month gets a lane of its own, and so does April, which would touch each of them');
+  for (const [i, a] of lanes.entries()) for (const b of lanes.slice(i + 1)) if (a.lane === b.lane) assert.ok(b.left > a.left + a.width || a.left > b.left + b.width, 'never touching in one lane');
   assert.deepEqual(quietYears([{ year: 2017, journeys: 2 }, { year: 2018, journeys: 0 }, { year: 2019, journeys: 0 }, { year: 2020, journeys: 1 }, { year: 2021, journeys: 0 }]), [[2018, 2019], [2021, 2021]]);
 });
 
@@ -231,6 +241,21 @@ test('a route starts and ends at its places in the frame, unbroken across 180°'
   assert.ok(Math.abs(pts.at(-1)![0] - sy.x) < 0.1 && Math.abs(pts.at(-1)![1] - sy.y) < 0.1, `${pts.at(-1)} vs ${JSON.stringify(sy)}`);
   for (let i = 1; i < pts.length; i++) assert.ok(Math.abs(pts[i][0] - pts[i - 1][0]) < c.w / 4, 'no jump across the map');
   assert.equal(arc(SYD, SYD, c), '');
+  // Over the pole: the route leaves at the top and comes back in, and still ends at its mark.
+  const NEW_YORK = p('New York', 'US', 40.7128, -74.006);
+  const c2 = cells(fitFrame([HANOI, NEW_YORK, ...[HANOI, NEW_YORK]], 1.2, 2.6));
+  const polar = xs(arc(HANOI, NEW_YORK, c2));
+  const ny = at(NEW_YORK, c2);
+  assert.ok(Math.abs(polar.at(-1)![0] - ny.x) < 0.1 && Math.abs(polar.at(-1)![1] - ny.y) < 0.1, `${polar.at(-1)} vs ${JSON.stringify(ny)}`);
+});
+
+test('a place or route south of the grid still gets room on the map', () => {
+  const SANTIAGO = p('Santiago', 'CL', -33.4489, -70.6693);
+  const ts = trips([j(SYD, SANTIAGO, 2027, 1), j(SANTIAGO, SYD, 2027, 2)]);
+  const model = mapModel(ts.flatMap((t) => t.legs), ts, { aspect: [1.2, 2], drawnAt: 472, layers: [[240, 703]] });
+  const ys = [...model.latest[0].d.matchAll(/[ML](-?[\d.]+) (-?[\d.]+)/g)].map((m) => Number(m[2]));
+  assert.ok(Math.max(...ys) <= model.h && Math.min(...ys) >= 0, `route rows ${Math.min(...ys)}..${Math.max(...ys)} in a frame ${model.h} high`);
+  for (const m of model.layers[0].marks) assert.ok(m.top >= 0 && m.top <= 1, JSON.stringify(m));
 });
 
 test('labels stay inside the map, off other marks and labels, and nearer their own mark than any other', () => {

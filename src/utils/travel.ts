@@ -164,14 +164,12 @@ export function summarize(journeys: Journey[]): TravelSummary {
 export const STAY_MONTHS = 3;
 
 /**
- * Months from one journey's departure to the next one's. When either month is missing only the years are
- * known, and the gap is taken as the smallest it could be (same year 0, Dec to Jan 1), so a missing month
- * never cuts a trip that might be whole.
+ * Months from one journey's departure to the next one's. A missing month is taken as the one that makes the
+ * gap smallest — December for the first journey, January for the next — so a missing month never cuts a trip
+ * that might be whole, and a stay it does cut is never longer than it could have been.
  */
 export function monthsBetween(a: { year: number; month?: number }, b: { year: number; month?: number }): number {
-  if (a.month && b.month) return (b.year - a.year) * 12 + (b.month - a.month);
-  if (b.year === a.year) return 0;
-  return (b.year - a.year - 1) * 12 + 1;
+  return Math.max(0, (b.year - a.year) * 12 + (b.month ?? 1) - (a.month ?? 12));
 }
 
 export type TripEnd =
@@ -275,7 +273,8 @@ export function placeVisits(ts: Trip[]): Array<Place & { trips: number; last: nu
 
 /**
  * The trips on a month rail from January `from` to December `to`: each a bar from its first month to the end
- * of its last, as fractions of the rail, in one of `lanes` lanes so neighbours never overlap. A trip with a
+ * of its last, as fractions of the rail, in the first lane where it starts after the last bar there ended
+ * (`lanes` to begin with, more when every one is taken), so neighbours never overlap or touch. A trip with a
  * month missing covers its whole years and is `known: false` (drawn hollow).
  */
 export function railMarks(ts: Trip[], from: number, to: number, lanes = 2): Array<{ trip: number; left: number; width: number; lane: number; known: boolean }> {
@@ -287,8 +286,8 @@ export function railMarks(ts: Trip[], from: number, to: number, lanes = 2): Arra
     const known = !!(a.month && b.month);
     const start = (a.year - from) * 12 + (known ? a.month! - 1 : 0);
     const end = (b.year - from) * 12 + (known ? b.month! : 12);
-    let lane = ends.findIndex((e) => start > e); // a trip in the very next month takes the other lane, so the two read as two
-    if (lane < 0) lane = ends.indexOf(Math.min(...ends));
+    let lane = ends.findIndex((e) => start > e); // a trip in the very next month takes another lane, so the two read as two
+    if (lane < 0) lane = ends.push(-Infinity) - 1;
     ends[lane] = end;
     return { trip: i, left: start / total, width: (end - start) / total, lane, known };
   });
