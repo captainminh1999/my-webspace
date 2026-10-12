@@ -74,11 +74,32 @@ function parsePlace(v: unknown): Place | null {
 const MODES: ReadonlySet<string> = new Set<Mode>(["air", "land", "sea"]);
 
 /**
+ * The journeys in the order travelled: by year, and within a year by month where it is known. Journeys in
+ * the same month keep the order they were stored in (so a trip's journeys in one month go in as travelled),
+ * and a journey with no month keeps its place among its year's.
+ */
+export function chronological(journeys: Journey[]): Journey[] {
+  const rows = journeys.map((j, i) => ({ j, i })).sort((a, b) => a.j.year - b.j.year || a.i - b.i);
+  for (let start = 0; start < rows.length; ) {
+    let end = start;
+    while (end < rows.length && rows[end].j.year === rows[start].j.year) end++;
+    // Within the year, only the slots holding a month are reordered; a journey without one stays put.
+    const slots: number[] = [];
+    for (let k = start; k < end; k++) if (rows[k].j.month) slots.push(k);
+    const dated = slots.map((k) => rows[k]).sort((a, b) => a.j.month! - b.j.month! || a.i - b.i);
+    slots.forEach((k, n) => (rows[k] = dated[n]));
+    start = end;
+  }
+  return rows.map((r) => r.j);
+}
+
+/**
  * The journeys as stored (the `journeys` collection in MongoDB, edited by hand), checked at the door.
  * A journey that would draw wrongly or throw — either end with a country code the map does not know or a
  * coordinate off the globe, both ends the same place, a month that is not 1-12 — is dropped rather than
  * shown. `by` is optional, so a value that is not air, land or sea only loses the mode, not the journey.
- * Unknown fields are left behind.
+ * Unknown fields are left behind. They come back in the order travelled (chronological()), so a journey
+ * remembered later can be added at the end of the collection.
  */
 export function parseJourneys(docs: unknown): Journey[] {
   if (!Array.isArray(docs)) return [];
@@ -100,7 +121,7 @@ export function parseJourneys(docs: unknown): Journey[] {
       ...(MODES.has(mode) ? { by: mode as Mode } : {}),
     });
   }
-  return out;
+  return chronological(out);
 }
 
 /** A place with the month of the latest journey that arrived there or left it. */
@@ -187,20 +208,46 @@ export interface Trip {
   /** The legs' legKm, added up. */
   km: number;
   end: TripEnd;
-  /** For end "stay": how long the record rests there, and where. */
+  /** For end "stay": how long the record rests there (stayAt), and where. */
   stay?: { months: number; place: Place };
 }
 
 /**
- * The journeys (stored in the order travelled) cut into trips. A trip is a chain, each journey leaving from
- * where the last one arrived, and it ends after the journey that
+ * How long the record stays at the place journey `i` arrives at, in months: up to the first journey that
+ * leaves it for good. A round trip out of it that comes back without passing home or stopping anywhere for
+ * STAY_MONTHS (a weekend at Cat Ba while living in Hanoi) is part of the stay, not the end of it. Null when
+ * the chain breaks or the record ends before a journey leaves for good.
+ */
+export function stayAt(journeys: Journey[], i: number): number | null {
+  const here = placeKey(journeys[i].to);
+  for (let k = i + 1; k < journeys.length; ) {
+    if (placeKey(journeys[k].from) !== here) return null;
+    let back = -1;
+    for (let m = k; m < journeys.length; m++) {
+      const to = placeKey(journeys[m].to);
+      if (to === here) {
+        back = m;
+        break;
+      }
+      const next = journeys[m + 1];
+      if (to === HOME_KEY || !next || placeKey(next.from) !== to || monthsBetween(journeys[m], next) >= STAY_MONTHS) break;
+    }
+    if (back < 0) return monthsBetween(journeys[i], journeys[k]);
+    k = back + 1;
+  }
+  return null;
+}
+
+/**
+ * The journeys (in the order travelled) cut into trips. A trip is a chain, each journey leaving from where
+ * the last one arrived, and it ends after the journey that
  *   1. arrives back at the trip's first place (a round trip), or
  *   2. arrives home in Sydney, or
- *   3. is the last one stored (the latest trip, open until the way back is added), or
+ *   3. is the last one (the latest trip, open until the way back is added), or
  *   4. is followed by a journey that leaves from somewhere else (the chain breaks), or
- *   5. is followed by one that leaves STAY_MONTHS or more later (a stay, not a stop).
+ *   5. arrives where the record then stays STAY_MONTHS or more (stayAt: a place lived in, not a stop).
  * Rule 5 makes years lived somewhere else read as trips from there without storing where that was: a base
- * is simply where the record rests for months.
+ * is simply where the record rests for months, round trips out of it included.
  */
 export function trips(journeys: Journey[]): Trip[] {
   const out: Trip[] = [];
@@ -217,8 +264,8 @@ export function trips(journeys: Journey[]): Trip[] {
     if (here === HOME_KEY) return close("home");
     if (!next) return close("open");
     if (placeKey(next.from) !== here) return close("break");
-    const gap = monthsBetween(j, next);
-    if (gap >= STAY_MONTHS) close("stay", { months: gap, place: j.to });
+    const stay = stayAt(journeys, i);
+    if (stay !== null && stay >= STAY_MONTHS) close("stay", { months: stay, place: j.to });
   });
   return out;
 }

@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { HOME, countryOf, distanceKm, formatKm, itinerary, legKm, monthsBetween, newestFirst, parseJourneys, placeVisits, places, quietYears, railMarks, span, summarize, trips, when } from '../travel.ts';
+import { HOME, chronological, countryOf, distanceKm, formatKm, itinerary, legKm, monthsBetween, newestFirst, parseJourneys, placeVisits, places, quietYears, railMarks, span, summarize, trips, when } from '../travel.ts';
 import { APAC_MIN, arc, at, cells, cropLand, fitFrame, mapModel, placeLabels } from '../travelMap.ts';
 import { GRID, RUNS } from '../../lib/worldMap.ts';
 import type { Journey, Mode, Place } from '../../types/travel.ts';
@@ -158,13 +158,47 @@ test('round trips from Sydney are one trip each, closed when they get home', () 
 test('years lived elsewhere read as trips from there: a stay of three months ends a trip, reaching Sydney ends one, the last is open', () => {
   const ts = trips(ABROAD);
   assert.deepEqual(ts.map((t) => [t.stops.map((s) => s.city).join('>'), t.end, t.stay ? `${t.stay.months} mo in ${t.stay.place.city}` : '']), [
-    ['Hanoi>Singapore', 'stay', '5 mo in Singapore'],
+    ['Hanoi>Singapore', 'stay', '12 mo in Singapore'], // the January trip to Hanoi and back is part of the year there
     ['Singapore>Hanoi>Singapore', 'round', ''],
     ['Singapore>Hanoi>Dubai', 'stay', '8 mo in Dubai'],
     ['Dubai>Hanoi', 'stay', '4 mo in Hanoi'],
     ['Hanoi>Sydney', 'home', ''],
     ['Sydney>Hanoi', 'open', ''],
   ]);
+});
+
+test('a round trip out of a place lived in is part of the stay, not the end of it', () => {
+  const CAT_BA = p('Cat Ba', 'VN', 20.7266, 107.0479);
+  const between = [j(DUBAI, HANOI, 2019, 4), j(HANOI, CAT_BA, 2019, 6, 'land'), j(CAT_BA, HANOI, 2019, 6, 'land'), j(HANOI, SYD, 2019, 8)];
+  assert.deepEqual(trips(between).map((t) => [t.stops.map((s) => s.city).join('>'), t.end, t.stay?.months]), [
+    ['Dubai>Hanoi', 'stay', 4],
+    ['Hanoi>Cat Ba>Hanoi', 'round', undefined],
+    ['Hanoi>Sydney', 'home', undefined],
+  ]);
+  // A short stay with a side trip stays one trip.
+  const holiday = [j(SYD, HANOI, 2025, 11), j(HANOI, NINH_BINH, 2025, 12), j(NINH_BINH, HANOI, 2025, 12), j(HANOI, SAIGON, 2025, 12), j(SAIGON, SYD, 2025, 12)];
+  assert.deepEqual(trips(holiday).map((t) => t.legs.length), [5]);
+  // Away for a year and back is a move, not a round trip out of the first place: two months in Singapore is
+  // a stop on the way to Dubai, the year in Dubai a stay, and three months back in Singapore another.
+  const moved = [j(HANOI, SINGAPORE, 2017, 8), j(SINGAPORE, DUBAI, 2017, 10), j(DUBAI, SINGAPORE, 2018, 10), j(SINGAPORE, SYD, 2019, 1)];
+  assert.deepEqual(trips(moved).map((t) => [t.stops.map((s) => s.city).join('>'), t.stay?.months ?? null]), [
+    ['Hanoi>Singapore>Dubai', 12],
+    ['Dubai>Singapore', 3],
+    ['Singapore>Sydney', null],
+  ]);
+});
+
+test('journeys come back in the order travelled, whatever order they were stored in', () => {
+  const CAT_BA = p('Cat Ba', 'VN', 20.7266, 107.0479);
+  const stored = [j(DUBAI, HANOI, 2019, 4), j(HANOI, SYD, 2019, 8), j(SYD, TOKYO, 2026, 10), j(HANOI, CAT_BA, 2019, 6), j(CAT_BA, HANOI, 2019, 6)];
+  assert.deepEqual(chronological(stored).map(leg), ['Dubai>Hanoi', 'Hanoi>Cat Ba', 'Cat Ba>Hanoi', 'Hanoi>Sydney', 'Sydney>Tokyo']);
+  // Same month: the stored order; no month: its place among the year's.
+  const sameMonth = [j(OSAKA, TOKYO, 2026, 10), j(SYD, OSAKA, 2026, 10)];
+  assert.deepEqual(chronological(sameMonth).map(leg), ['Osaka>Tokyo', 'Sydney>Osaka']);
+  const noMonth = [j(SYD, HANOI, 2019, 3), j(HANOI, SYD, 2019), j(SYD, PARIS, 2019, 1)];
+  assert.deepEqual(chronological(noMonth).map(leg), ['Sydney>Paris', 'Hanoi>Sydney', 'Sydney>Hanoi']);
+  const raw = stored.map((x) => ({ ...x }));
+  assert.deepEqual(parseJourneys(raw).map(leg), chronological(stored).map(leg), 'parseJourneys returns them in order');
 });
 
 test('a chain that breaks ends the trip; a missing month never cuts a trip that might be whole', () => {
