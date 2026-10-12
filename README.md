@@ -46,7 +46,7 @@ With `MONGODB_URI` set, every page reads that database too — not the live func
 
 Requires Node 22.12 or newer (`@netlify/functions` 6 asks for it); `npm test` needs 22.18 or newer, where Node runs the `.ts` test files with its own type stripping. Netlify builds with the Node named in `.nvmrc` and runs the functions on `nodejs22.x`.
 
-`next` is held to `~16.3` on purpose: the edge function stamps nonces on the tags Next.js writes, so a new minor should arrive as a deliberate bump, followed by `npm test` and the local proof below — a new kind of tag shows up there as "tag without the header's nonce". (The `overrides` entry that pointed Next 15's pinned `postcss` at the root one went with the move to Next 16, which pins a fixed `postcss` itself; `npm audit` reads 0 without it.)
+`next` is held to `~16.3` on purpose: the edge function stamps nonces on the tags Next.js writes, so a new minor should arrive as a deliberate bump, followed by `npm test` and the local proof below — a new kind of tag shows up there as "tag without the header's nonce". (The `overrides` entry that pointed Next 15's pinned `postcss` at the root one went with the move to Next 16, which pins a fixed `postcss` itself.) `npm audit` reads 5 high, all one chain in the linter only — `braces` ≤ 3.0.3 under `eslint-config-next`'s `fast-glob`, with no fixed `braces` published yet (2026-10-13); nothing of it reaches the site. Next is on 16.3.8 for the 2026-09 advisories (`next/og` ImageResponse, ISR cache poisoning, image optimisation).
 
 ## Scripts
 
