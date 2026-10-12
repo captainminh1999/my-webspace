@@ -1,8 +1,8 @@
 // Writes src/lib/worldMap.ts: the dot grid behind the Travel card's map, which
 // country each dot belongs to, and every country's name and continent.
 //
-// The map is data, not a picture: a 2° equirectangular grid, 180 columns from
-// 180°W and 70 rows from 84°N (Antarctica is left off), sampled once from
+// The map is data, not a picture: a 1° equirectangular grid, 360 columns from
+// 180°W and 140 rows from 84°N (Antarctica is left off), sampled once from
 // Natural Earth's 1:50m countries. A country too small to own a cell centre
 // (Singapore, Hong Kong, Malta, most islands) gets the free cell nearest its
 // middle — never the last cell of another country — so a visit anywhere lights
@@ -21,7 +21,7 @@ import { countries as LIST } from "countries-list";
 const require = createRequire(import.meta.url);
 const OUT = new URL("../src/lib/worldMap.ts", import.meta.url);
 
-const STEP = 2;
+const STEP = 1;
 const WEST = -180;
 const NORTH = 84;
 const COLS = 360 / STEP;
