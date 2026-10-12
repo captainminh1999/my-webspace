@@ -1,7 +1,8 @@
-// The Travel card's arithmetic: distances from Sydney, the counts, the board's
-// order, and the map's geometry. Pure functions; the card draws what they return.
+// The Travel card's arithmetic: the journeys checked on the way in, the board's order, the places and
+// routes they make, the counts and distances, and the map's geometry. Pure functions; the card draws
+// what they return.
 import { COUNTRIES, GRID, RUNS } from "../lib/worldMap.ts";
-import type { TravelStop } from "../types/travel.ts";
+import type { Journey, Mode, Place } from "../types/travel.ts";
 
 export const HOME = { city: "Sydney", country: "AU", lat: -33.8688, lon: 151.2093 } as const;
 
@@ -44,86 +45,152 @@ export function distanceKm(a: { lat: number; lon: number }, b: { lat: number; lo
 /** "16,990": to the nearest 10 km, which is all a city's centre is good for. */
 export const formatKm = (km: number) => (Math.round(km / 10) * 10).toLocaleString("en-AU");
 
-const placeKey = (s: Pick<TravelStop, "city" | "country">) => `${s.city.trim().toLowerCase()}|${s.country.toUpperCase()}`;
+const placeKey = (p: Pick<Place, "city" | "country">) => `${p.city.trim().toLowerCase()}|${p.country.toUpperCase()}`;
+const HOME_KEY = placeKey(HOME);
 
-/** Newest first by year, then month (a stop with no month comes last in its year); ties keep the order given. */
-export function newestFirst(stops: TravelStop[]): TravelStop[] {
-  return stops
+/**
+ * Newest first by year, then month (one with no month comes last in its year). Within a tie the one
+ * stored later comes first: the collection is kept in the order travelled, so a month with four
+ * journeys reads back from the last one.
+ */
+export function newestFirst<T extends { year: number; month?: number }>(items: T[]): T[] {
+  return items
     .map((s, i) => [s, i] as const)
-    .sort((a, b) => b[0].year - a[0].year || (b[0].month ?? 0) - (a[0].month ?? 0) || a[1] - b[1])
+    .sort((a, b) => b[0].year - a[0].year || (b[0].month ?? 0) - (a[0].month ?? 0) || b[1] - a[1])
     .map(([s]) => s);
 }
 
 const MONTHS = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
 
 /** "OCT 2026", or "2026" when the month is not known. */
-export const when = (s: Pick<TravelStop, "year" | "month">) => (s.month ? `${MONTHS[s.month - 1]} ${s.year}` : String(s.year));
+export const when = (s: { year: number; month?: number }) => (s.month ? `${MONTHS[s.month - 1]} ${s.year}` : String(s.year));
+
+function parsePlace(v: unknown): Place | null {
+  if (!v || typeof v !== "object") return null;
+  const { city, country, lat, lon } = v as Record<string, unknown>;
+  if (typeof city !== "string" || !city.trim()) return null;
+  if (typeof country !== "string" || !countryOf(country).continent) return null;
+  if (!Number.isFinite(lat) || !Number.isFinite(lon) || Math.abs(lat as number) > 90 || Math.abs(lon as number) > 180) return null;
+  return { city: city.trim(), country: country.toUpperCase(), lat: lat as number, lon: lon as number };
+}
+
+const MODES: ReadonlySet<string> = new Set<Mode>(["air", "land", "sea"]);
 
 /**
- * The stops as stored (the `travel` collection in MongoDB, edited by hand), checked at the door: anything
- * that would draw wrongly or throw — a country code the map does not know, a coordinate out of range, a
- * month that is not 1-12 — is dropped rather than shown. Unknown fields are left behind.
+ * The journeys as stored (the `journeys` collection in MongoDB, edited by hand), checked at the door.
+ * A journey that would draw wrongly or throw — either end with a country code the map does not know or a
+ * coordinate off the globe, both ends the same place, a month that is not 1-12 — is dropped rather than
+ * shown. `by` is optional, so a value that is not air, land or sea only loses the mode, not the journey.
+ * Unknown fields are left behind.
  */
-export function parseStops(docs: unknown): TravelStop[] {
+export function parseJourneys(docs: unknown): Journey[] {
   if (!Array.isArray(docs)) return [];
-  const out: TravelStop[] = [];
-  for (const d of docs as Array<Record<string, unknown>>) {
+  const out: Journey[] = [];
+  for (const d of docs as unknown[]) {
     if (!d || typeof d !== "object") continue;
-    const { city, country, year, month, lat, lon } = d;
-    if (typeof city !== "string" || !city.trim()) continue;
-    if (typeof country !== "string" || !countryOf(country).continent) continue;
+    const { from, to, year, month, by } = d as Record<string, unknown>;
+    const a = parsePlace(from);
+    const b = parsePlace(to);
+    if (!a || !b || placeKey(a) === placeKey(b)) continue;
     if (!Number.isInteger(year) || (year as number) < 1900 || (year as number) > 2100) continue;
     if (month != null && (!Number.isInteger(month) || (month as number) < 1 || (month as number) > 12)) continue;
-    if (typeof lat !== "number" || typeof lon !== "number" || Math.abs(lat) > 90 || Math.abs(lon) > 180) continue;
-    out.push({ city: city.trim(), country: country.toUpperCase(), year: year as number, ...(month != null ? { month: month as number } : {}), lat, lon });
+    const mode = typeof by === "string" ? by.trim().toLowerCase() : "";
+    out.push({
+      from: a,
+      to: b,
+      year: year as number,
+      ...(month != null ? { month: month as number } : {}),
+      ...(MODES.has(mode) ? { by: mode as Mode } : {}),
+    });
   }
   return out;
 }
 
-/** Each city once, at its most recent visit. */
-export function places(stops: TravelStop[]): TravelStop[] {
-  const seen = new Set<string>();
-  return newestFirst(stops).filter((s) => !seen.has(placeKey(s)) && !!seen.add(placeKey(s)));
+/** A place with the month of the latest journey that arrived there or left it. */
+export type Visited = Place & { year: number; month?: number };
+
+/** Every place a journey starts or ends at, home aside, once each, at its latest journey; newest first. */
+export function places(journeys: Journey[]): Visited[] {
+  const seen = new Set<string>([HOME_KEY]);
+  const out: Visited[] = [];
+  for (const j of newestFirst(journeys)) {
+    for (const p of [j.to, j.from]) {
+      const k = placeKey(p);
+      if (seen.has(k)) continue;
+      seen.add(k);
+      out.push({ ...p, year: j.year, ...(j.month ? { month: j.month } : {}) });
+    }
+  }
+  return out;
+}
+
+/**
+ * The lines on the map: each pair of places once, whichever way and however often it was travelled, in
+ * the direction of its latest journey and carrying that journey's year. Oldest first, so the newest
+ * draws on top.
+ */
+export function routes(journeys: Journey[]): Array<{ from: Place; to: Place; year: number }> {
+  const seen = new Map<string, { from: Place; to: Place; year: number }>();
+  for (const j of newestFirst(journeys)) {
+    const k = [placeKey(j.from), placeKey(j.to)].sort().join(">");
+    if (!seen.has(k)) seen.set(k, { from: j.from, to: j.to, year: j.year });
+  }
+  return [...seen.values()].reverse();
 }
 
 export interface TravelSummary {
-  /** Distinct ISO codes, in the order first met on the newest-first board. */
+  /** Distinct ISO codes of the places, in the order first met on the newest-first board. */
   countries: string[];
   cities: number;
+  journeys: number;
   continents: Continent[];
   /** Countries per continent, most first. */
   byContinent: Array<{ continent: Continent; countries: number }>;
   since: number | null;
-  /** Stops per year from `since` to the newest year, gaps included as 0. */
-  perYear: Array<{ year: number; stops: number }>;
-  farthest: { stop: TravelStop; km: number } | null;
+  /** Journeys per year from `since` to the newest year, gaps included as 0. */
+  perYear: Array<{ year: number; journeys: number }>;
+  /** Every journey's great-circle distance, added up. */
+  km: number;
+  longest: { journey: Journey; km: number } | null;
+  /** The place farthest from Sydney. */
+  farthest: { place: Visited; km: number } | null;
 }
 
-export function summarize(stops: TravelStop[]): TravelSummary {
-  const board = newestFirst(stops);
-  const countries = [...new Set(board.map((s) => s.country.toUpperCase()))];
+export function summarize(journeys: Journey[]): TravelSummary {
+  const visited = places(journeys);
+  const countries = [...new Set(visited.map((p) => p.country))];
   const counts = new Map<Continent, number>();
   for (const c of countries) {
     const { continent } = countryOf(c);
     if (continent) counts.set(continent, (counts.get(continent) ?? 0) + 1);
   }
   const byContinent = [...counts].map(([continent, n]) => ({ continent, countries: n })).sort((a, b) => b.countries - a.countries || a.continent.localeCompare(b.continent));
-  const years = board.map((s) => s.year);
+  const years = journeys.map((j) => j.year);
   const since = years.length ? Math.min(...years) : null;
   const perYear: TravelSummary["perYear"] = [];
-  if (since !== null) for (let y = since; y <= Math.max(...years); y++) perYear.push({ year: y, stops: years.filter((v) => v === y).length });
+  if (since !== null) for (let y = since; y <= Math.max(...years); y++) perYear.push({ year: y, journeys: years.filter((v) => v === y).length });
+  let km = 0;
+  let longest: TravelSummary["longest"] = null;
+  for (const j of newestFirst(journeys)) {
+    const d = distanceKm(j.from, j.to);
+    km += d;
+    if (!longest || d > longest.km) longest = { journey: j, km: d };
+  }
   let farthest: TravelSummary["farthest"] = null;
-  for (const s of board) {
-    const km = distanceKm(HOME, s);
-    if (!farthest || km > farthest.km) farthest = { stop: s, km };
+  for (const p of visited) {
+    const d = distanceKm(HOME, p);
+    if (!farthest || d > farthest.km) farthest = { place: p, km: d };
   }
   return {
     countries,
-    cities: places(stops).length,
+    cities: visited.length,
+    journeys: journeys.length,
     continents: byContinent.map((c) => c.continent),
     byContinent,
     since,
     perYear,
+    km,
+    longest,
     farthest,
   };
 }

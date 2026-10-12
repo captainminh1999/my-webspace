@@ -84,8 +84,8 @@ export default async function Page() {
     {
       // Edited by hand, not a feed, so no freshness stamp.
       id: "travel", folio: "10", title: "TRAVEL", span: "md:col-span-6 lg:col-span-12 md:order-10", width: "wide",
-      footer: data.travel.length ? <span className="truncate">Source: flight &amp; stay bookings</span> : null,
-      card: <TravelCard stops={data.travel} />, full: <TravelFull stops={data.travel} />,
+      footer: data.travel.length ? <span className="truncate">Source: travel bookings</span> : null,
+      card: <TravelCard journeys={data.travel} />, full: <TravelFull journeys={data.travel} />,
     },
   ] as const;
 

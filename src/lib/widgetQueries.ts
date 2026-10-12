@@ -50,12 +50,12 @@ export async function fetchMeta(db: Db) {
   return stripId(await single(db, "meta"));
 }
 
-/** The Travel card's stops: edited by hand, not written by a feed, so not a widget (no fetch time, no freshness). */
-const TRAVEL = "travel";
+/** The Travel card's journeys: edited by hand, not written by a feed, so not a widget (no fetch time, no freshness). */
+const TRAVEL = "journeys";
 export const fetchTravel = (db: Db) => list(db, TRAVEL);
 
 /**
- * Every widget, the meta singleton and the travel stops in ONE command — what the Daily Dash renders
+ * Every widget, the meta singleton and the journeys in ONE command — what the Daily Dash renders
  * (the profile comes from src/lib/cv.ts getProfile). Read as 13 separate finds they went out at once,
  * and on a cold connection pool each extra command waits for a connection of its own: TCP, TLS and
  * SCRAM to the cluster, several round trips each.

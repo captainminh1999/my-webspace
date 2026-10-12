@@ -11,7 +11,7 @@ import { connectToDatabase } from "./mongodb";
 import { getProfile } from "./cv";
 import { baseUrl, decodeStrings } from "./payload";
 import { fetchHome } from "./widgetQueries";
-import { parseStops } from "@/utils/travel";
+import { parseJourneys } from "@/utils/travel";
 import { WIDGET_IDS, type DashboardData, type WidgetId } from "@/types/dashboard";
 
 /** Everything but the profile, which comes from the CV reader already decoded. */
@@ -33,7 +33,7 @@ const EMPTY: Feeds = {
 async function fromMongo(client: MongoClient): Promise<Feeds> {
   const db = client.db(process.env.MONGODB_DB || "cv");
   const { widgets, meta, travel } = await fetchHome(db);
-  const out: Record<string, unknown> = { ...EMPTY, meta, travel: parseStops(travel) };
+  const out: Record<string, unknown> = { ...EMPTY, meta, travel: parseJourneys(travel) };
   for (const id of WIDGET_IDS) if (widgets[id] !== null) out[id] = widgets[id];
   return out as Feeds;
 }
@@ -45,7 +45,7 @@ async function fromFunctions(): Promise<Feeds> {
   const out: Record<string, unknown> = { ...EMPTY };
   for (const id of WIDGET_IDS as readonly WidgetId[]) if (all[id] != null) out[id] = all[id];
   if (all.meta != null) out.meta = all.meta;
-  out.travel = parseStops(all.travel);
+  out.travel = parseJourneys(all.travel);
   return out as Feeds;
 }
 
