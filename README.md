@@ -81,7 +81,7 @@ Each feed is a **Netlify Scheduled Function** (`netlify/functions/feed-*.ts`, lo
 
 | Feed | Function | Schedule (UTC) | Source | Writes |
 |---|---|---|---|---|
-| weather | `feed-weather` | hourly at :10 | OpenWeather One Call (Sydney) | `singletons/weather` |
+| weather | `feed-weather` | every 3 hours at :10 (00:10, 03:10 … UTC) | OpenWeather One Call (Sydney) | `singletons/weather` |
 | tech | `feed-tech` | every 3 h | Hacker News top 10 (with score) | `tech` |
 | space | `feed-space` | 08:05 | NASA APOD, EPIC | `singletons/space`, `singletons/epic` |
 | camera | `feed-camera` | 08:00 | Unsplash random landscape | `singletons/photography` |
