@@ -1,4 +1,4 @@
-# .github/workflows/ci.yml — lint, typecheck, test and build every pull request and every push to main.
+# .github/workflows/ci.yml — lint, typecheck, test, build and browser-test every pull request and every push to main.
 # Not ingestion: the feeds are Netlify Scheduled Functions (README § Feeds).
 name: CI
 
@@ -18,7 +18,7 @@ concurrency:
 jobs:
   check:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
     env:
       NEXT_TELEMETRY_DISABLED: 1
     steps:
@@ -33,6 +33,9 @@ jobs:
       - run: npm run lint
       - run: npm run typecheck
       - run: npm test
-      # No MONGODB_URI, NEXT_PUBLIC_BASE_URL, URL or secret reaches this job: every page's read goes to
-      # localhost:8888 (src/lib/payload.ts), is refused and prerenders empty. Never production data.
-      - run: npm run build
+      - run: npx playwright install --with-deps chromium
+      # The build and the browser tests (scripts/e2e.mjs): no MONGODB_URI, NEXT_PUBLIC_BASE_URL, URL or secret
+      # reaches this job, so every page's read goes to localhost:8888 (src/lib/payload.ts), where e2e/stub.mjs
+      # answers the Travel card with invented trips (e2e/fixtures/journeys.json) and every other read with a
+      # 404, so those prerender empty. Never production data.
+      - run: npm run test:e2e

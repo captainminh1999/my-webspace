@@ -7,6 +7,7 @@
     "dev:netlify": "netlify dev",
     "serve:netlify": "netlify dev --framework '#custom' --command 'next start' --target-port 3000 --no-open",
     "verify:csp": "node scripts/verify-csp.mjs",
+    "test:e2e": "node scripts/e2e.mjs",
     "build": "next build",
     "start": "next start",
     "lint": "eslint src",

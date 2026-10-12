@@ -60,6 +60,7 @@ Requires Node 22.12 or newer (`@netlify/functions` 6 asks for it); `npm test` ne
 | `npm run lint` | ESLint over `src/` with Next's flat config (`eslint.config.mjs`). Next 16 has no `next lint`, and `next build` no longer lints — this script is the only place it happens |
 | `npm run typecheck` | TypeScript, the site and then `netlify/` (functions and the edge function) |
 | `npm test` | Unit tests (`node --test`): `src/` and the scheduled feeds in `netlify/functions/feeds/__tests__/`, which run each feed offline against saved upstream responses |
+| `npm run test:e2e` | Browser tests (`scripts/e2e.mjs`, Playwright + `node --test`): builds the site against `e2e/stub.mjs` (invented trips in `e2e/fixtures/journeys.json`, never the owner's), starts it on :3100 and drives the Travel card and dialog at laptop, tablet and phone widths. `E2E_SKIP_BUILD=1` reuses `.next`. Needs ports 3100 and 8888 free and a Chromium (`npx playwright install chromium`, or `PLAYWRIGHT_CHROMIUM=<path>`) |
 
 ## Environment
 
