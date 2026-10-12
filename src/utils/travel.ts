@@ -139,7 +139,7 @@ export function routes(journeys: Journey[]): Array<{ from: Place; to: Place; yea
 }
 
 export interface TravelSummary {
-  /** Distinct ISO codes of the places, in the order first met on the newest-first board. */
+  /** Distinct ISO codes of the places, in places() order: newest journey first, its destination before its origin. */
   countries: string[];
   cities: number;
   journeys: number;

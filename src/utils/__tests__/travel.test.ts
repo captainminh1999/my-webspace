@@ -62,7 +62,7 @@ test('a journey reads as month and year when the month is known', () => {
 test('every place a journey touches is one place, home aside, at its latest journey; the match ignores case and spacing', () => {
   assert.deepEqual(places(TRIPS).map((x) => `${x.city} ${when(x)}`), ['Ho Chi Minh City OCT 2026', 'Hanoi OCT 2026', 'Tokyo MAR 2024', 'Paris JUL 2018', 'London JUN 2018']);
   const again = j({ ...HANOI, city: ' hanoi ' }, SYD, 2027, 1);
-  assert.deepEqual(places([...TRIPS, again]).map((x) => x.city).slice(0, 2), [' hanoi ', 'Ho Chi Minh City']);
+  assert.deepEqual(places([...TRIPS, again]).map((x) => x.city), [' hanoi ', 'Ho Chi Minh City', 'Tokyo', 'Paris', 'London']);
   assert.equal(places([j(LONDON, { ...SYD, city: 'SYDNEY' }, 2020)]).length, 1, 'home is matched without regard to case');
 });
 
