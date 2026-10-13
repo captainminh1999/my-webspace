@@ -457,7 +457,7 @@ function TripEntry({ t, i, longest, latest }: { t: Trip; i: number; longest: num
       <h5 id={`tsl-trip-${i}`} tabIndex={0} className="trip-h">
         <span className="stamp text-ink">{span(t)}</span>
         <span className="font-mono text-source text-ink-3 uppercase tracking-[0.04em]">
-          {endNote(t)} · {count(t.legs.length, "leg", "legs")} · {formatKm(t.km)} km
+          {endNote(t)} · {count(t.legs.length, "leg", "legs")} · {formatKm(t.km)}{"\u00a0"}km
         </span>
       </h5>
       <Route trip={t} className="block mt-1.5 font-mono text-item" />
