@@ -243,6 +243,7 @@
   .sl-cap-row { position: absolute; inset: 0 var(--cap-pad, 0px); display: flex; align-items: center; justify-content: space-between; gap: 12px; white-space: nowrap; overflow: hidden; visibility: hidden; opacity: 0; transition: opacity var(--t), visibility 0s linear 160ms; }
   .sl-cap-row > :first-child { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
   .sl-cap-row > :last-child { flex-shrink: 0; }
+  .sl-cap-over > .cap-hint { flex-shrink: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
   .sl[data-active-trip=""] .sl-cap-over, .sl-cap-row.is-active { visibility: visible; opacity: 1; transition-delay: 0s; }
   .sl-cap .sw { display: inline-block; width: 14px; height: 2px; background: var(--accent); margin-right: 8px; vertical-align: 0.25em; }
   /* Once the island runs, the overview says the map follows the list (never promised without it). */
@@ -304,7 +305,8 @@
   .sl-cap { --cap-pad: 16px; }
   .sl-legend, .sl-rail { margin-inline: max(16px, (100% - 44.5rem) / 2 + 16px); }
   .sl-list { max-width: 44.5rem; margin-inline: auto; padding: 20px 16px; }
-  /* Too short a screen to pin a map and still read (a phone on its side under 35rem wide, a zoomed window):
+  /* Too short a screen to pin a map and still read (a phone on its side too narrow or too short for the map
+     beside the list, a zoomed window):
      the map scrolls away with the rest, and the list still lights it. */
   @media (max-height: 32rem) {
     .sl { --sl-stacked: 0; }
@@ -312,7 +314,7 @@
   }
 
   /* Beside: from a laptop's width, or a phone on its side. The map gives way to the list's width and the screen's height. */
-  @media (min-width: 1024px), (orientation: landscape) and (max-height: 32rem) and (min-width: 35rem) {
+  @media (min-width: 1024px), (orientation: landscape) and (max-height: 32rem) and (min-height: 21.2rem) and (min-width: 37.5rem) {
     .sl { --sl-stacked: 0; display: grid; align-items: start; }
     .sl-fig { position: static; z-index: auto; border-bottom: 0; }
     .sl-fig > .tmap { width: 100%; }
@@ -330,10 +332,12 @@
     .sl-fig { width: min(100%, var(--fig-w)); }
     .sl-legend, .sl-rail { margin-inline: 0; width: min(100%, var(--fig-w)); }
   }
-  /* A phone on its side: only the map and its caption pinned on the left; the key and the rail head the list. */
-  @media (orientation: landscape) and (max-height: 32rem) and (min-width: 35rem) {
+  /* A phone on its side, tall enough for the map's 240px (21.2rem: 240px / 1.2, the squarest frame, plus caption,
+     margins and the dialog's 82px) and wide enough for a list beside it: only the map and its caption pinned on
+     the left; the key and the rail head the list. */
+  @media (orientation: landscape) and (max-height: 32rem) and (min-height: 21.2rem) and (min-width: 37.5rem) {
     /* The list keeps 20rem (less only on the narrowest), the map takes the rest up to its height's worth. */
-    .sl { --fig-w: calc((100dvh - 82px - 33px - 24px) * var(--ar)); grid-template-columns: minmax(240px, calc(var(--fig-w) + 32px)) minmax(min(20rem, 100% - 272px), 1fr); }
+    .sl { --fig-w: max(240px, calc((100dvh - 82px - 33px - 24px) * var(--ar))); grid-template-columns: minmax(240px, calc(var(--fig-w) + 32px)) minmax(min(20rem, 100% - 272px), 1fr); }
     .sl-pin { display: contents; position: static; padding: 0; }
     .sl-fig { grid-column: 1; grid-row: 1 / span 3; position: sticky; top: 12px; margin: 12px 16px; width: min(100% - 32px, var(--fig-w)); }
     .sl-legend, .sl-rail { grid-column: 2; margin: 0; width: auto; border-left: 1px solid var(--rule); padding: 0 24px; }

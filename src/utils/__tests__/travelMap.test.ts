@@ -4,7 +4,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { placeKey, trips } from '../travel.ts';
-import { APAC_MIN, LABEL_TRANSFORM, NARROWEST, at as atCell, placeLabels, spotlight, type Anchor, type Spotlight } from '../travelMap.ts';
+import { APAC_MIN, LABEL_TRANSFORM, NARROWEST, at as atCell, cropLand, labelBox, mapModel, placeLabels, spotlight, type Anchor, type Box, type Spotlight } from '../travelMap.ts';
 import type { Journey, Mode, Place } from '../../types/travel.ts';
 
 const p = (city: string, country: string, lat: number, lon: number): Place => ({ city, country, lat, lon });
@@ -28,6 +28,14 @@ const DUBAI = p('Dubai', 'AE', 25.2048, 55.2708);
 const NAGOYA = p('Nagoya', 'JP', 35.1815, 136.9066);
 const HIROSHIMA = p('Hiroshima', 'JP', 34.3853, 132.4553);
 const SAPPORO = p('Sapporo', 'JP', 43.0618, 141.3545);
+const HUE = p('Hue', 'VN', 16.4637, 107.5909);
+const HCMC = p('Ho Chi Minh City', 'VN', 10.7769, 106.7009);
+const DA_LAT = p('Da Lat', 'VN', 11.9404, 108.4583);
+const DA_NANG = p('Da Nang', 'VN', 16.0544, 108.2022);
+const HOI_AN = p('Hoi An', 'VN', 15.8801, 108.338);
+const HONG_KONG = p('Hong Kong', 'HK', 22.3193, 114.1694);
+const TAIPEI = p('Taipei', 'TW', 25.033, 121.5654);
+const JIUFEN = p('Jiufen', 'TW', 25.1092, 121.8445);
 const LONDON = p('London', 'GB', 51.5072, -0.1276);
 const PARIS = p('Paris', 'FR', 48.8566, 2.3522);
 const j = (from: Place, to: Place, year: number, month?: number, by: Mode = 'air'): Journey => ({ from, to, year, ...(month ? { month } : {}), by });
@@ -50,8 +58,29 @@ const LIFE = [
   j(SINGAPORE, SYD, 2024, 4),
   ...round([OSAKA, KYOTO, TOKYO], 2026, 10),
 ];
+// A latest trip to the frame's east edge, beside home: no anchor fits there without covering Sydney's mark.
+const TO_THE_EDGE = [...LIFE.slice(0, -4), ...round([OSAKA, KYOTO, TOKYO], 2025, 10), ...round([AUCKLAND], 2026, 12)];
+// A trip out of a base (Hanoi to Hue) among many nearby places: its destination is named only by the fallback.
+const OUT_OF_A_BASE = [
+  j(SYD, HANOI, 2018, 8),
+  ...round([HUE], 2019, 3, HANOI),
+  j(HANOI, SYD, 2019, 8),
+  ...round([HCMC, DA_LAT], 2023, 2),
+  ...round([DA_NANG, HOI_AN], 2023, 9),
+  ...round([BANGKOK], 2024, 1),
+  ...round([HONG_KONG, TAIPEI, JIUFEN], 2024, 6),
+  ...round([OSAKA, KYOTO, TOKYO], 2026, 10),
+];
+// Invented places 4.5° apart: the latest trip's first stop with its second stop to the east and earlier places
+// on every other side, so only covering a faint mark makes room for its name.
+const at45 = (city: string, dLat: number, dLon: number) => p(city, 'PH', 12 + dLat * 4.5, 124 + dLon * 4.5);
+const HEMMED = [
+  ...[at45('West', 0, -1), at45('North', 1, 0), at45('South', -1, 0), at45('East', 0, 2), at45('Northeast', 1, 1), at45('Southeast', -1, 1)].flatMap((g, k) => round([g], 2010 + k, 3)),
+  ...round([at45('Alpha', 0, 0), at45('Bravo', 0, 1)], 2026, 1),
+];
 const LAYERS: Array<[number, number]> = [[NARROWEST, 295], [296, 559], [560, 768]];
 const OPTS = { aspect: [1.2, 2.2] as [number, number], drawnAt: 640, layers: LAYERS };
+const CARD = { aspect: [1.2, 2] as [number, number], drawnAt: 472, layers: [[NARROWEST, 295], [296, 703]] as Array<[number, number]> };
 const lightOf = (s: Spotlight, i: number) => ({
   routes: s.routeSets.filter((g) => g.trips.includes(i)),
   lands: s.landSets.filter((g) => g.trips.includes(i)),
@@ -92,6 +121,19 @@ test('each trip lights one set of routes and one set of marks and labels; routes
     assert.equal(lit.labels.length, 1, `trip ${i} labels`);
     assert.ok(lit.lands.length <= 1, `trip ${i} lands`);
     for (const leg of lit.routes[0].legs) assert.ok(ids.has(leg.id), leg.id);
+    // The routes it lights are its own journeys, each pair of places once.
+    const n1 = (v: number) => +v.toFixed(1);
+    const point = (x: Place) => {
+      const q = atCell(x, s.overview.cells);
+      return `${n1(q.x)} ${n1(q.y)}`;
+    };
+    const ends = (d: string) => {
+      const pts = [...d.matchAll(/[ML](-?[\d.]+) (-?[\d.]+)/g)].map((m) => `${m[1]} ${m[2]}`);
+      return [pts[0], pts[pts.length - 1]].sort().join('|');
+    };
+    const own = new Set(t.legs.map((x) => [point(x.from), point(x.to)].sort().join('|')));
+    const lit_ = new Set(lit.routes[0].legs.map((l) => ends(s.routes.find((r) => r.id === l.id)!.d)));
+    assert.deepEqual([...lit_].sort(), [...own].sort(), `trip ${i} lights its own journeys`);
     // A pair travelled both ways in one trip is one route.
     const legs = lit.routes[0].legs.map((l) => `${l.id}|${l.land}`);
     assert.equal(new Set(legs).size, legs.length, `trip ${i}: ${legs.join(', ')}`);
@@ -182,6 +224,99 @@ test('on a crowded 240px map the latest trip is still named, in the overview and
   assert.ok(lit.some((l) => l.kind === 'now' && own.test(l.text)), `lit: ${lit.map((l) => l.text).join(', ') || 'no labels'}`);
 });
 
+test('a trip out of a base names the place it reached at every width, not only where it set off from', () => {
+  const ts = trips(OUT_OF_A_BASE);
+  const s = spotlight(OUT_OF_A_BASE, ts, OPTS);
+  const hue = ts.findIndex((t) => t.stops.some((x) => x.city === 'Hue'));
+  for (const w of [NARROWEST, 296, 559, 560, 768]) {
+    const labels = at(lightOf(s, hue).labels[0].layers, w).labels;
+    assert.ok(labels.some((l) => l.kind === 'now' && /HUE/.test(l.text)), `${w}px: ${labels.map((l) => `${l.text}/${l.kind}`).join(', ')}`);
+  }
+});
+
+test("a latest trip at the frame's edge beside home is named at every width, on the card too, over home's mark if it must", () => {
+  const ts = trips(TO_THE_EDGE);
+  const s = spotlight(TO_THE_EDGE, ts, OPTS);
+  const card = mapModel(TO_THE_EDGE, ts, CARD);
+  const named = (labels: Array<{ text: string; kind: string }>) => labels.some((l) => l.kind === 'now' && l.text === 'AUCKLAND');
+  for (const layer of [...card.layers, ...s.overview.layers]) assert.ok(named(layer.labels), `${layer.minW}px: ${layer.labels.map((l) => l.text).join(', ')}`);
+  for (const layer of lightOf(s, ts.length - 1).labels[0].layers) assert.ok(named(layer.labels), `lit ${layer.minW}px: ${layer.labels.map((l) => l.text).join(', ')}`);
+});
+
+test('faint marks are no rivals: a lit trip names its places beside them', () => {
+  const ts = trips(OUT_OF_A_BASE);
+  const s = spotlight(OUT_OF_A_BASE, ts, OPTS);
+  const texts = (city: string) => at(lightOf(s, ts.findIndex((t) => t.stops.some((x) => x.city === city))).labels[0].layers, NARROWEST).labels.map((l) => l.text);
+  assert.deepEqual(texts('Hong Kong').filter((t) => t !== 'SYDNEY').sort(), ['HONG KONG', 'TAIPEI · JIUFEN']);
+  assert.ok(texts('Da Nang').includes('DA NANG · HOI AN'), texts('Da Nang').join(', '));
+});
+
+test("a place hemmed in on every side is named over a faint mark, never over the trip's next stop", () => {
+  const ts = trips(HEMMED);
+  const s = spotlight(HEMMED, ts, OPTS);
+  const card = mapModel(HEMMED, ts, CARD);
+  for (const layer of [card.layers[0], s.overview.layers[0], lightOf(s, ts.length - 1).labels[0].layers[0]]) {
+    assert.ok(layer.labels.some((l) => l.text === 'ALPHA'), layer.labels.map((l) => l.text).join(', '));
+  }
+});
+
+/**
+ * At every width a layer is drawn: a mark is named once at most, every label stays inside the map, and no label
+ * covers a named mark or one of the trip's own (a forced label may cover a faint mark, or home, unnamed).
+ */
+function labelsHold(where: string, layers: Array<{ minW: number; maxW: number; labels: Array<{ key: string; left: number; top: number; text: string; anchor: Anchor }> }>, marksAt: (w: number) => Array<{ key: string; left: number; top: number; size: number; own: boolean }>, frame: { w: number; h: number }) {
+  const overlaps = (p: Box, q: Box) => p.l < q.r && q.l < p.r && p.t < q.b && q.t < p.b;
+  for (const layer of layers) {
+    const keys = layer.labels.map((l) => l.key);
+    assert.equal(new Set(keys).size, keys.length, `${where} ${layer.minW}px: a mark named twice (${keys.join(', ')})`);
+    for (let W = layer.minW; W <= layer.maxW; W = W === layer.maxW ? W + 1 : Math.min(W + 10, layer.maxW)) {
+      const s = W / frame.w;
+      const H = frame.h * s;
+      const marks = marksAt(W);
+      for (const l of layer.labels) {
+        const b = labelBox(l.left * frame.w, l.top * frame.h, l.anchor, l.text, W, frame.w);
+        assert.ok(b.l >= 0 && b.t >= 0 && b.r <= W && b.b <= H, `${where} ${W}px: ${l.text} leaves the map`);
+        for (const m of marks) {
+          if (m.key === l.key || !(m.own || keys.includes(m.key))) continue;
+          const r = m.size / 2 + 2;
+          const x = m.left * frame.w * s;
+          const y = m.top * frame.h * s;
+          assert.ok(!overlaps(b, { l: x - r, t: y - r, r: x + r, b: y + r }), `${where} ${W}px: ${l.text} covers ${m.key}`);
+        }
+      }
+    }
+  }
+}
+
+test('labels never cover a named mark or a trip\'s own, never twice, never off the map: card, overview and every lit trip', () => {
+  for (const [name, js] of Object.entries({ LIFE, CROWDED, OUT_OF_A_BASE, TO_THE_EDGE, HEMMED })) {
+    const ts = trips(js);
+    const s = spotlight(js, ts, OPTS);
+    const frame = { w: s.overview.w, h: s.overview.h };
+    const card = mapModel(js, ts, CARD);
+    const kindMarks = (layers: typeof card.layers) => (w: number) => at(layers, w).marks.map((m) => ({ ...m, size: m.kind === 'now' ? 9 : 7, own: m.kind === 'now' }));
+    labelsHold(`${name} card`, card.layers, kindMarks(card.layers), { w: card.w, h: card.h });
+    labelsHold(`${name} overview`, s.overview.layers, kindMarks(s.overview.layers), frame);
+    for (const set of s.labelSets) {
+      labelsHold(`${name} trip ${set.trips.join(' ')}`, set.layers, (w) => {
+        const lit = at(set.layers, w).marks;
+        return at(s.base, w).marks.map((m) => {
+          const mine = lit.find((x) => x.key === m.key);
+          return { ...m, size: mine ? 9 : 7, own: !!mine && mine.kind !== 'home' };
+        });
+      }, frame);
+    }
+  }
+});
+
+test("the overview lights the latest trip's countries as the card does, where it set off from included", () => {
+  const js = [j(HANOI, SINGAPORE, 2017, 8)];
+  const s = spotlight(js, trips(js), OPTS);
+  assert.equal(s.overview.land.latest, cropLand(s.overview.cells, (iso) => (iso === 'VN' || iso === 'SG' ? 1 : 0), 2)[1]);
+  // A lit trip lights only where it went.
+  assert.deepEqual(s.landSets.map((g) => g.countries), [['c-SG']]);
+});
+
 test('labels: faint marks block a label but are no rivals for it; a label that must show gives up the nearness rule, then may cover a faint mark', () => {
   const frame = { w: 100, h: 60 };
   // A lit mark with faint marks 12px above and below it: a label beside it is nearer one of them than the rule allows.
@@ -196,6 +331,10 @@ test('labels: faint marks block a label but are no rivals for it; a label that m
   const hemmed = [{ mark: 0, texts: ['KYOTO'], must: true }];
   assert.deepEqual(placeLabels(ring, hemmed, frame, 240, 240), []);
   assert.equal(placeLabels(ring, hemmed, frame, 240, 240, { coverable: (i) => i > 0 }).length, 1);
+  // Waiving the nearness rule comes before covering anything: W is free but too near another mark, E covers one.
+  const nearFirst = [{ x: 50, y: 30, size: 9 }, { x: 54, y: 30, size: 7 }, { x: 50, y: 26, size: 7 }, { x: 50, y: 34, size: 7 }];
+  const forced = placeLabels(nearFirst, [{ mark: 0, texts: ['KYOTO'], must: true }], frame, 240, 240, { coverable: (i) => i === 1 });
+  assert.deepEqual(forced.map((l) => l.anchor), ['W']);
   // Of several that must show, one is enough: the second is named when the first cannot be.
   const two = placeLabels(ring, [{ mark: 0, texts: ['KYOTO'], must: true }, { mark: 1, texts: ['NARA'], must: true }], frame, 240, 240, { coverable: () => false });
   assert.deepEqual(two.map((l) => l.text), ['NARA']);
@@ -217,6 +356,7 @@ test('trips that light the same are written once, with every trip they belong to
   const s = spotlight(same, trips(same), OPTS);
   assert.deepEqual(s.labelSets.map((g) => g.trips), [[0, 2, 3], [1]]);
   assert.deepEqual(s.routeSets.map((g) => g.trips), [[0, 2, 3], [1]]);
+  assert.deepEqual(s.landSets.map((g) => g.trips), [[0, 2, 3], [1]]);
 });
 
 test('64 different trips stay inside the budget the home page can carry', () => {

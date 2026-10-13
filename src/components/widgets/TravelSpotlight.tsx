@@ -34,9 +34,14 @@ export function TravelSpotlight() {
     let raf = 0;
     let focusY: number | null = null;
     let focused = false;
+    let stale = true;
 
-    // Trip tops in scroll-content px, and the pinned map's height (0 where it is not pinned above the list).
+    // Trip tops in scroll-content px, and the pinned map's height (0 where it is not pinned above the list). Not
+    // while the dialog is closed: its boxes are all 0 then, and the last lengths should survive a reopen.
     const measure = () => {
+      if (!sc.clientHeight) return;
+      // Only promise that the map follows where it stays in view.
+      root.toggleAttribute("data-follow", getComputedStyle(fig).position === "sticky" || getComputedStyle(pin).position === "sticky");
       const base = sc.getBoundingClientRect().top - sc.scrollTop;
       tops = trips.map((t) => t.getBoundingClientRect().top - base);
       pinH = getComputedStyle(root).getPropertyValue("--sl-stacked").trim() === "1" ? fig.offsetHeight : 0;
@@ -54,6 +59,10 @@ export function TravelSpotlight() {
     };
     const pick = () => {
       raf = 0;
+      if (stale) {
+        stale = false;
+        measure();
+      }
       const h = sc.clientHeight;
       const max = sc.scrollHeight - h;
       // A fractional scrollTop (zoom, a 125% display) may stop just short of the end.
@@ -94,8 +103,10 @@ export function TravelSpotlight() {
       focused = false;
       queue();
     };
+    // Measured in the next frame, not in the observer's callback: measuring writes --pin-chrome, and a layout
+    // change made inside the callback would be observed again in the same frame (a "ResizeObserver loop").
     const ro = new ResizeObserver(() => {
-      measure();
+      stale = true;
       queue();
     });
     ro.observe(root);
@@ -104,7 +115,6 @@ export function TravelSpotlight() {
     sc.addEventListener("scroll", queue, { passive: true });
     root.addEventListener("focusin", onFocusIn);
     root.addEventListener("focusout", onFocusOut);
-    root.dataset.follow = "";
     return () => {
       ro.disconnect();
       sc.removeEventListener("scroll", queue);

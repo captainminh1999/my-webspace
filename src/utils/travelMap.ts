@@ -198,7 +198,14 @@ export const LABEL_TRANSFORM: Record<Anchor, string> = {
 const labelWidth = (s: string) => s.length * 7.04 + 6;
 const LABEL_H = 14;
 
-type Box = { l: number; t: number; r: number; b: number };
+export type Box = { l: number; t: number; r: number; b: number };
+/** A label's box in px on a map `W` px wide whose frame is `frameW` units wide, its mark at (x, y) in frame units. */
+export function labelBox(x: number, y: number, anchor: Anchor, text: string, W: number, frameW: number): Box {
+  const s = W / frameW;
+  const w = labelWidth(text);
+  const [dx, dy] = OFFSET[anchor](w, LABEL_H);
+  return { l: x * s + dx, t: y * s + dy, r: x * s + dx + w, b: y * s + dy + LABEL_H };
+}
 const overlaps = (p: Box, q: Box) => p.l < q.r && q.l < p.r && p.t < q.b && q.t < p.b;
 const distance = (p: Box, x: number, y: number) => Math.hypot(Math.max(p.l - x, 0, x - p.r), Math.max(p.t - y, 0, y - p.b));
 
@@ -218,9 +225,10 @@ export interface Mark {
  * with no such anchor is left off; its mark keeps its tooltip, and the board names the place.
  * `rivals` narrows the nearness test to the marks a label could be mistaken for (a lit trip's own, when the rest
  * are faint ghosts); every mark still blocks a label's box. Of the wants marked `must` (a trip's own places,
- * which come first), at least one is named: if none found an anchor, each in turn tries again with its shortest
- * text and the nearness test waived, then allowed to cover the marks `coverable` names (faint ones, never the
- * trip's own); always inside the map, never over another label.
+ * which come first), at least one is named. If none found an anchor, each in turn tries again with its shortest
+ * text and the nearness test waived; then allowed to cover the marks `coverable(mark, 1)` names (faint ones);
+ * then, last, those `coverable(mark, 2)` names (home too). Always inside the map, never over another label; a
+ * mark a label covers gets no label of its own (it keeps its tooltip).
  */
 export function placeLabels(
   marks: Mark[],
@@ -228,18 +236,24 @@ export function placeLabels(
   frame: { w: number; h: number },
   minW: number,
   maxW: number,
-  opts: { rivals?: (mark: number) => boolean; coverable?: (mark: number) => boolean } = {},
+  opts: { rivals?: (mark: number) => boolean; coverable?: (mark: number, pass: 1 | 2) => boolean } = {},
 ) {
   const widths: number[] = [];
   for (let W = minW; W < maxW; W += 10) widths.push(W);
   widths.push(maxW);
   const placed: Array<{ mark: number; text: string; anchor: Anchor; w: number }> = [];
+  const covered = new Set<number>();
   const box = (W: number, m: Mark, a: Anchor, w: number): Box => {
     const s = W / frame.w;
     const [dx, dy] = OFFSET[a](w, LABEL_H);
     return { l: m.x * s + dx, t: m.y * s + dy, r: m.x * s + dx + w, b: m.y * s + dy + LABEL_H };
   };
-  const fits = (want: { mark: number }, a: Anchor, w: number, near = true, cover = false) =>
+  const ring = (W: number, o: Mark): Box => {
+    const s = W / frame.w;
+    const r = o.size / 2 + 2;
+    return { l: o.x * s - r, t: o.y * s - r, r: o.x * s + r, b: o.y * s + r };
+  };
+  const fits = (want: { mark: number }, a: Anchor, w: number, near = true, pass: 0 | 1 | 2 = 0) =>
     widths.every((W) => {
       const s = W / frame.w;
       const H = frame.h * s;
@@ -248,28 +262,27 @@ export function placeLabels(
       const own = distance(me, marks[want.mark].x * s, marks[want.mark].y * s);
       for (const [i, o] of marks.entries()) {
         if (i === want.mark) continue;
-        const r = o.size / 2 + 2;
-        const ox = o.x * s;
-        const oy = o.y * s;
-        if (!(cover && opts.coverable?.(i)) && overlaps(me, { l: ox - r, t: oy - r, r: ox + r, b: oy + r })) return false;
-        if (near && (opts.rivals?.(i) ?? true) && distance(me, ox, oy) < own + 8) return false;
+        if (!(pass && opts.coverable?.(i, pass)) && overlaps(me, ring(W, o))) return false;
+        if (near && (opts.rivals?.(i) ?? true) && distance(me, o.x * s, o.y * s) < own + 8) return false;
       }
       return placed.every((p) => !overlaps(me, box(W, marks[p.mark], p.anchor, p.w)));
     });
   const ANCHORS: Anchor[] = ["E", "W", "NE", "SE", "NW", "SW", "N", "S"];
-  const place = (want: { mark: number }, text: string, near: boolean, cover = false) => {
+  const place = (want: { mark: number }, text: string, near: boolean, pass: 0 | 1 | 2 = 0) => {
     const w = labelWidth(text);
-    const anchor = ANCHORS.find((a) => fits(want, a, w, near, cover));
-    if (anchor) placed.push({ mark: want.mark, text, anchor, w });
-    return !!anchor;
+    const anchor = ANCHORS.find((a) => fits(want, a, w, near, pass));
+    if (!anchor) return false;
+    placed.push({ mark: want.mark, text, anchor, w });
+    if (pass) marks.forEach((o, i) => i !== want.mark && widths.some((W) => overlaps(box(W, marks[want.mark], anchor, w), ring(W, o))) && covered.add(i));
+    return true;
   };
   const musts = wants.filter((w) => w.must && w.texts.length);
   const lastMust = wants.lastIndexOf(musts[musts.length - 1]);
+  const short = (w: { texts: string[] }) => w.texts.reduce((a, b) => (b.length < a.length ? b : a));
   wants.forEach((want, i) => {
-    want.texts.some((text) => place(want, text, true));
+    if (!covered.has(want.mark)) want.texts.some((text) => place(want, text, true));
     if (i !== lastMust || placed.some((p) => musts.some((m) => m.mark === p.mark))) return;
-    const short = (w: { texts: string[] }) => w.texts.reduce((a, b) => (b.length < a.length ? b : a));
-    if (!musts.some((m) => place(m, short(m), false))) musts.some((m) => place(m, short(m), false, true));
+    for (const pass of [0, 1, 2] as const) if (musts.some((m) => place(m, short(m), false, pass))) return;
   });
   return placed.map(({ mark, text, anchor }) => ({ mark, text, anchor }));
 }
@@ -403,7 +416,7 @@ export function mapModel(journeys: Journey[], ts: Trip[], opts: { aspect: [numbe
       maxW,
       // Earlier places first, so the latest trip's marks and home sit on top.
       marks: [...groups].sort((a, b) => b.rank - a.rank).map((g) => ({ key: g.key, ...pos(g), kind: g.kind, title: g.title })),
-      labels: placeLabels(groups, wants, c, minW, maxW, { coverable: (i) => groups[i].kind === "was" }).map((l) => ({
+      labels: placeLabels(groups, wants, c, minW, maxW, { coverable: (i, pass) => groups[i].kind === "was" || (pass === 2 && groups[i].kind === "home") }).map((l) => ({
         key: groups[l.mark].key,
         ...pos(groups[l.mark]),
         kind: groups[l.mark].kind,
@@ -579,11 +592,12 @@ export function spotlight(journeys: Journey[], ts: Trip[], opts: { aspect: [numb
       const lit = new Set(mine.map((m) => m.mark));
       const placed = placeLabels(
         groups.map((g, i) => ({ x: g.x, y: g.y, size: lit.has(i) ? 9 : 7 })),
-        mine.map((m) => ({ mark: m.mark, texts: m.texts, must: m.kind !== "home" })),
+        // The places it reached must be named; where it set off from only when it reached nowhere else.
+        mine.map((m) => ({ mark: m.mark, texts: m.texts, must: m.kind === "now" || (m.kind === "from" && !mine.some((x) => x.kind === "now")) })),
         c,
         minW,
         maxW,
-        { rivals: (i) => lit.has(i), coverable: (i) => !lit.has(i) },
+        { rivals: (i) => lit.has(i), coverable: (i, pass) => !lit.has(i) || (pass === 2 && groups[i].home) },
       );
       const kindOf = new Map(mine.map((m) => [m.mark, m.kind]));
       return {

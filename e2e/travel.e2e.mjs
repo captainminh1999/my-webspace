@@ -89,10 +89,12 @@ const SWEEP = {
   laptop1024: { width: 1024, height: 768 },
   laptopShort: { width: 1024, height: 600 },
   sideways: { width: 844, height: 390 },
-  sidewaysSmall: { width: 568, height: 320 },
+  sidewaysShort: { width: 692, height: 280 },
 };
-/** From a laptop's width the map, its key and the rail are pinned beside the list; elsewhere only the map is pinned. */
+/** From a laptop's width the map, its key and the rail are pinned beside the list; on a screen too short for it
+ * (a 360px-wide phone on its side) nothing is pinned; elsewhere only the map is. */
 const LAPTOP = new Set(["laptop", "laptop1280", "laptop1024", "laptopShort"]);
+const UNPINNED = new Set(["sidewaysShort"]);
 
 /**
  * Scroll the dialog from top to bottom in `step` px, waiting two frames at each, and record what is lit. One
@@ -118,6 +120,8 @@ const sweep = (page, step = 4) =>
         const shown = (e) => getComputedStyle(e).visibility === "visible" && +getComputedStyle(e).opacity > 0.99;
         row.routes = [...root.querySelectorAll(".sl-r")].filter(shown).map((g) => g.dataset.lit);
         row.lands = [...root.querySelectorAll(".sl-lands > g")].filter(shown).map((g) => g.dataset.lit);
+        row.landsListing = [...root.querySelectorAll(".sl-lands > g")].filter((g) => a !== "" && g.dataset.lit.split(" ").includes(a)).length;
+        row.overLand = +getComputedStyle(root.querySelector(".sl-over-land")).opacity;
         row.sets = [...root.querySelectorAll(".sl-set")].filter(shown).map((g) => g.dataset.lit);
         row.articles = [...root.querySelectorAll("article.is-active")].map((e) => e.dataset.trip);
         const rail = root.querySelector(".trip-rail-mark.is-active");
@@ -128,7 +132,7 @@ const sweep = (page, step = 4) =>
         // Where the pinned column's parts are, in the scroll area (beside the map) and in the content (stacked).
         const top = sc.getBoundingClientRect().top;
         row.pinned = [".sl-fig", ".sl-legend", ".sl-rail"].map((q) => Math.round(root.querySelector(q).getBoundingClientRect().top - top));
-        row.content = [".sl-legend", ".sl-rail", ".sl-list"].map((q) => Math.round(root.querySelector(q).getBoundingClientRect().top - top + sc.scrollTop));
+        row.content = [".sl-fig", ".sl-legend", ".sl-rail", ".sl-list"].map((q) => Math.round(root.querySelector(q).getBoundingClientRect().top - top + sc.scrollTop));
       }
       out.push(row);
       if (y >= max) break;
@@ -152,6 +156,7 @@ test("the dialog opens on the overview, however tall the screen: nothing lit, th
     assert.equal(await root.getAttribute("data-follow"), "", `${name}: the island ran`);
     assert.equal(await dialog.locator(".is-active").count(), 0, name);
     assert.equal(await dialog.locator(`.sl-r.latest`).evaluate((g) => getComputedStyle(g).opacity), "1", name);
+    assert.equal(await dialog.locator(`.sl-over-land`).evaluate((g) => getComputedStyle(g).opacity), "1", `${name}: the latest trip's countries`);
     assert.ok(await dialog.locator(".cap-hint").isVisible(), `${name}: the follow hint shows once the island runs`);
     assert.deepEqual(errors, [], name);
     await close();
@@ -187,14 +192,15 @@ test("scrolling lights every trip once, newest first, for long enough to read, a
       const mine = (l) => l.split(" ").includes(r.a);
       assert.ok(r.routes.length === 1 && mine(r.routes[0]), `${name}: one route group shows, trip ${r.a}'s (${r.routes})`);
       assert.ok(r.sets.length === 1 && mine(r.sets[0]), `${name}: one set of marks and labels shows, trip ${r.a}'s (${r.sets})`);
-      assert.ok(r.lands.length <= 1 && r.lands.every(mine), `${name}: only trip ${r.a}'s countries light (${r.lands})`);
+      assert.ok(r.lands.length === r.landsListing && r.lands.every(mine), `${name}: trip ${r.a}'s countries light, and only them (${r.lands})`);
+      assert.equal(r.overLand, 0, `${name}: the overview's countries step back while trip ${r.a} is lit`);
       assert.deepEqual(r.articles, [r.a], `${name}: one trip marked in the list`);
       assert.ok(r.rail === "hollow" || r.rail === accentRgb, `${name}: trip ${r.a}'s rail mark is in the accent (${r.rail})`);
       assert.ok(r.labels >= 1, `${name}: trip ${r.a} names a place on the map`);
     }
     // The lit trips that share their routes with others: 1, 2 and 10 go to the same place.
     assert.ok(changes.some((r) => r.a === "10" && r.routes[0] === "1 2 10"), `${name}: a shared route set lights for its last trip`);
-    const fixed = (r) => (LAPTOP.has(name) ? r.pinned : [r.pinned[0], ...r.content]).join(",");
+    const fixed = (r) => (LAPTOP.has(name) ? r.pinned : UNPINNED.has(name) ? r.content : [r.pinned[0], ...r.content.slice(1)]).join(",");
     assert.equal(new Set(changes.map(fixed)).size, 1, `${name}: lighting a trip moves nothing (${[...new Set(changes.map(fixed))].join(" / ")})`);
     assert.equal(new Set(rows.map((r) => r.height)).size, 1, `${name}: the scroll height never changes`);
     assert.ok(rows.every((r) => Math.abs(r.at - r.y) <= 1), `${name}: nothing pulls the scroll position`);
@@ -239,7 +245,7 @@ test("the pinned map leaves room to read: inside the scroll area beside the list
     if (name === "phone") assert.ok(g.fig.h / g.sc.h <= 0.36, `${name}: map and caption take ${((g.fig.h / g.sc.h) * 100).toFixed(0)}%`);
     await close();
   }
-  for (const name of ["sideways", "sidewaysSmall"]) {
+  for (const name of ["sideways"]) {
     const { page, close } = await open(SWEEP[name]);
     await openDialog(page);
     await page.locator("#dialog-travel [data-scroller]").evaluate((e) => (e.scrollTop = e.scrollHeight));
@@ -248,13 +254,21 @@ test("the pinned map leaves room to read: inside the scroll area beside the list
     assert.equal(await overflowX(page), 0, `${name}: no horizontal scroll`);
     await close();
   }
-  // Too short to pin a map and read (a window zoomed to 400%): the map scrolls away with the rest.
-  const { page, close } = await open({ width: 320, height: 256 });
-  await openDialog(page);
-  await page.locator("#dialog-travel [data-scroller]").evaluate((e) => (e.scrollTop = e.scrollHeight / 2));
-  const g = await geometry(page);
-  assert.ok(g.fig.bottom < g.sc.top, `320x256: the map has scrolled away (${g.fig.bottom} vs ${g.sc.top})`);
-  await close();
+  // Too short to pin a map and read (a 360px phone on its side, a window zoomed to 400%): the map scrolls away
+  // with the rest, and the caption makes no promise that it follows.
+  for (const viewport of [SWEEP.sidewaysShort, { width: 568, height: 320 }, { width: 320, height: 256 }]) {
+    const name = `${viewport.width}x${viewport.height}`;
+    const { page, close } = await open(viewport);
+    const dialog = await openDialog(page);
+    await page.waitForTimeout(100);
+    assert.equal(await dialog.locator(".sl").getAttribute("data-follow"), null, `${name}: no promise`);
+    assert.ok(await dialog.locator(".cap-latest").isVisible(), `${name}: the overview names the latest trip instead`);
+    await page.locator("#dialog-travel [data-scroller]").evaluate((e) => (e.scrollTop = e.scrollHeight / 2));
+    const g = await geometry(page);
+    assert.ok(g.fig.bottom < g.sc.top, `${name}: the map has scrolled away (${g.fig.bottom} vs ${g.sc.top})`);
+    assert.equal(await overflowX(page), 0, `${name}: no horizontal scroll`);
+    await close();
+  }
 });
 
 test("a trip heading reached by keyboard lights its trip; scrolling on hands the map back to the reading line", async () => {
@@ -285,18 +299,15 @@ test("a trip heading reached by keyboard lights its trip; scrolling on hands the
     await heads.nth(1).focus();
     await page.keyboard.press("PageDown");
     await page.keyboard.press("PageDown");
-    // Keyboard scrolling is animated: wait until it has come to rest.
-    await page.waitForFunction(
-      () =>
+    // Keyboard scrolling is animated: wait until it has come to rest (unmoved for 120ms), then a frame more.
+    await dialog.locator("[data-scroller]").evaluate(
+      (e) =>
         new Promise((done) => {
-          const sc = document.querySelector("#dialog-travel [data-scroller]");
-          const y = sc.scrollTop;
-          setTimeout(() => done(sc.scrollTop === y), 120);
+          let y = -1;
+          const tick = () => (e.scrollTop === y ? requestAnimationFrame(() => requestAnimationFrame(done)) : ((y = e.scrollTop), setTimeout(tick, 120)));
+          tick();
         }),
-      null,
-      { polling: 50, timeout: 5000 },
     );
-    await page.waitForTimeout(50);
     const held = await root.getAttribute("data-active-trip");
     await dialog.locator("button[type=submit]").focus();
     await page.waitForTimeout(150);
@@ -367,5 +378,28 @@ test("a trip heading clicked with the mouse does not hold the map, even once a k
     assert.equal(lit, await root.getAttribute("data-active-trip"), `${name}: the line decides, not the clicked heading`);
     assert.deepEqual(errors, [], `${name}: no errors`);
     await close();
+  }
+});
+
+test("opening, closing and reopening the dialog raises no error, not even a ResizeObserver loop", async () => {
+  // Heights where, without the island's guard, each open measured the closed dialog and looped (found by a scan).
+  for (const viewport of [{ width: 1024, height: 580 }, { width: 1366, height: 612 }, { width: 1024, height: 668 }, VIEWPORTS.laptop, VIEWPORTS.phone]) {
+    const name = `${viewport.width}x${viewport.height}`;
+    const context = await browser.newContext({ viewport });
+    // Errors that reach window.onerror (error monitoring) but not Playwright's pageerror, like the ResizeObserver loop.
+    await context.addInitScript(() => {
+      window.__errors = [];
+      window.addEventListener("error", (e) => window.__errors.push(String(e.message)));
+    });
+    const page = await context.newPage();
+    await page.goto(URL, { waitUntil: "networkidle" });
+    for (let k = 0; k < 3; k++) {
+      const dialog = await openDialog(page);
+      await page.waitForTimeout(150);
+      await dialog.locator("button[type=submit]").click();
+      await dialog.waitFor({ state: "hidden" });
+    }
+    assert.deepEqual(await page.evaluate(() => window.__errors), [], name);
+    await context.close();
   }
 });
