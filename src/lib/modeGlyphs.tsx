@@ -10,10 +10,8 @@ export type ModeGlyphName = "plane" | "car" | "bus" | "minivan" | "train" | "fer
 /** The owner's pick for "land" (car | bus | minivan). Bus recommended: see the design note. */
 export const LAND_GLYPH: ModeGlyphName = "bus";
 
-// `rail` is not a Mode yet; the train is drawn so that adding it is one line here and one in MODES (src/utils/travel.ts).
-type AnyMode = Mode | "rail";
-const GLYPH: Record<AnyMode, ModeGlyphName> = { air: "plane", land: LAND_GLYPH, sea: "ferry", rail: "train" };
-export const MODE_WORDS: Record<AnyMode, string> = { air: "By air", land: "By land", sea: "By sea", rail: "By rail" };
+const GLYPH: Record<Mode, ModeGlyphName> = { air: "plane", land: LAND_GLYPH, rail: "train", sea: "ferry" };
+export const MODE_WORDS: Record<Mode, string> = { air: "By air", land: "By land", rail: "By rail", sea: "By sea" };
 
 const PATHS: Record<ModeGlyphName, React.ReactNode> = {
   // Top view, nose right: a 2 px fuselage, swept wings, a small tailplane.
@@ -55,7 +53,7 @@ const PATHS: Record<ModeGlyphName, React.ReactNode> = {
  * hidden span beside it (more reliable in a table cell than role=img), plus an svg <title> for the mouse
  * tooltip, which aria-hidden keeps out of the accessibility tree.
  */
-export function ModeGlyph({ by, size = 14, className = "", glyph }: { by?: AnyMode; size?: 12 | 14 | 16 | 24; className?: string; glyph?: ModeGlyphName }) {
+export function ModeGlyph({ by, size = 14, className = "", glyph }: { by?: Mode; size?: 12 | 14 | 16 | 24; className?: string; glyph?: ModeGlyphName }) {
   const name = glyph ?? (by ? GLYPH[by] : "unknown");
   const words = by ? MODE_WORDS[by] : "Mode not known";
   return (

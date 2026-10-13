@@ -171,8 +171,9 @@
   .tmap-dots { fill: none; stroke-width: 0.56; stroke-linecap: round; stroke-dasharray: 0 1; stroke-dashoffset: -0.5; }
   .tmap-earlier path { fill: none; stroke: var(--ink-3); stroke-width: var(--w-earlier); }
   .tmap-latest path { fill: none; stroke: var(--accent); stroke-width: var(--w-latest); stroke-linecap: round; }
-  /* A journey by land is a line of dots; it is not drawn on (the draw uses the dash array). */
+  /* A journey by land is a line of dots, by rail a dashed line; neither is drawn on (the draw uses the dash array). */
   .tmap path.land { stroke-dasharray: 0 var(--dot-gap); stroke-linecap: round; stroke-width: var(--w-dot); }
+  .tmap path.rail { stroke-dasharray: var(--dash) var(--dash-gap); stroke-linecap: butt; }
   .tmap-mk { position: absolute; display: block; transform: translate(-50%, -50%); box-sizing: border-box; }
   .tmap-mk.was { width: 7px; height: 7px; border-radius: 50%; background: var(--surface); border: 1.25px solid var(--ink-2); }
   .tmap-mk.now { width: 9px; height: 9px; border-radius: 50%; background: var(--accent); border: 1.5px solid var(--surface); }
@@ -185,12 +186,13 @@
   @container tmap (min-width: 296px) { .tmap-from-296 { display: block; } .tmap-to-296 { display: none; } }
   @container tmap (min-width: 560px) { .tmap-from-560 { display: block; } .tmap-to-560 { display: none; } }
 
-  /* A trip's legs as one bar, each segment as long as its leg: land dotted, sea dashed, mode unknown a hairline */
+  /* A trip's legs as one bar, each segment as long as its leg: land dotted, rail short dashes, sea long dashes, mode unknown a hairline */
   .trip-strip { display: flex; gap: 2px; height: 3px; color: var(--ink-3); }
   .trip-strip.latest { color: var(--accent); }
   .trip-seg { display: block; flex-basis: 0; min-width: 3px; height: 3px; background: currentColor; }
   .trip-seg.land { background: radial-gradient(circle, currentColor 1.1px, transparent 1.35px) 0 50% / 4px 3px repeat-x; min-width: 4px; }
-  .trip-seg.sea { background: repeating-linear-gradient(90deg, currentColor 0 4px, transparent 4px 7px); }
+  .trip-seg.rail { background: repeating-linear-gradient(90deg, currentColor 0 4px, transparent 4px 6px); min-width: 6px; }
+  .trip-seg.sea { background: repeating-linear-gradient(90deg, currentColor 0 7px, transparent 7px 10px); }
   .trip-seg.unknown { background: linear-gradient(currentColor, currentColor) 0 50% / 100% 1px no-repeat; }
 
   /* Trips by month: a bar per trip on a ten-year rail, two lanes so neighbours never touch */
@@ -225,6 +227,7 @@
   .sl-ghost use { transition: stroke-opacity var(--t); }
   .sl-r { fill: none; stroke: var(--accent); stroke-width: var(--w-latest); stroke-linecap: round; opacity: 0; transition: opacity var(--t); }
   .sl-ghost .land, .sl-r .land { stroke-dasharray: 0 var(--dot-gap); stroke-width: var(--w-dot); stroke-linecap: round; }
+  .sl-ghost .rail, .sl-r .rail { stroke-dasharray: var(--dash) var(--dash-gap); stroke-linecap: butt; }
   .sl-r.is-active, .sl-lands .is-active, .sl[data-active-trip=""] .sl-r.latest { opacity: 1; }
   /* The overview's countries are the card's: every country the latest trip stopped in, where it set off included. */
   .sl-over-land { opacity: 0; transition: opacity var(--t); }

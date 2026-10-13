@@ -324,16 +324,20 @@ export interface MapModel {
   /** Land dots: the rest, the visited countries, the latest trip's countries. */
   land: { rest: string; visited: string; latest: string };
   /** Route widths in frame units: px at the width the map is drawn for. */
-  stroke: { earlier: number; latest: number; dot: number; dotGap: number };
+  stroke: { earlier: number; latest: number; dot: number; dotGap: number; dash: number; dashGap: number };
   /** Each pair of places the earlier trips joined, once, oldest first; `opacity` fades with age. */
-  earlier: Array<{ key: string; d: string; land: boolean; opacity: number }>;
+  earlier: Array<{ key: string; d: string; line?: Line; opacity: number }>;
   /** The latest trip, leg by leg, in the order travelled. */
-  latest: Array<{ key: string; d: string; land: boolean }>;
+  latest: Array<{ key: string; d: string; line?: Line }>;
   /** One set of marks and labels per range of rendered widths. */
   layers: Array<{ minW: number; maxW: number; marks: Array<{ key: string; left: number; top: number; kind: MarkKind; title: string }>; labels: Array<{ key: string; left: number; top: number; kind: MarkKind; text: string; anchor: Anchor }> }>;
   /** What the map shows, in words, for its role="img". */
   label: string;
 }
+
+/** How a route is drawn when not a plain line: by land a line of dots, by rail a dashed line. */
+export type Line = "land" | "rail";
+const lineOf = (j: Journey): Line | undefined => (j.by === "land" || j.by === "rail" ? j.by : undefined);
 
 const LONG_MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 const plural = (n: number, one: string, many: string) => `${n} ${n === 1 ? one : many}`;
@@ -444,9 +448,9 @@ export function mapModel(journeys: Journey[], ts: Trip[], opts: { aspect: [numbe
     h: c.h,
     cells: c,
     land: { rest, visited: seen, latest: now },
-    stroke: { earlier: u(1.1), latest: u(2), dot: u(2.2), dotGap: u(4) },
-    earlier: [...earlier.entries()].map(([key, j]) => ({ key, d: arc(j.from, j.to, c), land: j.by === "land", opacity: ageOpacity(newestYear - j.year) })),
-    latest: latest.legs.map((j, i) => ({ key: `${pair(j)}|${i}`, d: arc(j.from, j.to, c), land: j.by === "land" })),
+    stroke: { earlier: u(1.1), latest: u(2), dot: u(2.2), dotGap: u(4), dash: u(3), dashGap: u(2.5) },
+    earlier: [...earlier.entries()].map(([key, j]) => ({ key, d: arc(j.from, j.to, c), line: lineOf(j), opacity: ageOpacity(newestYear - j.year) })),
+    latest: latest.legs.map((j, i) => ({ key: `${pair(j)}|${i}`, d: arc(j.from, j.to, c), line: lineOf(j) })),
     layers,
     label,
   };
@@ -472,11 +476,11 @@ export interface Spotlight {
   /** One path per visited country (id `c-XX`), drawn by <use> for every trip that went there. */
   countries: Array<{ id: string; d: string }>;
   /** Every pair of places any journey joined, once (id `r<n>`), in the mode and age of its last journey, oldest first: the faint ghost under a lit trip. */
-  routes: Array<{ id: string; d: string; land: boolean; opacity: number }>;
+  routes: Array<{ id: string; d: string; line?: Line; opacity: number }>;
   /** Every place once per width layer, unlabelled and with its tooltip: the marks under a lit trip. */
   base: SpotLayer[];
   /** What lights for each trip, written once for all the trips it is the same for (`trips`: indexes into trips()). */
-  routeSets: Array<{ trips: number[]; legs: Array<{ id: string; land: boolean }> }>;
+  routeSets: Array<{ trips: number[]; legs: Array<{ id: string; line?: Line }> }>;
   landSets: Array<{ trips: number[]; countries: string[] }>;
   labelSets: Array<{ trips: number[]; layers: SpotLayer[] }>;
 }
@@ -533,7 +537,7 @@ export function spotlight(journeys: Journey[], ts: Trip[], opts: { aspect: [numb
   const ids = new Map<string, string>();
   const routes = [...lastUse.entries()].map(([k, j], n) => {
     ids.set(k, `r${n}`);
-    return { id: `r${n}`, d: arc(j.from, j.to, c), land: j.by === "land", opacity: ageOpacity(newestYear - j.year) };
+    return { id: `r${n}`, d: arc(j.from, j.to, c), line: lineOf(j), opacity: ageOpacity(newestYear - j.year) };
   });
 
   // Marks: every place and home, clustered per layer as mapModel does (9px at the layer's narrowest width).
@@ -562,11 +566,11 @@ export function spotlight(journeys: Journey[], ts: Trip[], opts: { aspect: [numb
 
   const rank: Record<SpotKind, number> = { now: 0, from: 1, home: 2, was: 3 };
   const perTrip = ts.map((t) => {
-    // Its legs, each pair once (by land when this trip went by land).
-    const legs: Array<{ id: string; land: boolean }> = [];
+    // Its legs, each pair once (drawn as this trip went: by land, by rail).
+    const legs: Array<{ id: string; line?: Line }> = [];
     for (const j of t.legs) {
-      const leg = { id: ids.get(pair(j))!, land: j.by === "land" };
-      if (!legs.some((l) => l.id === leg.id && l.land === leg.land)) legs.push(leg);
+      const leg = { id: ids.get(pair(j))!, ...(lineOf(j) ? { line: lineOf(j) } : {}) };
+      if (!legs.some((l) => l.id === leg.id && l.line === leg.line)) legs.push(leg);
     }
     // Its countries: the places it reached (not where it set off from, unless it stopped there too, nor home).
     const startKey = placeKey(t.stops[0]);

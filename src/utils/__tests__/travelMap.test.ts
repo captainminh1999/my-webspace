@@ -139,7 +139,7 @@ test('each trip lights one set of routes and one set of marks and labels; routes
     const lit_ = new Set(lit.routes[0].legs.map((l) => ends(s.routes.find((r) => r.id === l.id)!.d)));
     assert.deepEqual([...lit_].sort(), [...own].sort(), `trip ${i} lights its own journeys`);
     // A pair travelled both ways in one trip is one route.
-    const legs = lit.routes[0].legs.map((l) => `${l.id}|${l.land}`);
+    const legs = lit.routes[0].legs.map((l) => `${l.id}|${l.line}`);
     assert.equal(new Set(legs).size, legs.length, `trip ${i}: ${legs.join(', ')}`);
     assert.ok(legs.length <= t.legs.length);
   });
@@ -442,6 +442,17 @@ test('64 different trips stay inside the budget the home page can carry', () => 
   // What the dialog writes for each trip: measured at about 2 KB a trip as JSON (130 KB here).
   const bytes = JSON.stringify({ labelSets: s.labelSets, routeSets: s.routeSets, landSets: s.landSets }).length;
   assert.ok(bytes < 64 * 2.5 * 1024, `${bytes} bytes for 64 trips`);
+});
+
+test('a journey by rail is drawn dashed, by land dotted, by air as a line: on the card, the ghost and the lit trip', () => {
+  const js = [j(SYD, KL, 2024, 4), j(KL, PENANG, 2024, 4, 'rail'), j(PENANG, SINGAPORE, 2024, 4, 'land'), j(SINGAPORE, SYD, 2024, 4)];
+  const ts = trips(js);
+  const s = spotlight(js, ts, OPTS);
+  assert.deepEqual(s.overview.latest.map((r) => r.line), [undefined, 'rail', 'land', undefined]);
+  assert.deepEqual(s.routes.map((r) => r.line).sort(), ['land', 'rail', undefined, undefined].sort());
+  assert.deepEqual(s.routeSets[0].legs.map((l) => l.line ?? 'air'), ['air', 'rail', 'land', 'air']);
+  const css = readFileSync(new URL('../../app/globals.css', import.meta.url), 'utf8');
+  for (const rule of ['.tmap path.rail', '.sl-r .rail', '.trip-seg.rail']) assert.ok(css.includes(rule), rule);
 });
 
 test("the label anchors in the CSS are the placer's", () => {

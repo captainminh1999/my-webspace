@@ -28,6 +28,8 @@ function TravelMap({ model }: { model: MapModel }) {
     "--w-latest": model.stroke.latest,
     "--w-dot": model.stroke.dot,
     "--dot-gap": model.stroke.dotGap,
+    "--dash": model.stroke.dash,
+    "--dash-gap": model.stroke.dashGap,
   } as CSSProperties;
   return (
     <div className="tmap" role="img" aria-label={model.label} style={style}>
@@ -37,8 +39,8 @@ function TravelMap({ model }: { model: MapModel }) {
         <path className="tmap-dots" d={model.land.latest} stroke="var(--accent)" />
         <g className="tmap-earlier">
           {model.earlier.map((r, i) =>
-            r.land ? (
-              <path key={r.key} d={r.d} className="land" strokeOpacity={r.opacity} />
+            r.line ? (
+              <path key={r.key} d={r.d} className={r.line} strokeOpacity={r.opacity} />
             ) : (
               <path key={r.key} d={r.d} pathLength={1} className="draw" strokeOpacity={r.opacity} style={{ animationDelay: `${80 + i * 20}ms` }} />
             ),
@@ -46,7 +48,7 @@ function TravelMap({ model }: { model: MapModel }) {
         </g>
         <g className="tmap-latest">
           {model.latest.map((r, i) =>
-            r.land ? <path key={r.key} d={r.d} className="land" /> : <path key={r.key} d={r.d} pathLength={1} className="draw" style={{ animationDelay: `${320 + i * 160}ms` }} />,
+            r.line ? <path key={r.key} d={r.d} className={r.line} /> : <path key={r.key} d={r.d} pathLength={1} className="draw" style={{ animationDelay: `${320 + i * 160}ms` }} />,
           )}
         </g>
       </svg>
@@ -66,7 +68,7 @@ function TravelMap({ model }: { model: MapModel }) {
   );
 }
 
-function Legend({ earlier, land }: { earlier: boolean; land: boolean }) {
+function Legend({ earlier, land, rail }: { earlier: boolean; land: boolean; rail: boolean }) {
   return (
     <p className="mt-3 flex flex-wrap gap-x-4 gap-y-1 font-mono text-source text-ink-3 uppercase" aria-hidden>
       <span className="inline-flex items-center gap-1.5">
@@ -80,6 +82,11 @@ function Legend({ earlier, land }: { earlier: boolean; land: boolean }) {
       {land && (
         <span className="inline-flex items-center gap-1.5">
           <i className="trip-seg land w-3.5 basis-auto shrink-0" /> By land
+        </span>
+      )}
+      {rail && (
+        <span className="inline-flex items-center gap-1.5">
+          <i className="trip-seg rail w-3.5 basis-auto shrink-0" /> By rail
         </span>
       )}
       <span className="inline-flex items-center gap-1.5">
@@ -160,7 +167,7 @@ export function TravelCard({ journeys }: { journeys: Journey[] }) {
       </div>
       <figure className="md:col-start-1 md:row-start-1 md:row-span-2 flex flex-col justify-center">
         <TravelMap model={model} />
-        <Legend earlier={ts.length > 1} land={journeys.some((j) => j.by === "land")} />
+        <Legend earlier={ts.length > 1} land={journeys.some((j) => j.by === "land")} rail={journeys.some((j) => j.by === "rail")} />
       </figure>
       <div className="md:col-start-2 md:row-start-2">
         <table className="w-full font-mono text-dense">
@@ -308,7 +315,15 @@ function Layer({ layer, titles }: { layer: Pick<SpotLayer, "minW" | "maxW"> & { 
  */
 function SpotMap({ s, latest }: { s: Spotlight; latest: number }) {
   const m = s.overview;
-  const style = { aspectRatio: `${m.w} / ${m.h}`, "--w-earlier": m.stroke.earlier, "--w-latest": m.stroke.latest, "--w-dot": m.stroke.dot, "--dot-gap": m.stroke.dotGap } as CSSProperties;
+  const style = {
+    aspectRatio: `${m.w} / ${m.h}`,
+    "--w-earlier": m.stroke.earlier,
+    "--w-latest": m.stroke.latest,
+    "--w-dot": m.stroke.dot,
+    "--dot-gap": m.stroke.dotGap,
+    "--dash": m.stroke.dash,
+    "--dash-gap": m.stroke.dashGap,
+  } as CSSProperties;
   const lit = (trips: number[]) => trips.join(" ");
   const isLatest = (trips: number[]) => (trips.includes(latest) ? "latest" : undefined);
   return (
@@ -336,14 +351,14 @@ function SpotMap({ s, latest }: { s: Spotlight; latest: number }) {
         </g>
         <g className="sl-ghost">
           {s.routes.map((r) => (
-            <use key={r.id} href={`#tsl-${r.id}`} className={r.land ? "land" : undefined} strokeOpacity={r.opacity} />
+            <use key={r.id} href={`#tsl-${r.id}`} className={r.line} strokeOpacity={r.opacity} />
           ))}
         </g>
         <g className="sl-routes">
           {s.routeSets.map((g) => (
             <g key={lit(g.trips)} data-lit={lit(g.trips)} className={`sl-r ${isLatest(g.trips) ?? ""}`}>
               {g.legs.map((l) => (
-                <use key={`${l.id}${l.land}`} href={`#tsl-${l.id}`} className={l.land ? "land" : undefined} />
+                <use key={`${l.id}${l.line ?? ""}`} href={`#tsl-${l.id}`} className={l.line} />
               ))}
             </g>
           ))}
@@ -425,6 +440,13 @@ function SpotLegend({ ts, journeys }: { ts: Trip[]; journeys: Journey[] }) {
           <i className="trip-seg land lg-land" />
           <ModeGlyphBare glyph={LAND_GLYPH} size={12} />
           By land
+        </span>
+      )}
+      {journeys.some((j) => j.by === "rail") && (
+        <span>
+          <i className="trip-seg rail lg-land" />
+          <ModeGlyphBare glyph="train" size={12} />
+          By rail
         </span>
       )}
       <span>
@@ -585,7 +607,7 @@ export function TravelFull({ journeys }: { journeys: Journey[] }) {
         <p className="font-mono text-source text-ink-3 mt-6">
           From flight, rail and stay bookings · a journey runs from one stay to the next, so a change of planes on the way is not a place · a trip
           ends back where it began, at home in Sydney, where the record breaks, or before a stay of {STAY_MONTHS} months or more · a there-and-back
-          under {SIDE_KM} km is a side trip, in brackets · bars show each trip&apos;s legs to scale, dotted by land · distances are great-circle, to
+          under {SIDE_KM} km is a side trip, in brackets · bars show each trip&apos;s legs to scale, dotted by land, dashed by rail · distances are great-circle, to
           the nearest 10 km · map: Natural Earth 1:50m on a 1° grid
         </p>
       </div>

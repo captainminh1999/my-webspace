@@ -71,7 +71,7 @@ function parsePlace(v: unknown): Place | null {
   return { city: city.trim(), country: country.toUpperCase(), lat: lat as number, lon: lon as number };
 }
 
-const MODES: ReadonlySet<string> = new Set<Mode>(["air", "land", "sea"]);
+const MODES: ReadonlySet<string> = new Set<Mode>(["air", "land", "rail", "sea"]);
 
 /**
  * The journeys in the order travelled: by year, and within a year by month where it is known. Journeys in

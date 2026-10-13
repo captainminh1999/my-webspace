@@ -1,6 +1,6 @@
 // e2e/travel.e2e.mjs — the Travel card and dialog in a real browser, against `next start` rendering
 // e2e/fixtures/journeys.json (run by scripts/e2e.mjs). Eleven invented trips, 2016-2026: one without a month, side
-// trips by land, three to the same place (one route set lit for trips 1, 2 and 10), a stay abroad with a trip out
+// trips by land and one by rail, three to the same place (one route set lit for trips 1, 2 and 10), a stay abroad with a trip out
 // of it (a "set off from" mark), and empty years in between. The dialog's map lights the trip being read: the sweeps below
 // scroll it end to end at every size and check what is lit at each step.
 import { test, after } from "node:test";
@@ -48,6 +48,7 @@ test("the card shows the trips from the fixture, at every width, without overflo
     const text = (await card.innerText()).replace(/\s+/g, " ");
     assert.match(text, /7 countries/i, name);
     assert.match(text, /11 cities · 11 trips · 26 journeys · since 2016/i, name);
+    assert.match(text, /by land.*by rail/i, `${name}: the key names land and rail`);
     assert.equal(await overflowX(page), 0, `${name}: no horizontal scroll`);
     assert.deepEqual(errors, [], `${name}: no errors`);
     await close();
@@ -65,6 +66,9 @@ test("the dialog lists every trip, newest first, and does not overflow", async (
     assert.ok(at.every((i) => i >= 0), `${name}: every year listed`);
     assert.deepEqual([...at].sort((a, b) => a - b), at, `${name}: newest first`);
     assert.match(text, /2020 – 2022\s*No journeys/i, `${name}: the empty years`);
+    // Each leg says how it went, in words a screen reader reads: the train for the one by rail.
+    assert.equal(await dialog.locator("td.mode .sr-only", { hasText: "By rail" }).count(), 1, `${name}: one leg by rail`);
+    assert.ok((await dialog.locator("td.mode .sr-only", { hasText: "By land" }).count()) > 1, `${name}: legs by land`);
     assert.equal(await overflowX(page), 0, `${name}: no horizontal scroll`);
     assert.deepEqual(errors, [], `${name}: no errors`);
     await close();
