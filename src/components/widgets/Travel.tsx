@@ -260,8 +260,8 @@ function Rail({ ts, sum }: { ts: Trip[]; sum: TravelSummary }) {
               <span key={y}>
                 {show && (
                   <>
-                    <span className="max-sm:hidden">{y}</span>
-                    <span className="sm:hidden">’{String(y).slice(2)}</span>
+                    <span className="y-long">{y}</span>
+                    <span className="y-short">’{String(y).slice(2)}</span>
                   </>
                 )}
               </span>
@@ -324,9 +324,10 @@ function SpotMap({ s, latest }: { s: Spotlight; latest: number }) {
         </defs>
         <path className="tmap-dots" d={s.land.rest} stroke="var(--rule-strong)" />
         <path className="tmap-dots" d={s.land.visited} stroke="var(--ink-3)" />
+        <path className="tmap-dots sl-over-land" d={m.land.latest} stroke="var(--accent)" />
         <g className="sl-lands">
           {s.landSets.map((g) => (
-            <g key={lit(g.trips)} data-lit={lit(g.trips)} className={isLatest(g.trips)}>
+            <g key={lit(g.trips)} data-lit={lit(g.trips)}>
               {g.countries.map((c) => (
                 <use key={c} href={`#tsl-${c}`} />
               ))}
@@ -547,7 +548,7 @@ export function TravelFull({ journeys }: { journeys: Journey[] }) {
       </div>
 
       <div className="sl-list">
-        <dl className="raster grid-cols-2 sm:grid-cols-3">
+        <dl className="raster sl-figs">
           {stats.map(([label, value, under]) => (
             <div key={label} className="px-3 py-2.5">
               <dt className="stamp text-ink-3">{label}</dt>

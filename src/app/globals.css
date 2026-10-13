@@ -214,7 +214,7 @@
    TravelSpotlight adds .is-active to every element whose data-lit lists it. Only colour and opacity move, and a
    lit state never changes the layout: every wording that swaps is stacked in place at the size of the wider. */
 @layer components {
-  .sl { --t: 160ms ease-out; --pin-h: 0px; }
+  .sl { --t: 160ms ease-out; }
   .sl-swap { display: inline-grid; }
   .sl-swap > * { grid-area: 1 / 1; }
   .sl[data-active-trip=""] .sl-l, .sl:not([data-active-trip=""]) .sl-o { visibility: hidden; }
@@ -225,7 +225,10 @@
   .sl-ghost use { transition: stroke-opacity var(--t); }
   .sl-r { fill: none; stroke: var(--accent); stroke-width: var(--w-latest); stroke-linecap: round; opacity: 0; transition: opacity var(--t); }
   .sl-ghost .land, .sl-r .land { stroke-dasharray: 0 var(--dot-gap); stroke-width: var(--w-dot); stroke-linecap: round; }
-  .sl-r.is-active, .sl-lands .is-active, .sl[data-active-trip=""] .sl-r.latest, .sl[data-active-trip=""] .sl-lands .latest { opacity: 1; }
+  .sl-r.is-active, .sl-lands .is-active, .sl[data-active-trip=""] .sl-r.latest { opacity: 1; }
+  /* The overview's countries are the card's: every country the latest trip stopped in, where it set off included. */
+  .sl-over-land { opacity: 0; transition: opacity var(--t); }
+  .sl[data-active-trip=""] .sl-over-land { opacity: 1; }
   .sl:not([data-active-trip=""]) .sl-ghost use { stroke-opacity: 0.4; }
   .sl-over, .sl-base, .sl-set { position: absolute; inset: 0; visibility: hidden; opacity: 0; transition: opacity var(--t), visibility 0s linear 160ms; }
   .sl[data-active-trip=""] .sl-over, .sl:not([data-active-trip=""]) .sl-base, .sl-set.is-active { visibility: visible; opacity: 1; transition-delay: 0s; }
@@ -234,17 +237,20 @@
   .tmap-mk.from { width: 9px; height: 9px; border-radius: 50%; background: var(--surface); border: 2px solid var(--accent); }
   .tmap-lbl.from { color: var(--ink-2); }
 
-  /* The line under the map: what is lit */
-  .sl-cap { position: relative; height: 33px; border-top: 1px solid var(--rule); container: slcap / inline-size; color: var(--ink-3); }
+  /* The line under the map: what is lit. The rows are inset by --cap-pad, and so is the box the container
+     queries measure; if a row still does not fit, its start is cut, never the distance. */
+  .sl-cap { position: relative; height: 33px; padding-inline: var(--cap-pad, 0px); border-top: 1px solid var(--rule); container: slcap / inline-size; color: var(--ink-3); }
   .sl-cap-row { position: absolute; inset: 0 var(--cap-pad, 0px); display: flex; align-items: center; justify-content: space-between; gap: 12px; white-space: nowrap; overflow: hidden; visibility: hidden; opacity: 0; transition: opacity var(--t), visibility 0s linear 160ms; }
+  .sl-cap-row > :first-child { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+  .sl-cap-row > :last-child { flex-shrink: 0; }
   .sl[data-active-trip=""] .sl-cap-over, .sl-cap-row.is-active { visibility: visible; opacity: 1; transition-delay: 0s; }
   .sl-cap .sw { display: inline-block; width: 14px; height: 2px; background: var(--accent); margin-right: 8px; vertical-align: 0.25em; }
   /* Once the island runs, the overview says the map follows the list (never promised without it). */
   .cap-hint, .sl[data-follow] .cap-latest { display: none; }
   .sl[data-follow] .cap-hint { display: inline; }
-  @container slcap (max-width: 420px) { .sl[data-follow] .cap-sum { display: none; } }
-  @container slcap (max-width: 370px) { .cap-kind { display: none; } }
-  @container slcap (max-width: 300px) { .cap-legs { display: none; } }
+  @container slcap (max-width: 500px) { .sl[data-follow] .cap-sum { display: none; } }
+  @container slcap (max-width: 420px) { .cap-kind { display: none; } }
+  @container slcap (max-width: 310px) { .cap-legs { display: none; } }
 
   .sl-legend { margin-top: 12px; display: flex; flex-wrap: wrap; gap: 4px 16px; font: 0.6875rem/1rem var(--font-mono); letter-spacing: 0.04em; color: var(--ink-3); text-transform: uppercase; }
   .sl-legend > span { display: inline-flex; align-items: center; gap: 6px; }
@@ -255,7 +261,10 @@
   .lg-home { width: 7px; height: 7px; background: var(--ink); }
 
   /* Trips by month: the lit trip's mark in the accent; in the overview, the latest's */
-  .sl-rail { margin-top: 24px; }
+  .sl-rail { margin-top: 24px; container: slrail / inline-size; }
+  /* Years in full while ten of them fit, then '17 */
+  .sl-rail .y-short { display: none; }
+  @container slrail (max-width: 22rem) { .sl-rail .y-long { display: none; } .sl-rail .y-short { display: inline; } }
   .sl .trip-rail-mark { transition: background-color var(--t), box-shadow var(--t); }
   .sl:not([data-active-trip=""]) .trip-rail-mark.latest:not(.unknown):not(.is-active) { background: var(--ink-2); }
   .sl .trip-rail-mark.is-active:not(.unknown) { background: var(--accent); }
@@ -263,11 +272,13 @@
 
   /* The list: a 2px accent rule down the trip on the map, over the column rule beside the map */
   .sl-list { container: sllist / inline-size; }
+  .sl-figs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  @container sllist (min-width: 24rem) { .sl-figs { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
   .sl-yr { margin-top: 20px; padding-top: 12px; border-top: 1px solid var(--rule-strong); }
   .trip { position: relative; margin-left: -16px; padding: 12px 0 8px 14px; border-left: 2px solid transparent; transition: border-color var(--t); }
   .trip + .trip::before { content: ""; position: absolute; top: 0; left: 14px; right: 0; border-top: 1px solid var(--rule); }
   .trip.is-active { border-left-color: var(--accent); }
-  .trip-h { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 2px 16px; border-radius: 2px; scroll-margin-top: calc(var(--pin-h) + 12px); }
+  .trip-h { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 2px 16px; border-radius: 2px; }
   .trip .trip-strip { margin-top: 8px; transition: color var(--t); }
   .sl:not([data-active-trip=""]) .trip:not(.is-active) .trip-strip.latest { color: var(--ink-3); }
   .trip.is-active .trip-strip { color: var(--accent); }
@@ -284,18 +295,25 @@
   }
 
   /* Stacked (phones and tablets): the map, with its caption, pinned at the top; the rest scrolls under it.
-     The map is at most 31% of the scroll area tall, never under the 240px its labels are placed for. */
-  .sl { --sl-stacked: 1; --pin-h: calc(min((min(76rem, 100vw - 2rem) - 2px) / var(--ar), max(240px / var(--ar), (100dvh - 82px) * 0.31)) + 33px); }
+     The map is at most 31% of the scroll area tall, never under the 240px its labels are placed for. The
+     island sets the scroll area's scroll-padding to the pinned height, so focus and paging clear the map. */
+  .sl { --sl-stacked: 1; }
   .sl-pin { display: contents; }
   .sl-fig { position: sticky; top: 0; z-index: 2; background: var(--surface); border-bottom: 1px solid var(--rule); }
   .sl-fig > .tmap { width: min(100%, max(240px, calc((100dvh - 82px) * 0.31 * var(--ar)))); margin-inline: auto; }
   .sl-cap { --cap-pad: 16px; }
   .sl-legend, .sl-rail { margin-inline: max(16px, (100% - 44.5rem) / 2 + 16px); }
   .sl-list { max-width: 44.5rem; margin-inline: auto; padding: 20px 16px; }
+  /* Too short a screen to pin a map and still read (a phone on its side under 35rem wide, a zoomed window):
+     the map scrolls away with the rest, and the list still lights it. */
+  @media (max-height: 32rem) {
+    .sl { --sl-stacked: 0; }
+    .sl-fig { position: static; }
+  }
 
   /* Beside: from a laptop's width, or a phone on its side. The map gives way to the list's width and the screen's height. */
-  @media (min-width: 1024px), (orientation: landscape) and (max-height: 32rem) and (min-width: 40rem) {
-    .sl { --sl-stacked: 0; --pin-h: 0px; display: grid; align-items: start; }
+  @media (min-width: 1024px), (orientation: landscape) and (max-height: 32rem) and (min-width: 35rem) {
+    .sl { --sl-stacked: 0; display: grid; align-items: start; }
     .sl-fig { position: static; z-index: auto; border-bottom: 0; }
     .sl-fig > .tmap { width: 100%; }
     .sl-cap { --cap-pad: 0px; }
@@ -303,7 +321,9 @@
     .trip { margin-left: -25px; padding-left: 23px; }
     .trip + .trip::before { left: 23px; }
   }
-  /* A laptop: map, caption, key and rail pinned in the left column, which is as wide as the map can be at this height. */
+  /* A laptop: map, caption, key and rail pinned in the left column, which is as wide as the map can be at this
+     height. --pin-chrome is their height besides the map's: the island measures it (a key on two lines); this is
+     the estimate before it runs. */
   @media (min-width: 1024px) {
     .sl { --pin-chrome: calc(175px + var(--lanes) * 13px); --fig-w: calc((100dvh - 82px - var(--pin-chrome)) * var(--ar)); grid-template-columns: minmax(0, calc(var(--fig-w) + 48px)) minmax(28rem, 1fr); }
     .sl-pin { display: block; position: sticky; top: 0; grid-column: 1; padding: 20px 24px; }
@@ -311,8 +331,9 @@
     .sl-legend, .sl-rail { margin-inline: 0; width: min(100%, var(--fig-w)); }
   }
   /* A phone on its side: only the map and its caption pinned on the left; the key and the rail head the list. */
-  @media (orientation: landscape) and (max-height: 32rem) and (min-width: 40rem) {
-    .sl { --fig-w: calc((100dvh - 82px - 33px - 24px) * var(--ar)); grid-template-columns: minmax(272px, calc(var(--fig-w) + 32px)) minmax(0, 1fr); }
+  @media (orientation: landscape) and (max-height: 32rem) and (min-width: 35rem) {
+    /* The list keeps 20rem (less only on the narrowest), the map takes the rest up to its height's worth. */
+    .sl { --fig-w: calc((100dvh - 82px - 33px - 24px) * var(--ar)); grid-template-columns: minmax(240px, calc(var(--fig-w) + 32px)) minmax(min(20rem, 100% - 272px), 1fr); }
     .sl-pin { display: contents; position: static; padding: 0; }
     .sl-fig { grid-column: 1; grid-row: 1 / span 3; position: sticky; top: 12px; margin: 12px 16px; width: min(100% - 32px, var(--fig-w)); }
     .sl-legend, .sl-rail { grid-column: 2; margin: 0; width: auto; border-left: 1px solid var(--rule); padding: 0 24px; }

@@ -9,9 +9,14 @@ import { useEffect, useRef } from "react";
  * the map stays one role="img". Without it the dialog shows the overview, which reads fine.
  *
  * The trip being read is the last one whose top has passed the reading line: a third of the way down the
- * scroll area beside the map, or 24px under the map where the map is pinned above the list. Over the last
- * stretch of scroll the line slides down, so the oldest trips, which can never reach it, each still get a turn.
- * A trip heading focused from the keyboard lights its trip until the reader scrolls a third of a screen on.
+ * scroll area beside the map (but above the first trip at the top, so the dialog opens on the overview however
+ * tall the screen), or 24px under the map where the map is pinned above the list. Over the last stretch of
+ * scroll the line slides down, so the oldest trips, which can never reach it, each still get a turn. A trip
+ * heading focused from the keyboard lights its trip until the reader scrolls a third of a screen on.
+ *
+ * It also keeps two lengths the CSS cannot know: the pinned map's height as the scroll area's scroll-padding
+ * (so a heading reached by keyboard, and a page of PageDown, clear the map), and the pinned column's chrome
+ * beside the map (caption, key, rail: the map gives up that much height, however the key wraps).
  */
 export function TravelSpotlight() {
   const ref = useRef<HTMLSpanElement>(null);
@@ -19,7 +24,9 @@ export function TravelSpotlight() {
     const root = ref.current?.closest<HTMLElement>(".sl");
     const sc = root?.closest<HTMLElement>("[data-scroller]");
     const fig = root?.querySelector<HTMLElement>(".sl-fig");
-    if (!root || !sc || !fig) return;
+    const pin = root?.querySelector<HTMLElement>(".sl-pin");
+    const map = fig?.querySelector<HTMLElement>(".tmap");
+    if (!root || !sc || !fig || !pin || !map) return;
     const trips = [...root.querySelectorAll<HTMLElement>("[data-trip]")];
     let tops: number[] = [];
     let pinH = 0;
@@ -33,6 +40,11 @@ export function TravelSpotlight() {
       const base = sc.getBoundingClientRect().top - sc.scrollTop;
       tops = trips.map((t) => t.getBoundingClientRect().top - base);
       pinH = getComputedStyle(root).getPropertyValue("--sl-stacked").trim() === "1" ? fig.offsetHeight : 0;
+      sc.style.scrollPaddingTop = pinH ? `${pinH + 12}px` : "";
+      if (getComputedStyle(pin).position === "sticky") {
+        const chrome = `${Math.ceil(pin.offsetHeight - map.offsetHeight)}px`;
+        if (root.style.getPropertyValue("--pin-chrome") !== chrome) root.style.setProperty("--pin-chrome", chrome);
+      } else root.style.removeProperty("--pin-chrome");
     };
     const set = (i: string) => {
       if (i === cur) return;
@@ -45,19 +57,19 @@ export function TravelSpotlight() {
       const h = sc.clientHeight;
       const max = sc.scrollHeight - h;
       // A fractional scrollTop (zoom, a 125% display) may stop just short of the end.
-      const y = sc.scrollTop >= max - 2 ? max : sc.scrollTop;
+      const y = max > 4 && sc.scrollTop >= max - 2 ? max : sc.scrollTop;
 
       const f = document.activeElement;
-      const t = focused && f instanceof HTMLElement && root.contains(f) && f.matches(":focus-visible") ? f.closest<HTMLElement>("[data-trip]") : null;
+      const t = focused && f instanceof HTMLElement && root.contains(f) ? f.closest<HTMLElement>("[data-trip]") : null;
       if (t) {
         focusY ??= y;
         const r = t.getBoundingClientRect();
         const s = sc.getBoundingClientRect();
         if (Math.abs(y - focusY) < h / 3 && r.bottom > s.top + pinH && r.top < s.bottom) return set(t.dataset.trip ?? "");
       }
-      if (max < 1 || !tops.length) return set("");
+      if (max < 3 || !tops.length) return set("");
 
-      const L = pinH ? pinH + 24 : h / 3;
+      const L = pinH ? pinH + 24 : Math.max(0, Math.min(h / 3, tops[0] - 40));
       // The oldest trip reaches the line 48px before the end: over the D px before that the line slides down by
       // S, as far as that trip falls short of it, at most half as fast as the list moves.
       const E = Math.min(48, max / 2);
@@ -71,8 +83,10 @@ export function TravelSpotlight() {
     const queue = () => {
       raf ||= requestAnimationFrame(pick);
     };
-    const onFocusIn = () => {
-      focused = true;
+    // Only focus that arrives from the keyboard holds the map: a heading clicked with the mouse does not, even
+    // once a key is pressed (when Chrome starts drawing its focus ring).
+    const onFocusIn = (e: FocusEvent) => {
+      focused = e.target instanceof Element && e.target.matches(":focus-visible");
       focusY = null;
       queue();
     };
@@ -86,6 +100,7 @@ export function TravelSpotlight() {
     });
     ro.observe(root);
     ro.observe(sc);
+    ro.observe(pin);
     sc.addEventListener("scroll", queue, { passive: true });
     root.addEventListener("focusin", onFocusIn);
     root.addEventListener("focusout", onFocusOut);
@@ -97,6 +112,8 @@ export function TravelSpotlight() {
       root.removeEventListener("focusout", onFocusOut);
       cancelAnimationFrame(raf);
       delete root.dataset.follow;
+      sc.style.scrollPaddingTop = "";
+      root.style.removeProperty("--pin-chrome");
     };
   }, []);
   return <span hidden ref={ref} />;
