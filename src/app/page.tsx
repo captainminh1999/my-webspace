@@ -83,7 +83,7 @@ export default async function Page() {
     },
     {
       // Edited by hand, not a feed, so no freshness stamp.
-      id: "travel", folio: "10", title: "TRAVEL", span: "md:col-span-6 lg:col-span-12 md:order-10", width: "wide",
+      id: "travel", folio: "10", title: "TRAVEL", span: "md:col-span-6 lg:col-span-12 md:order-10", width: "atlas", flush: true,
       footer: data.travel.length ? <span className="truncate">Source: travel bookings</span> : null,
       card: <TravelCard journeys={data.travel} />, full: <TravelFull journeys={data.travel} />,
     },
@@ -123,6 +123,7 @@ export default async function Page() {
               freshness={c.id in f ? f[c.id as keyof typeof f] : undefined}
               stamp={"stamp" in c ? c.stamp : "text"}
               width={"width" in c ? c.width : "narrow"}
+              flush={"flush" in c ? c.flush : false}
             >
               {c.full}
             </WidgetDialog>
