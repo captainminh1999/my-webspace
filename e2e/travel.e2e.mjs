@@ -115,13 +115,22 @@ const sweep = (page, step = 4) =>
       const prev = out.at(-1);
       const row = { y, at: sc.scrollTop, a, height: sc.scrollHeight };
       if (!prev || prev.a !== a) {
-        // What is lit, checked where the state changes, once its 160ms fade is over: by what shows, not by class.
-        await new Promise((r) => setTimeout(r, 220));
-        const shown = (e) => getComputedStyle(e).visibility === "visible" && +getComputedStyle(e).opacity > 0.99;
+        // What is lit, checked where the state changes, once its fades are over: by what shows, not by class. An
+        // element shows when it has a box, is visible, and neither it nor any element up to .sl is hidden or faded.
+        await Promise.allSettled(root.getAnimations({ subtree: true }).map((x) => x.finished));
+        const shown = (e) => {
+          if (getComputedStyle(e).visibility !== "visible" || !e.getBoundingClientRect().width) return false;
+          for (let x = e; x && x !== root.parentElement; x = x.parentElement) if (getComputedStyle(x).display === "none" || +getComputedStyle(x).opacity < 0.99) return false;
+          return true;
+        };
         row.routes = [...root.querySelectorAll(".sl-r")].filter(shown).map((g) => g.dataset.lit);
         row.lands = [...root.querySelectorAll(".sl-lands > g")].filter(shown).map((g) => g.dataset.lit);
         row.landsListing = [...root.querySelectorAll(".sl-lands > g")].filter((g) => a !== "" && g.dataset.lit.split(" ").includes(a)).length;
         row.overLand = +getComputedStyle(root.querySelector(".sl-over-land")).opacity;
+        row.over = shown(root.querySelector(".sl-over"));
+        row.base = shown(root.querySelector(".sl-base"));
+        row.caps = [...root.querySelectorAll(".sl-cap-row")].filter(shown).map((c) => c.dataset.lit ?? "overview");
+        row.marks = [...root.querySelectorAll(".sl-set.is-active .tmap-mk")].filter(shown).length;
         row.sets = [...root.querySelectorAll(".sl-set")].filter(shown).map((g) => g.dataset.lit);
         row.articles = [...root.querySelectorAll("article.is-active")].map((e) => e.dataset.trip);
         const rail = root.querySelector(".trip-rail-mark.is-active");
@@ -188,7 +197,11 @@ test("scrolling lights every trip once, newest first, for long enough to read, a
       const until = changes[k + 1]?.y ?? max + 4;
       if (r.a) assert.ok(until - r.y >= 40, `${name}: trip ${r.a} lit for ${until - r.y}px of scroll`);
       assert.ok(r.tokens, `${name}: exactly the elements listing trip ${r.a || "(none)"} are lit`);
+      assert.equal(r.over, !r.a, `${name}: the overview's marks and labels show only when no trip is lit (${r.a})`);
+      assert.equal(r.base, !!r.a, `${name}: the faint marks show under a lit trip (${r.a})`);
+      assert.deepEqual(r.caps, [r.a || "overview"], `${name}: one caption line shows, ${r.a || "the overview"}'s`);
       if (!r.a) continue;
+      assert.ok(r.marks >= 1, `${name}: trip ${r.a}'s places are marked on the map`);
       const mine = (l) => l.split(" ").includes(r.a);
       assert.ok(r.routes.length === 1 && mine(r.routes[0]), `${name}: one route group shows, trip ${r.a}'s (${r.routes})`);
       assert.ok(r.sets.length === 1 && mine(r.sets[0]), `${name}: one set of marks and labels shows, trip ${r.a}'s (${r.sets})`);
@@ -254,9 +267,10 @@ test("the pinned map leaves room to read: inside the scroll area beside the list
     assert.equal(await overflowX(page), 0, `${name}: no horizontal scroll`);
     await close();
   }
-  // Too short to pin a map and read (a 360px phone on its side, a window zoomed to 400%): the map scrolls away
+  // Too short to pin a map and read (a 360px phone on its side, a window zoomed to 400%, a laptop with its
+  // developer tools docked below): the map scrolls away
   // with the rest, and the caption makes no promise that it follows.
-  for (const viewport of [SWEEP.sidewaysShort, { width: 568, height: 320 }, { width: 320, height: 256 }]) {
+  for (const viewport of [SWEEP.sidewaysShort, { width: 568, height: 320 }, { width: 320, height: 256 }, { width: 1366, height: 330 }]) {
     const name = `${viewport.width}x${viewport.height}`;
     const { page, close } = await open(viewport);
     const dialog = await openDialog(page);

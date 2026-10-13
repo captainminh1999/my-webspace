@@ -314,7 +314,7 @@
   }
 
   /* Beside: from a laptop's width, or a phone on its side. The map gives way to the list's width and the screen's height. */
-  @media (min-width: 1024px), (orientation: landscape) and (max-height: 32rem) and (min-height: 21.2rem) and (min-width: 37.5rem) {
+  @media (min-width: 1024px) and (min-height: 21.2rem), (orientation: landscape) and (max-height: 32rem) and (min-height: 21.2rem) and (min-width: 37.5rem) {
     .sl { --sl-stacked: 0; display: grid; align-items: start; }
     .sl-fig { position: static; z-index: auto; border-bottom: 0; }
     .sl-fig > .tmap { width: 100%; }
@@ -326,7 +326,7 @@
   /* A laptop: map, caption, key and rail pinned in the left column, which is as wide as the map can be at this
      height. --pin-chrome is their height besides the map's: the island measures it (a key on two lines); this is
      the estimate before it runs. */
-  @media (min-width: 1024px) {
+  @media (min-width: 1024px) and (min-height: 21.2rem) {
     .sl { --pin-chrome: calc(175px + var(--lanes) * 13px); --fig-w: calc((100dvh - 82px - var(--pin-chrome)) * var(--ar)); grid-template-columns: minmax(0, calc(var(--fig-w) + 48px)) minmax(28rem, 1fr); }
     .sl-pin { display: block; position: sticky; top: 0; grid-column: 1; padding: 20px 24px; }
     .sl-fig { width: min(100%, var(--fig-w)); }

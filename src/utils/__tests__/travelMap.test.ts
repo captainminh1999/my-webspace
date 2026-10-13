@@ -78,6 +78,10 @@ const HEMMED = [
   ...[at45('West', 0, -1), at45('North', 1, 0), at45('South', -1, 0), at45('East', 0, 2), at45('Northeast', 1, 1), at45('Southeast', -1, 1)].flatMap((g, k) => round([g], 2010 + k, 3)),
   ...round([at45('Alpha', 0, 0), at45('Bravo', 0, 1)], 2026, 1),
 ];
+// More invented histories between real places (src/utils/__tests__/fixtures/travel-histories.json): three random
+// ones, and four built to reproduce what reviews found (a label over faint marks, a move home from a base, a trip
+// beside home among faint marks, a trip out of a base hemmed in at the map's edge).
+const HISTORIES: Record<string, Journey[]> = JSON.parse(readFileSync(new URL('./fixtures/travel-histories.json', import.meta.url), 'utf8'));
 const LAYERS: Array<[number, number]> = [[NARROWEST, 295], [296, 559], [560, 768]];
 const OPTS = { aspect: [1.2, 2.2] as [number, number], drawnAt: 640, layers: LAYERS };
 const CARD = { aspect: [1.2, 2] as [number, number], drawnAt: 472, layers: [[NARROWEST, 295], [296, 703]] as Array<[number, number]> };
@@ -212,6 +216,8 @@ const CROWDED = [
   ...round([SHANGHAI], 2019, 3),
   ...round([NAGOYA, HIROSHIMA, SAPPORO], 2026, 10),
 ];
+const ALL: Record<string, Journey[]> = { LIFE, CROWDED, OUT_OF_A_BASE, TO_THE_EDGE, HEMMED, ...HISTORIES };
+
 
 test('on a crowded 240px map the latest trip is still named, in the overview and when lit', () => {
   const ts = trips(CROWDED);
@@ -260,9 +266,68 @@ test("a place hemmed in on every side is named over a faint mark, never over the
   }
 });
 
+test('every lit trip, in every history, names a place it reached at every width (or, if it reached only home, where it set off from)', () => {
+  for (const [name, js] of Object.entries(ALL)) {
+    const ts = trips(js);
+    const s = spotlight(js, ts, OPTS);
+    for (const set of s.labelSets) {
+      for (const layer of set.layers) {
+        const want = layer.marks.some((m) => m.kind === 'now') ? 'now' : layer.marks.some((m) => m.kind === 'from') ? 'from' : null;
+        if (want) assert.ok(layer.labels.some((l) => l.kind === want), `${name} trip ${set.trips.join(' ')} at ${layer.minW}px: ${layer.labels.map((l) => `${l.text}/${l.kind}`).join(', ')}`);
+      }
+    }
+  }
+});
+
+test('a forced label covers home only when covering a faint mark will not do', () => {
+  const js = HISTORIES.aucklandAmongFaint;
+  const ts = trips(js);
+  const s = spotlight(js, ts, OPTS);
+  const akl = ts.findIndex((t) => t.stops.some((x) => x.city === 'Auckland'));
+  const narrow = at(lightOf(s, akl).labels[0].layers, NARROWEST).labels.map((l) => l.text);
+  assert.ok(narrow.includes('AUCKLAND') && narrow.includes('SYDNEY'), narrow.join(', '));
+});
+
+test('the card and the overview, too, cover home only when covering a faint mark will not do', () => {
+  // The same history with the trip to Auckland made the latest.
+  const akl = (x: Journey) => x.from.city === 'Auckland' || x.to.city === 'Auckland';
+  const js = [...HISTORIES.aucklandAmongFaint.filter((x) => !akl(x)), ...HISTORIES.aucklandAmongFaint.filter(akl).map((x) => ({ ...x, year: 2030 }))];
+  const ts = trips(js);
+  assert.ok(ts[ts.length - 1].stops.some((x) => x.city === 'Auckland'));
+  const s = spotlight(js, ts, OPTS);
+  const card = mapModel(js, ts, CARD);
+  for (const [layer, frame] of [[card.layers[0], card], [s.overview.layers[0], s.overview]] as const) {
+    const l = layer.labels.find((x) => x.text === 'AUCKLAND');
+    assert.ok(l, layer.labels.map((x) => x.text).join(', '));
+    const home = layer.marks.find((m) => m.kind === 'home')!;
+    for (let W = layer.minW; W <= layer.maxW; W += 5) {
+      const b = labelBox(l.left * frame.w, l.top * frame.h, l.anchor, l.text, W, frame.w);
+      const x = home.left * W;
+      const y = home.top * frame.h * (W / frame.w);
+      assert.ok(b.r <= x - 5.5 || b.l >= x + 5.5 || b.b <= y - 5.5 || b.t >= y + 5.5, `${W}px: AUCKLAND (${l.anchor}) over home`);
+    }
+  }
+});
+
+test("the latest trip's countries leave out home's", () => {
+  const js = [...LIFE.slice(0, -4), ...round([OSAKA, KYOTO, TOKYO], 2026, 10)];
+  const s = spotlight(js, trips(js), OPTS);
+  assert.equal(s.overview.land.latest, cropLand(s.overview.cells, (iso) => (iso === 'JP' ? 1 : 0), 2)[1]);
+});
+
+test('a mark home shares with the latest trip names the trip\'s places first, on the card as when lit', () => {
+  const WOLLONGONG = p('Wollongong', 'AU', -34.4278, 150.8931);
+  const KATOOMBA = p('Katoomba', 'AU', -33.7125, 150.3119);
+  const js = [...LIFE, ...round([WOLLONGONG, KATOOMBA], 2027, 1)];
+  const ts = trips(js);
+  const card = mapModel(js, ts, CARD);
+  for (const layer of card.layers) assert.ok(layer.labels.some((l) => /^(WOLLONGONG|KATOOMBA)/.test(l.text)), layer.labels.map((l) => l.text).join(', '));
+});
+
 /**
- * At every width a layer is drawn: a mark is named once at most, every label stays inside the map, and no label
- * covers a named mark or one of the trip's own (a forced label may cover a faint mark, or home, unnamed).
+ * At every width a layer is drawn: a mark is named once at most, labels never overlap or leave the map, and no
+ * label covers a named mark or a place the trip reached (a forced label may cover a faint mark, home, or where
+ * the trip set off from, unnamed).
  */
 function labelsHold(where: string, layers: Array<{ minW: number; maxW: number; labels: Array<{ key: string; left: number; top: number; text: string; anchor: Anchor }> }>, marksAt: (w: number) => Array<{ key: string; left: number; top: number; size: number; own: boolean }>, frame: { w: number; h: number }) {
   const overlaps = (p: Box, q: Box) => p.l < q.r && q.l < p.r && p.t < q.b && q.t < p.b;
@@ -273,6 +338,8 @@ function labelsHold(where: string, layers: Array<{ minW: number; maxW: number; l
       const s = W / frame.w;
       const H = frame.h * s;
       const marks = marksAt(W);
+      const boxes = layer.labels.map((l) => labelBox(l.left * frame.w, l.top * frame.h, l.anchor, l.text, W, frame.w));
+      boxes.forEach((b, k) => boxes.slice(k + 1).forEach((c, n) => assert.ok(!overlaps(b, c), `${where} ${W}px: ${layer.labels[k].text} over ${layer.labels[k + 1 + n].text}`)));
       for (const l of layer.labels) {
         const b = labelBox(l.left * frame.w, l.top * frame.h, l.anchor, l.text, W, frame.w);
         assert.ok(b.l >= 0 && b.t >= 0 && b.r <= W && b.b <= H, `${where} ${W}px: ${l.text} leaves the map`);
@@ -288,8 +355,8 @@ function labelsHold(where: string, layers: Array<{ minW: number; maxW: number; l
   }
 }
 
-test('labels never cover a named mark or a trip\'s own, never twice, never off the map: card, overview and every lit trip', () => {
-  for (const [name, js] of Object.entries({ LIFE, CROWDED, OUT_OF_A_BASE, TO_THE_EDGE, HEMMED })) {
+test('labels never overlap, cover a named mark or a trip\'s own, never twice, never off the map: card, overview and every lit trip', () => {
+  for (const [name, js] of Object.entries(ALL)) {
     const ts = trips(js);
     const s = spotlight(js, ts, OPTS);
     const frame = { w: s.overview.w, h: s.overview.h };
@@ -302,7 +369,7 @@ test('labels never cover a named mark or a trip\'s own, never twice, never off t
         const lit = at(set.layers, w).marks;
         return at(s.base, w).marks.map((m) => {
           const mine = lit.find((x) => x.key === m.key);
-          return { ...m, size: mine ? 9 : 7, own: !!mine && mine.kind !== 'home' };
+          return { ...m, size: mine ? 9 : 7, own: !!mine && mine.kind === 'now' };
         });
       }, frame);
     }

@@ -226,9 +226,9 @@ export interface Mark {
  * `rivals` narrows the nearness test to the marks a label could be mistaken for (a lit trip's own, when the rest
  * are faint ghosts); every mark still blocks a label's box. Of the wants marked `must` (a trip's own places,
  * which come first), at least one is named. If none found an anchor, each in turn tries again with its shortest
- * text and the nearness test waived; then allowed to cover the marks `coverable(mark, 1)` names (faint ones);
- * then, last, those `coverable(mark, 2)` names (home too). Always inside the map, never over another label; a
- * mark a label covers gets no label of its own (it keeps its tooltip).
+ * text and the nearness test waived; then allowed to cover the marks `coverable(mark, pass)` names, pass 1 to 3
+ * (faint ones; then those and home; last, those and where a trip set off from). Always inside the map, never over another
+ * label; a mark a label covers gets no label of its own (it keeps its tooltip).
  */
 export function placeLabels(
   marks: Mark[],
@@ -236,7 +236,7 @@ export function placeLabels(
   frame: { w: number; h: number },
   minW: number,
   maxW: number,
-  opts: { rivals?: (mark: number) => boolean; coverable?: (mark: number, pass: 1 | 2) => boolean } = {},
+  opts: { rivals?: (mark: number) => boolean; coverable?: (mark: number, pass: 1 | 2 | 3) => boolean } = {},
 ) {
   const widths: number[] = [];
   for (let W = minW; W < maxW; W += 10) widths.push(W);
@@ -253,7 +253,7 @@ export function placeLabels(
     const r = o.size / 2 + 2;
     return { l: o.x * s - r, t: o.y * s - r, r: o.x * s + r, b: o.y * s + r };
   };
-  const fits = (want: { mark: number }, a: Anchor, w: number, near = true, pass: 0 | 1 | 2 = 0) =>
+  const fits = (want: { mark: number }, a: Anchor, w: number, near = true, pass: 0 | 1 | 2 | 3 = 0) =>
     widths.every((W) => {
       const s = W / frame.w;
       const H = frame.h * s;
@@ -268,7 +268,7 @@ export function placeLabels(
       return placed.every((p) => !overlaps(me, box(W, marks[p.mark], p.anchor, p.w)));
     });
   const ANCHORS: Anchor[] = ["E", "W", "NE", "SE", "NW", "SW", "N", "S"];
-  const place = (want: { mark: number }, text: string, near: boolean, pass: 0 | 1 | 2 = 0) => {
+  const place = (want: { mark: number }, text: string, near: boolean, pass: 0 | 1 | 2 | 3 = 0) => {
     const w = labelWidth(text);
     const anchor = ANCHORS.find((a) => fits(want, a, w, near, pass));
     if (!anchor) return false;
@@ -282,7 +282,7 @@ export function placeLabels(
   wants.forEach((want, i) => {
     if (!covered.has(want.mark)) want.texts.some((text) => place(want, text, true));
     if (i !== lastMust || placed.some((p) => musts.some((m) => m.mark === p.mark))) return;
-    for (const pass of [0, 1, 2] as const) if (musts.some((m) => place(m, short(m), false, pass))) return;
+    for (const pass of [0, 1, 2, 3] as const) if (musts.some((m) => place(m, short(m), false, pass))) return;
   });
   return placed.map(({ mark, text, anchor }) => ({ mark, text, anchor }));
 }
@@ -387,7 +387,8 @@ export function mapModel(journeys: Journey[], ts: Trip[], opts: { aspect: [numbe
   const pts = [...visits, { ...HOME, trips: 0, last: -1 }].map((p) => ({ ...p, key: placeKey(p), ...at(p, c) }));
   const layers = opts.layers.map(([minW, maxW]) => {
     const groups = cluster(pts, 9, c.w, minW).map((g) => {
-      const named = [...g].sort((a, b) => (order.get(a.key) ?? 99) - (order.get(b.key) ?? 99) || b.trips - a.trips || b.last - a.last);
+      // Home last, so a mark it shares with the latest trip's places names them first ("WOLLONGONG +2").
+      const named = [...g].sort((a, b) => +(a.key === homeKey) - +(b.key === homeKey) || (order.get(a.key) ?? 99) - (order.get(b.key) ?? 99) || b.trips - a.trips || b.last - a.last);
       const kind: MarkKind = g.some((p) => p.key === homeKey) ? "home" : g.some((p) => order.has(p.key)) ? "now" : "was";
       // A latest-trip mark names only the latest trip's places: another place sharing the mark is in its tooltip.
       const names = (kind === "now" ? named.filter((p) => order.has(p.key)) : named).map((p) => p.city.toUpperCase());
@@ -416,7 +417,7 @@ export function mapModel(journeys: Journey[], ts: Trip[], opts: { aspect: [numbe
       maxW,
       // Earlier places first, so the latest trip's marks and home sit on top.
       marks: [...groups].sort((a, b) => b.rank - a.rank).map((g) => ({ key: g.key, ...pos(g), kind: g.kind, title: g.title })),
-      labels: placeLabels(groups, wants, c, minW, maxW, { coverable: (i, pass) => groups[i].kind === "was" || (pass === 2 && groups[i].kind === "home") }).map((l) => ({
+      labels: placeLabels(groups, wants, c, minW, maxW, { coverable: (i, pass) => groups[i].kind === "was" || (pass >= 2 && groups[i].kind === "home") }).map((l) => ({
         key: groups[l.mark].key,
         ...pos(groups[l.mark]),
         kind: groups[l.mark].kind,
@@ -590,6 +591,7 @@ export function spotlight(journeys: Journey[], ts: Trip[], opts: { aspect: [numb
         })
         .sort((a, b) => rank[a.kind] - rank[b.kind] || a.first - b.first);
       const lit = new Set(mine.map((m) => m.mark));
+      const from = new Set(mine.filter((m) => m.kind === "from").map((m) => m.mark));
       const placed = placeLabels(
         groups.map((g, i) => ({ x: g.x, y: g.y, size: lit.has(i) ? 9 : 7 })),
         // The places it reached must be named; where it set off from only when it reached nowhere else.
@@ -597,7 +599,7 @@ export function spotlight(journeys: Journey[], ts: Trip[], opts: { aspect: [numb
         c,
         minW,
         maxW,
-        { rivals: (i) => lit.has(i), coverable: (i, pass) => !lit.has(i) || (pass === 2 && groups[i].home) },
+        { rivals: (i) => lit.has(i), coverable: (i, pass) => !lit.has(i) || (pass === 2 && groups[i].home) || (pass === 3 && from.has(i)) },
       );
       const kindOf = new Map(mine.map((m) => [m.mark, m.kind]));
       return {
