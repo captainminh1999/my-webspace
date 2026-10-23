@@ -23,7 +23,7 @@ export function SpaceCard({ data }: { data: SpaceData | null }) {
       <div className="relative aspect-video grow overflow-hidden rounded-thumb bg-surface-2 border border-rule">
         <Image
           src={lead}
-          alt={apod?.title ?? "Earth from NASA's EPIC camera"}
+          alt={apod?.alt ?? apod?.title ?? "Earth from NASA's EPIC camera"}
           fill
           sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 60vw"
           quality={70}
@@ -62,7 +62,7 @@ export function SpaceFull({ data }: { data: SpaceData | null }) {
           <h3 className="font-display font-medium text-h2 text-ink mt-1">{apod.title}</h3>
           {lead && (
             <div className="mt-4">
-              <Plate src={lead} alt={apod.title} width={apod.width} height={apod.height} sizes="(max-width: 960px) 100vw, 900px" />
+              <Plate src={lead} alt={apod.alt ?? apod.title} width={apod.width} height={apod.height} sizes="(max-width: 960px) 100vw, 900px" />
             </div>
           )}
           <p className="text-body text-ink-2 mt-4 whitespace-pre-line">{apod.explanation}</p>
@@ -92,7 +92,7 @@ export function SpaceFull({ data }: { data: SpaceData | null }) {
         </section>
       )}
       {!apod && !epic && <p className="font-mono text-dense text-ink-3">No items</p>}
-      <p className="font-mono text-source text-ink-3">Source: api.nasa.gov · epic.gsfc.nasa.gov</p>
+      <p className="font-mono text-source text-ink-3">Source: science.nasa.gov/apod · epic.gsfc.nasa.gov</p>
     </div>
   );
 }

@@ -6,7 +6,7 @@ import { headline, parseFeed, shareImage } from "../../../src/utils/rss.ts";
 import { dayNumber, joinContent, parseReference, rotate, sydneyDate, type Reference } from "../../../src/utils/verse.ts";
 import { METHODS } from "../../../src/utils/reflection.ts";
 import { scripture } from "../../../src/utils/scripture.ts";
-import { apodProblem, cleanExplanation } from "../../../src/utils/apod.ts";
+import { APOD_FEED, apodProblem, fromApodFeed } from "../../../src/utils/apod.ts";
 import type { VerseData, VerseSegment } from "../../../src/types/verse.ts";
 
 type Any = Record<string, any>; // eslint-disable-line @typescript-eslint/no-explicit-any
@@ -256,22 +256,24 @@ export async function games(db: Db) {
 
 export async function space(db: Db) {
   const key = requireEnv("NASA_KEY");
-  // Both fetches first, in parallel, so a failed EPIC call cannot leave a new APOD under an old stamp.
-  const [apod, epicList] = await Promise.all([
-    getJson<Any>(`https://api.nasa.gov/planetary/apod?api_key=${key}&thumbs=true`),
+  // Both fetches first, in parallel, so a failed EPIC call cannot leave a new APOD under an old stamp. APOD comes
+  // from its feed on science.nasa.gov, not the API (src/utils/apod.ts); the feed is one 400 KB document that the
+  // site has taken anything from 0.1 to 8 s to send, so it gets longer than the usual 8 s.
+  const [feed, epicList] = await Promise.all([
+    getText(APOD_FEED, 12_000),
     getJson<Any[]>(`https://api.nasa.gov/EPIC/api/natural?api_key=${key}`),
   ]);
-  // A broken answer is refused before anything is written: the card keeps the last good picture (src/utils/apod.ts).
+  // A broken day is refused before anything is written: the card keeps the last good picture.
+  const apod = fromApodFeed(feed);
   const problem = apodProblem(apod);
-  if (problem) throw new Error(`unexpected APOD payload: ${problem}`);
+  if (!apod || problem) throw new Error(`unexpected APOD payload: ${problem}`);
   const epic = epicList?.[0];
   if (!epic?.image) throw new Error("unexpected EPIC payload");
   const [ymd] = String(epic.date).split(" ");
-  // The picture the dashboard will show (a video's thumbnail on video days), measured so it can be framed to its own shape.
+  // The picture the dashboard will show (a video's still on video days), measured so it can be framed to its own shape.
   const shown = apod.media_type === "image" ? apod.url : apod.thumbnail_url;
-  const size = shown ? await imageSize(shown) : null;
-  const explanation = typeof apod.explanation === "string" ? { explanation: cleanExplanation(apod.explanation) } : {};
-  await writeSingleton(db, "space", { ...apod, ...explanation, ...(size ?? {}) });
+  const size = typeof shown === "string" ? await imageSize(shown) : null;
+  await writeSingleton(db, "space", { ...apod, ...(size ?? {}) });
   await writeSingleton(db, "epic", {
     date: epic.date,
     image: epic.image,

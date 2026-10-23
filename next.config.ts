@@ -44,7 +44,7 @@ const nextConfig: NextConfig = {
     // (arbitrary publisher hosts) are plain <img> in src/components/widgets/NewsList.tsx,
     // so no wildcard is needed and /_next/image is not an open proxy.
     remotePatterns: [
-      { protocol: 'https', hostname: 'apod.nasa.gov', pathname: '/apod/image/**' },
+      { protocol: 'https', hostname: 'assets.science.nasa.gov', pathname: '/dynamicimage/assets/science/cds/apod/**' },
       { protocol: 'https', hostname: 'epic.gsfc.nasa.gov', pathname: '/archive/**' },
       { protocol: 'https', hostname: 'images.unsplash.com', pathname: '/**' },
       { protocol: 'https', hostname: 'i.ytimg.com', pathname: '/vi/**' },

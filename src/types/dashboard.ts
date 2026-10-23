@@ -20,6 +20,8 @@ export interface Apod {
   media_type?: string; // "image" | "video" | "other"
   thumbnail_url?: string;
   copyright?: string;
+  /** APOD's own description of the picture (since the feed moved to science.nasa.gov); absent on older documents. */
+  alt?: string;
   /** Pixel size of the picture shown (the thumbnail on video days), measured by the space feed; absent on older documents. */
   width?: number;
   height?: number;

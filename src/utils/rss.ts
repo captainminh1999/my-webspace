@@ -60,7 +60,7 @@ export function isoDate(raw: string, now = Date.now()): string {
 }
 
 /** The character data of an element: CDATA sections as they are, everything else XML-decoded. */
-function text(raw: string): string {
+export function text(raw: string): string {
   return raw
     .split(/(<!\[CDATA\[[\s\S]*?\]\]>)/)
     .map((part) => (part.startsWith("<![CDATA[") ? part.slice(9, -3) : decodeXml(part)))
@@ -70,7 +70,7 @@ function text(raw: string): string {
 const escapeRe = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
 /** Inner XML of the first <name>…</name> in a block, or "". */
-function inner(block: string, name: string): string {
+export function inner(block: string, name: string): string {
   const m = block.match(new RegExp(`<${escapeRe(name)}(?:\\s[^>]*)?>([\\s\\S]*?)</${escapeRe(name)}>`, "i"));
   return m ? m[1] : "";
 }
