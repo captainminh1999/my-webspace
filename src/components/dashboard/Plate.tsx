@@ -1,9 +1,10 @@
 import Image from "next/image";
 
 // The hosts next.config.ts lets through the image optimizer (images.remotePatterns) — keep the two in step.
-// Anything else (an APOD video thumbnail, NASA moving APOD to another host) is shown as it is rather than as a broken image.
+// Anything else (NASA moving APOD to another host, as it did from apod.nasa.gov in October 2026) is shown as it is
+// rather than as a broken image.
 const OPTIMIZED = [
-  /^https:\/\/apod\.nasa\.gov\/apod\/image\//,
+  /^https:\/\/assets\.science\.nasa\.gov\/dynamicimage\/assets\/science\/cds\/apod\//,
   /^https:\/\/epic\.gsfc\.nasa\.gov\/archive\//,
   /^https:\/\/images\.unsplash\.com\//,
   /^https:\/\/i\.ytimg\.com\/vi\//,
