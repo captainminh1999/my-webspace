@@ -19,7 +19,9 @@ export async function weather(db: Db) {
   await writeSingleton(db, "weather", {
     updated: Math.floor(Date.now() / 1000),
     current: { temp: src.current.temp, icon: src.current.weather[0].icon },
-    hourly: src.hourly.slice(0, 12).map((h: Any) => ({ dt: h.dt, temp: h.temp, icon: h.weather[0].icon })),
+    // Fifteen hours: the twelve the card shows, plus the three a reading can age before the next run (every 3 h);
+    // the card drops the hours already gone (upcomingHours in src/utils/weather.ts).
+    hourly: src.hourly.slice(0, 15).map((h: Any) => ({ dt: h.dt, temp: h.temp, icon: h.weather[0].icon })),
     daily: src.daily.slice(0, 7).map((d: Any) => ({ dt: d.dt, min: d.temp.min, max: d.temp.max, icon: d.weather[0].icon })),
   });
 }

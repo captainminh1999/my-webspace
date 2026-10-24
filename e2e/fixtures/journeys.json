@@ -1,0 +1,442 @@
+[
+ {
+  "from": {
+   "city": "Sydney",
+   "country": "AU",
+   "lat": -33.8688,
+   "lon": 151.2093
+  },
+  "to": {
+   "city": "Auckland",
+   "country": "NZ",
+   "lat": -36.8485,
+   "lon": 174.7633
+  },
+  "year": 2016,
+  "month": 5,
+  "by": "air"
+ },
+ {
+  "from": {
+   "city": "Auckland",
+   "country": "NZ",
+   "lat": -36.8485,
+   "lon": 174.7633
+  },
+  "to": {
+   "city": "Queenstown",
+   "country": "NZ",
+   "lat": -45.0312,
+   "lon": 168.6626
+  },
+  "year": 2016,
+  "month": 5,
+  "by": "land"
+ },
+ {
+  "from": {
+   "city": "Queenstown",
+   "country": "NZ",
+   "lat": -45.0312,
+   "lon": 168.6626
+  },
+  "to": {
+   "city": "Sydney",
+   "country": "AU",
+   "lat": -33.8688,
+   "lon": 151.2093
+  },
+  "year": 2016,
+  "month": 6,
+  "by": "air"
+ },
+ {
+  "from": {
+   "city": "Sydney",
+   "country": "AU",
+   "lat": -33.8688,
+   "lon": 151.2093
+  },
+  "to": {
+   "city": "Denpasar",
+   "country": "ID",
+   "lat": -8.6705,
+   "lon": 115.2126
+  },
+  "year": 2018,
+  "by": "air"
+ },
+ {
+  "from": {
+   "city": "Denpasar",
+   "country": "ID",
+   "lat": -8.6705,
+   "lon": 115.2126
+  },
+  "to": {
+   "city": "Sydney",
+   "country": "AU",
+   "lat": -33.8688,
+   "lon": 151.2093
+  },
+  "year": 2018,
+  "by": "air"
+ },
+ {
+  "from": {
+   "city": "Sydney",
+   "country": "AU",
+   "lat": -33.8688,
+   "lon": 151.2093
+  },
+  "to": {
+   "city": "Bangkok",
+   "country": "TH",
+   "lat": 13.7563,
+   "lon": 100.5018
+  },
+  "year": 2019,
+  "month": 2,
+  "by": "air"
+ },
+ {
+  "from": {
+   "city": "Bangkok",
+   "country": "TH",
+   "lat": 13.7563,
+   "lon": 100.5018
+  },
+  "to": {
+   "city": "Chiang Mai",
+   "country": "TH",
+   "lat": 18.7883,
+   "lon": 98.9853
+  },
+  "year": 2019,
+  "month": 2,
+  "by": "rail"
+ },
+ {
+  "from": {
+   "city": "Chiang Mai",
+   "country": "TH",
+   "lat": 18.7883,
+   "lon": 98.9853
+  },
+  "to": {
+   "city": "Bangkok",
+   "country": "TH",
+   "lat": 13.7563,
+   "lon": 100.5018
+  },
+  "year": 2019,
+  "month": 3,
+  "by": "land"
+ },
+ {
+  "from": {
+   "city": "Bangkok",
+   "country": "TH",
+   "lat": 13.7563,
+   "lon": 100.5018
+  },
+  "to": {
+   "city": "Sydney",
+   "country": "AU",
+   "lat": -33.8688,
+   "lon": 151.2093
+  },
+  "year": 2019,
+  "month": 3,
+  "by": "air"
+ },
+ {
+  "from": {
+   "city": "Sydney",
+   "country": "AU",
+   "lat": -33.8688,
+   "lon": 151.2093
+  },
+  "to": {
+   "city": "Seoul",
+   "country": "KR",
+   "lat": 37.5665,
+   "lon": 126.978
+  },
+  "year": 2023,
+  "month": 7,
+  "by": "air"
+ },
+ {
+  "from": {
+   "city": "Seoul",
+   "country": "KR",
+   "lat": 37.5665,
+   "lon": 126.978
+  },
+  "to": {
+   "city": "Busan",
+   "country": "KR",
+   "lat": 35.1796,
+   "lon": 129.0756
+  },
+  "year": 2023,
+  "month": 7,
+  "by": "land"
+ },
+ {
+  "from": {
+   "city": "Busan",
+   "country": "KR",
+   "lat": 35.1796,
+   "lon": 129.0756
+  },
+  "to": {
+   "city": "Seoul",
+   "country": "KR",
+   "lat": 37.5665,
+   "lon": 126.978
+  },
+  "year": 2023,
+  "month": 7,
+  "by": "land"
+ },
+ {
+  "from": {
+   "city": "Seoul",
+   "country": "KR",
+   "lat": 37.5665,
+   "lon": 126.978
+  },
+  "to": {
+   "city": "Sydney",
+   "country": "AU",
+   "lat": -33.8688,
+   "lon": 151.2093
+  },
+  "year": 2023,
+  "month": 8,
+  "by": "air"
+ },
+ {
+  "from": {
+   "city": "Sydney",
+   "country": "AU",
+   "lat": -33.8688,
+   "lon": 151.2093
+  },
+  "to": {
+   "city": "Singapore",
+   "country": "SG",
+   "lat": 1.2903,
+   "lon": 103.852
+  },
+  "year": 2025,
+  "month": 12,
+  "by": "air"
+ },
+ {
+  "from": {
+   "city": "Singapore",
+   "country": "SG",
+   "lat": 1.2903,
+   "lon": 103.852
+  },
+  "to": {
+   "city": "Kuala Lumpur",
+   "country": "MY",
+   "lat": 3.139,
+   "lon": 101.6869
+  },
+  "year": 2025,
+  "month": 12,
+  "by": "land"
+ },
+ {
+  "from": {
+   "city": "Kuala Lumpur",
+   "country": "MY",
+   "lat": 3.139,
+   "lon": 101.6869
+  },
+  "to": {
+   "city": "Sydney",
+   "country": "AU",
+   "lat": -33.8688,
+   "lon": 151.2093
+  },
+  "year": 2025,
+  "month": 12,
+  "by": "air"
+ },
+ {
+  "from": {
+   "city": "Sydney",
+   "country": "AU",
+   "lat": -33.8688,
+   "lon": 151.2093
+  },
+  "to": {
+   "city": "Denpasar",
+   "country": "ID",
+   "lat": -8.65,
+   "lon": 115.2167
+  },
+  "year": 2017,
+  "month": 3,
+  "by": "air"
+ },
+ {
+  "from": {
+   "city": "Denpasar",
+   "country": "ID",
+   "lat": -8.65,
+   "lon": 115.2167
+  },
+  "to": {
+   "city": "Sydney",
+   "country": "AU",
+   "lat": -33.8688,
+   "lon": 151.2093
+  },
+  "year": 2017,
+  "month": 3,
+  "by": "air"
+ },
+ {
+  "from": {
+   "city": "Sydney",
+   "country": "AU",
+   "lat": -33.8688,
+   "lon": 151.2093
+  },
+  "to": {
+   "city": "Singapore",
+   "country": "SG",
+   "lat": 1.2903,
+   "lon": 103.852
+  },
+  "year": 2024,
+  "month": 2,
+  "by": "air"
+ },
+ {
+  "from": {
+   "city": "Singapore",
+   "country": "SG",
+   "lat": 1.2903,
+   "lon": 103.852
+  },
+  "to": {
+   "city": "Malacca",
+   "country": "MY",
+   "lat": 2.1896,
+   "lon": 102.2501
+  },
+  "year": 2024,
+  "month": 5,
+  "by": "land"
+ },
+ {
+  "from": {
+   "city": "Malacca",
+   "country": "MY",
+   "lat": 2.1896,
+   "lon": 102.2501
+  },
+  "to": {
+   "city": "Singapore",
+   "country": "SG",
+   "lat": 1.2903,
+   "lon": 103.852
+  },
+  "year": 2024,
+  "month": 5,
+  "by": "land"
+ },
+ {
+  "from": {
+   "city": "Singapore",
+   "country": "SG",
+   "lat": 1.2903,
+   "lon": 103.852
+  },
+  "to": {
+   "city": "Sydney",
+   "country": "AU",
+   "lat": -33.8688,
+   "lon": 151.2093
+  },
+  "year": 2024,
+  "month": 9,
+  "by": "air"
+ },
+ {
+  "from": {
+   "city": "Sydney",
+   "country": "AU",
+   "lat": -33.8688,
+   "lon": 151.2093
+  },
+  "to": {
+   "city": "Tokyo",
+   "country": "JP",
+   "lat": 35.6762,
+   "lon": 139.6503
+  },
+  "year": 2026,
+  "month": 1,
+  "by": "air"
+ },
+ {
+  "from": {
+   "city": "Tokyo",
+   "country": "JP",
+   "lat": 35.6762,
+   "lon": 139.6503
+  },
+  "to": {
+   "city": "Sydney",
+   "country": "AU",
+   "lat": -33.8688,
+   "lon": 151.2093
+  },
+  "year": 2026,
+  "month": 1,
+  "by": "air"
+ },
+ {
+  "from": {
+   "city": "Sydney",
+   "country": "AU",
+   "lat": -33.8688,
+   "lon": 151.2093
+  },
+  "to": {
+   "city": "Denpasar",
+   "country": "ID",
+   "lat": -8.65,
+   "lon": 115.2167
+  },
+  "year": 2026,
+  "month": 4,
+  "by": "air"
+ },
+ {
+  "from": {
+   "city": "Denpasar",
+   "country": "ID",
+   "lat": -8.65,
+   "lon": 115.2167
+  },
+  "to": {
+   "city": "Sydney",
+   "country": "AU",
+   "lat": -33.8688,
+   "lon": 151.2093
+  },
+  "year": 2026,
+  "month": 4,
+  "by": "air"
+ }
+]

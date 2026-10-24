@@ -198,7 +198,14 @@ export const LABEL_TRANSFORM: Record<Anchor, string> = {
 const labelWidth = (s: string) => s.length * 7.04 + 6;
 const LABEL_H = 14;
 
-type Box = { l: number; t: number; r: number; b: number };
+export type Box = { l: number; t: number; r: number; b: number };
+/** A label's box in px on a map `W` px wide whose frame is `frameW` units wide, its mark at (x, y) in frame units. */
+export function labelBox(x: number, y: number, anchor: Anchor, text: string, W: number, frameW: number): Box {
+  const s = W / frameW;
+  const w = labelWidth(text);
+  const [dx, dy] = OFFSET[anchor](w, LABEL_H);
+  return { l: x * s + dx, t: y * s + dy, r: x * s + dx + w, b: y * s + dy + LABEL_H };
+}
 const overlaps = (p: Box, q: Box) => p.l < q.r && q.l < p.r && p.t < q.b && q.t < p.b;
 const distance = (p: Box, x: number, y: number) => Math.hypot(Math.max(p.l - x, 0, x - p.r), Math.max(p.t - y, 0, y - p.b));
 
@@ -216,18 +223,37 @@ export interface Mark {
  * the map, clear of every other mark and every label already placed, and clearly nearer its own mark than any
  * other, by 8px at least (so a label is never read as another place's). `texts` is the label and its shorter fallbacks. A label
  * with no such anchor is left off; its mark keeps its tooltip, and the board names the place.
+ * `rivals` narrows the nearness test to the marks a label could be mistaken for (a lit trip's own, when the rest
+ * are faint ghosts); every mark still blocks a label's box. Of the wants marked `must` (a trip's own places,
+ * which come first), at least one is named. If none found an anchor, each in turn tries again with its shortest
+ * text and the nearness test waived; then allowed to cover the marks `coverable(mark, pass)` names, pass 1 to 3
+ * (faint ones; then those and home; last, those and where a trip set off from). Always inside the map, never over another
+ * label; a mark a label covers gets no label of its own (it keeps its tooltip).
  */
-export function placeLabels(marks: Mark[], wants: Array<{ mark: number; texts: string[] }>, frame: { w: number; h: number }, minW: number, maxW: number) {
+export function placeLabels(
+  marks: Mark[],
+  wants: Array<{ mark: number; texts: string[]; must?: boolean }>,
+  frame: { w: number; h: number },
+  minW: number,
+  maxW: number,
+  opts: { rivals?: (mark: number) => boolean; coverable?: (mark: number, pass: 1 | 2 | 3) => boolean } = {},
+) {
   const widths: number[] = [];
   for (let W = minW; W < maxW; W += 10) widths.push(W);
   widths.push(maxW);
   const placed: Array<{ mark: number; text: string; anchor: Anchor; w: number }> = [];
+  const covered = new Set<number>();
   const box = (W: number, m: Mark, a: Anchor, w: number): Box => {
     const s = W / frame.w;
     const [dx, dy] = OFFSET[a](w, LABEL_H);
     return { l: m.x * s + dx, t: m.y * s + dy, r: m.x * s + dx + w, b: m.y * s + dy + LABEL_H };
   };
-  const fits = (want: { mark: number }, a: Anchor, w: number) =>
+  const ring = (W: number, o: Mark): Box => {
+    const s = W / frame.w;
+    const r = o.size / 2 + 2;
+    return { l: o.x * s - r, t: o.y * s - r, r: o.x * s + r, b: o.y * s + r };
+  };
+  const fits = (want: { mark: number }, a: Anchor, w: number, near = true, pass: 0 | 1 | 2 | 3 = 0) =>
     widths.every((W) => {
       const s = W / frame.w;
       const H = frame.h * s;
@@ -236,30 +262,33 @@ export function placeLabels(marks: Mark[], wants: Array<{ mark: number; texts: s
       const own = distance(me, marks[want.mark].x * s, marks[want.mark].y * s);
       for (const [i, o] of marks.entries()) {
         if (i === want.mark) continue;
-        const r = o.size / 2 + 2;
-        const ox = o.x * s;
-        const oy = o.y * s;
-        if (overlaps(me, { l: ox - r, t: oy - r, r: ox + r, b: oy + r })) return false;
-        if (distance(me, ox, oy) < own + 8) return false;
+        if (!(pass && opts.coverable?.(i, pass)) && overlaps(me, ring(W, o))) return false;
+        if (near && (opts.rivals?.(i) ?? true) && distance(me, o.x * s, o.y * s) < own + 8) return false;
       }
       return placed.every((p) => !overlaps(me, box(W, marks[p.mark], p.anchor, p.w)));
     });
   const ANCHORS: Anchor[] = ["E", "W", "NE", "SE", "NW", "SW", "N", "S"];
-  for (const want of wants) {
-    for (const text of want.texts) {
-      const w = labelWidth(text);
-      const anchor = ANCHORS.find((a) => fits(want, a, w));
-      if (anchor) {
-        placed.push({ mark: want.mark, text, anchor, w });
-        break;
-      }
-    }
-  }
+  const place = (want: { mark: number }, text: string, near: boolean, pass: 0 | 1 | 2 | 3 = 0) => {
+    const w = labelWidth(text);
+    const anchor = ANCHORS.find((a) => fits(want, a, w, near, pass));
+    if (!anchor) return false;
+    placed.push({ mark: want.mark, text, anchor, w });
+    if (pass) marks.forEach((o, i) => i !== want.mark && widths.some((W) => overlaps(box(W, marks[want.mark], anchor, w), ring(W, o))) && covered.add(i));
+    return true;
+  };
+  const musts = wants.filter((w) => w.must && w.texts.length);
+  const lastMust = wants.lastIndexOf(musts[musts.length - 1]);
+  const short = (w: { texts: string[] }) => w.texts.reduce((a, b) => (b.length < a.length ? b : a));
+  wants.forEach((want, i) => {
+    if (!covered.has(want.mark)) want.texts.some((text) => place(want, text, true));
+    if (i !== lastMust || placed.some((p) => musts.some((m) => m.mark === p.mark))) return;
+    for (const pass of [0, 1, 2, 3] as const) if (musts.some((m) => place(m, short(m), false, pass))) return;
+  });
   return placed.map(({ mark, text, anchor }) => ({ mark, text, anchor }));
 }
 
 /** Points nearer than `px` to each other at the width `minW` share one mark (single linkage). */
-function cluster<T extends { x: number; y: number }>(pts: T[], px: number, frameW: number, minW: number): T[][] {
+export function cluster<T extends { x: number; y: number }>(pts: T[], px: number, frameW: number, minW: number): T[][] {
   const s = minW / frameW;
   const parent = pts.map((_, i) => i);
   const find = (i: number): number => (parent[i] === i ? i : (parent[i] = find(parent[i])));
@@ -290,25 +319,31 @@ export interface MapModel {
   /** viewBox width and height, in grid cells. */
   w: number;
   h: number;
+  /** The frame in grid cells: anything else drawn on this map (spotlight()) places its points with it. */
+  cells: Cells;
   /** Land dots: the rest, the visited countries, the latest trip's countries. */
   land: { rest: string; visited: string; latest: string };
   /** Route widths in frame units: px at the width the map is drawn for. */
-  stroke: { earlier: number; latest: number; dot: number; dotGap: number };
+  stroke: { earlier: number; latest: number; dot: number; dotGap: number; dash: number; dashGap: number };
   /** Each pair of places the earlier trips joined, once, oldest first; `opacity` fades with age. */
-  earlier: Array<{ key: string; d: string; land: boolean; opacity: number }>;
+  earlier: Array<{ key: string; d: string; line?: Line; opacity: number }>;
   /** The latest trip, leg by leg, in the order travelled. */
-  latest: Array<{ key: string; d: string; land: boolean }>;
+  latest: Array<{ key: string; d: string; line?: Line }>;
   /** One set of marks and labels per range of rendered widths. */
   layers: Array<{ minW: number; maxW: number; marks: Array<{ key: string; left: number; top: number; kind: MarkKind; title: string }>; labels: Array<{ key: string; left: number; top: number; kind: MarkKind; text: string; anchor: Anchor }> }>;
   /** What the map shows, in words, for its role="img". */
   label: string;
 }
 
+/** How a route is drawn when not a plain line: by land a line of dots, by rail a dashed line. */
+export type Line = "land" | "rail";
+const lineOf = (j: Journey): Line | undefined => (j.by === "land" || j.by === "rail" ? j.by : undefined);
+
 const LONG_MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 const plural = (n: number, one: string, many: string) => `${n} ${n === 1 ? one : many}`;
 
 /** Earlier routes fade with the years since they were last travelled. */
-function ageOpacity(years: number): number {
+export function ageOpacity(years: number): number {
   if (years <= 1) return 0.85;
   if (years <= 3) return 0.7;
   if (years <= 6) return 0.5;
@@ -356,7 +391,8 @@ export function mapModel(journeys: Journey[], ts: Trip[], opts: { aspect: [numbe
   const pts = [...visits, { ...HOME, trips: 0, last: -1 }].map((p) => ({ ...p, key: placeKey(p), ...at(p, c) }));
   const layers = opts.layers.map(([minW, maxW]) => {
     const groups = cluster(pts, 9, c.w, minW).map((g) => {
-      const named = [...g].sort((a, b) => (order.get(a.key) ?? 99) - (order.get(b.key) ?? 99) || b.trips - a.trips || b.last - a.last);
+      // Home last, so a mark it shares with the latest trip's places names them first ("WOLLONGONG +2").
+      const named = [...g].sort((a, b) => +(a.key === homeKey) - +(b.key === homeKey) || (order.get(a.key) ?? 99) - (order.get(b.key) ?? 99) || b.trips - a.trips || b.last - a.last);
       const kind: MarkKind = g.some((p) => p.key === homeKey) ? "home" : g.some((p) => order.has(p.key)) ? "now" : "was";
       // A latest-trip mark names only the latest trip's places: another place sharing the mark is in its tooltip.
       const names = (kind === "now" ? named.filter((p) => order.has(p.key)) : named).map((p) => p.city.toUpperCase());
@@ -374,17 +410,24 @@ export function mapModel(journeys: Journey[], ts: Trip[], opts: { aspect: [numbe
         trips: Math.max(...g.map((p) => p.trips)),
       };
     });
+    // One of the latest trip's places is always named, at every width.
     const wants = groups
       .map((g, mark) => ({ g, mark }))
       .sort((a, b) => a.g.rank - b.g.rank || a.g.first - b.g.first || b.g.trips - a.g.trips)
-      .map(({ g, mark }) => ({ mark, texts: g.texts }));
+      .map(({ g, mark }) => ({ mark, texts: g.texts, must: g.kind === "now" }));
     const pos = (g: { x: number; y: number }) => ({ left: g.x / c.w, top: g.y / c.h });
     return {
       minW,
       maxW,
       // Earlier places first, so the latest trip's marks and home sit on top.
       marks: [...groups].sort((a, b) => b.rank - a.rank).map((g) => ({ key: g.key, ...pos(g), kind: g.kind, title: g.title })),
-      labels: placeLabels(groups, wants, c, minW, maxW).map((l) => ({ key: groups[l.mark].key, ...pos(groups[l.mark]), kind: groups[l.mark].kind, text: l.text, anchor: l.anchor })),
+      labels: placeLabels(groups, wants, c, minW, maxW, { coverable: (i, pass) => groups[i].kind === "was" || (pass >= 2 && groups[i].kind === "home") }).map((l) => ({
+        key: groups[l.mark].key,
+        ...pos(groups[l.mark]),
+        kind: groups[l.mark].kind,
+        text: l.text,
+        anchor: l.anchor,
+      })),
     };
   });
 
@@ -403,12 +446,187 @@ export function mapModel(journeys: Journey[], ts: Trip[], opts: { aspect: [numbe
   return {
     w: c.w,
     h: c.h,
+    cells: c,
     land: { rest, visited: seen, latest: now },
-    stroke: { earlier: u(1.1), latest: u(2), dot: u(2.2), dotGap: u(4) },
-    earlier: [...earlier.entries()].map(([key, j]) => ({ key, d: arc(j.from, j.to, c), land: j.by === "land", opacity: ageOpacity(newestYear - j.year) })),
-    latest: latest.legs.map((j, i) => ({ key: `${pair(j)}|${i}`, d: arc(j.from, j.to, c), land: j.by === "land" })),
+    stroke: { earlier: u(1.1), latest: u(2), dot: u(2.2), dotGap: u(4), dash: u(3), dashGap: u(2.5) },
+    earlier: [...earlier.entries()].map(([key, j]) => ({ key, d: arc(j.from, j.to, c), line: lineOf(j), opacity: ageOpacity(newestYear - j.year) })),
+    latest: latest.legs.map((j, i) => ({ key: `${pair(j)}|${i}`, d: arc(j.from, j.to, c), line: lineOf(j) })),
     layers,
     label,
   };
 }
 
+// ---- The dialog's map, lit one trip at a time ----
+
+export type SpotKind = "now" | "from" | "home" | "was";
+
+export interface SpotLayer {
+  minW: number;
+  maxW: number;
+  marks: Array<{ key: string; left: number; top: number; kind: SpotKind; title?: string }>;
+  labels: Array<{ key: string; left: number; top: number; kind: SpotKind; text: string; anchor: Anchor }>;
+}
+
+/** Everything the dialog's map draws: the overview, and what lights for each trip as it is read. */
+export interface Spotlight {
+  /** The map with no trip lit, as the server renders it and as it stays without JavaScript. */
+  overview: MapModel;
+  /** Land dots outside the visited countries, and inside them. */
+  land: { rest: string; visited: string };
+  /** One path per visited country (id `c-XX`), drawn by <use> for every trip that went there. */
+  countries: Array<{ id: string; d: string }>;
+  /** Every pair of places any journey joined, once (id `r<n>`), in the mode and age of its last journey, oldest first: the faint ghost under a lit trip. */
+  routes: Array<{ id: string; d: string; line?: Line; opacity: number }>;
+  /** Every place once per width layer, unlabelled and with its tooltip: the marks under a lit trip. */
+  base: SpotLayer[];
+  /** What lights for each trip, written once for all the trips it is the same for (`trips`: indexes into trips()). */
+  routeSets: Array<{ trips: number[]; legs: Array<{ id: string; line?: Line }> }>;
+  landSets: Array<{ trips: number[]; countries: string[] }>;
+  labelSets: Array<{ trips: number[]; layers: SpotLayer[] }>;
+}
+
+/** Neighbouring width layers that came out the same are one layer over the joined range. */
+function mergeLayers(layers: SpotLayer[]): SpotLayer[] {
+  const out: SpotLayer[] = [];
+  const same = (a: SpotLayer, b: SpotLayer) => JSON.stringify([a.marks, a.labels]) === JSON.stringify([b.marks, b.labels]);
+  for (const l of layers) {
+    const last = out.at(-1);
+    if (last && last.maxW + 1 === l.minW && same(last, l)) out[out.length - 1] = { ...last, maxW: l.maxW };
+    else out.push(l);
+  }
+  return out;
+}
+
+/** Items that came out the same for several trips, once each, with the trips they belong to. */
+function shared<T>(items: T[]): Array<{ trips: number[]; item: T }> {
+  const byKey = new Map<string, { trips: number[]; item: T }>();
+  items.forEach((item, i) => {
+    const k = JSON.stringify(item);
+    const hit = byKey.get(k);
+    if (hit) hit.trips.push(i);
+    else byKey.set(k, { trips: [i], item });
+  });
+  return [...byKey.values()];
+}
+
+/**
+ * The dialog's map, lit trip by trip: mapModel()'s overview, and on the same frame every route and visited
+ * country once (a trip <use>s its own), the places as unlabelled marks, and for each trip its marks and labels per
+ * width layer. A trip's labels name only its own places; the other marks still block a label's box but, faint
+ * behind the lit trip, are not rivals in the nearness test, and one of the trip's places is always named.
+ */
+export function spotlight(journeys: Journey[], ts: Trip[], opts: { aspect: [number, number]; drawnAt: number; layers: Array<[number, number]> }): Spotlight {
+  const overview = mapModel(journeys, ts, opts);
+  const c = overview.cells;
+  const sum = summarize(journeys);
+  const homeKey = placeKey(HOME);
+  const visits = placeVisits(ts).filter((p) => placeKey(p) !== homeKey);
+
+  const visited = new Set(sum.countries);
+  const [rest, seen] = cropLand(c, (iso) => (visited.has(iso) ? 1 : 0), 2);
+  const countries = [...visited].map((iso) => ({ id: `c-${iso}`, d: cropLand(c, (k) => (k === iso ? 1 : 0), 2)[1] })).filter((x) => x.d);
+  const drawn = new Set(countries.map((x) => x.id));
+
+  const pair = (j: Journey) => [placeKey(j.from), placeKey(j.to)].sort().join(">");
+  const newestYear = sum.perYear.at(-1)?.year ?? journeys[journeys.length - 1].year;
+  const lastUse = new Map<string, Journey>();
+  for (const j of journeys) {
+    lastUse.delete(pair(j));
+    lastUse.set(pair(j), j);
+  }
+  const ids = new Map<string, string>();
+  const routes = [...lastUse.entries()].map(([k, j], n) => {
+    ids.set(k, `r${n}`);
+    return { id: `r${n}`, d: arc(j.from, j.to, c), line: lineOf(j), opacity: ageOpacity(newestYear - j.year) };
+  });
+
+  // Marks: every place and home, clustered per layer as mapModel does (9px at the layer's narrowest width).
+  const pts = [...visits, { ...HOME, trips: 0, last: -1 }].map((p) => ({ ...p, key: placeKey(p), ...at(p, c) }));
+  const titleOf = (p: (typeof pts)[number]) => (p.key === homeKey ? "Sydney · home" : `${p.city}, ${countryOf(p.country).name} · ${plural(p.trips, "trip", "trips")}`);
+  const pos = (g: { x: number; y: number }) => ({ left: g.x / c.w, top: g.y / c.h });
+  const layerGroups = opts.layers.map(([minW, maxW]) => ({
+    minW,
+    maxW,
+    groups: cluster(pts, 9, c.w, minW).map((g) => ({
+      key: g.map((p) => p.key).join("+"),
+      places: g,
+      x: g.reduce((s, p) => s + p.x, 0) / g.length,
+      y: g.reduce((s, p) => s + p.y, 0) / g.length,
+      home: g.some((p) => p.key === homeKey),
+    })),
+  }));
+  const base = mergeLayers(
+    layerGroups.map(({ minW, maxW, groups }) => ({
+      minW,
+      maxW,
+      marks: groups.map((g) => ({ key: g.key, ...pos(g), kind: g.home ? ("home" as const) : ("was" as const), title: g.places.map(titleOf).join("\n") })),
+      labels: [],
+    })),
+  );
+
+  const rank: Record<SpotKind, number> = { now: 0, from: 1, home: 2, was: 3 };
+  const perTrip = ts.map((t) => {
+    // Its legs, each pair once (drawn as this trip went: by land, by rail).
+    const legs: Array<{ id: string; line?: Line }> = [];
+    for (const j of t.legs) {
+      const leg = { id: ids.get(pair(j))!, ...(lineOf(j) ? { line: lineOf(j) } : {}) };
+      if (!legs.some((l) => l.id === leg.id && l.line === leg.line)) legs.push(leg);
+    }
+    // Its countries: the places it reached (not where it set off from, unless it stopped there too, nor home).
+    const startKey = placeKey(t.stops[0]);
+    const reached = (t.end === "round" ? t.stops.slice(1, -1) : t.stops.slice(1)).filter((p) => placeKey(p) !== homeKey);
+    const lit = [...new Set(reached.map((p) => `c-${p.country}`))].filter((id) => drawn.has(id));
+
+    // Its places in the order reached; where it set off from, when that is not home, is a "from" mark.
+    const order = new Map<string, number>();
+    t.stops.forEach((p, i) => {
+      if (!order.has(placeKey(p))) order.set(placeKey(p), i);
+    });
+    const layers = layerGroups.map(({ minW, maxW, groups }): SpotLayer => {
+      const mine = groups
+        // A mark's own places in the order reached, where it set off from last ("CAT BA · HANOI" from Hanoi).
+        .map((g, mark) => ({ g, mark, own: g.places.filter((p) => order.has(p.key)).sort((a, b) => +(a.key === startKey) - +(b.key === startKey) || order.get(a.key)! - order.get(b.key)!) }))
+        .filter((x) => x.own.length)
+        .map((x) => {
+          const kind: SpotKind = x.g.home ? "home" : x.own.every((p) => p.key === startKey) ? "from" : "now";
+          const names = x.own.map((p) => p.city.toUpperCase());
+          const texts = names.length > 2 ? [`${names[0]} +${names.length - 1}`] : names.length === 2 ? [names.join(" · "), `${names[0]} +1`] : names;
+          return { ...x, kind, texts, first: Math.min(...x.own.map((p) => order.get(p.key)!)) };
+        })
+        .sort((a, b) => rank[a.kind] - rank[b.kind] || a.first - b.first);
+      const lit = new Set(mine.map((m) => m.mark));
+      const from = new Set(mine.filter((m) => m.kind === "from").map((m) => m.mark));
+      const placed = placeLabels(
+        groups.map((g, i) => ({ x: g.x, y: g.y, size: lit.has(i) ? 9 : 7 })),
+        // The places it reached must be named; where it set off from only when it reached nowhere else.
+        mine.map((m) => ({ mark: m.mark, texts: m.texts, must: m.kind === "now" || (m.kind === "from" && !mine.some((x) => x.kind === "now")) })),
+        c,
+        minW,
+        maxW,
+        { rivals: (i) => lit.has(i), coverable: (i, pass) => !lit.has(i) || (pass === 2 && groups[i].home) || (pass === 3 && from.has(i)) },
+      );
+      const kindOf = new Map(mine.map((m) => [m.mark, m.kind]));
+      return {
+        minW,
+        maxW,
+        // Home and the start under the stops, so a stop is never hidden by them.
+        marks: [...mine].reverse().map((m) => ({ key: m.g.key, ...pos(m.g), kind: m.kind })),
+        labels: placed.map((l) => ({ key: groups[l.mark].key, ...pos(groups[l.mark]), kind: kindOf.get(l.mark)!, text: l.text, anchor: l.anchor })),
+      };
+    });
+    return { legs, countries: lit, layers: mergeLayers(layers) };
+  });
+
+  return {
+    overview,
+    land: { rest, visited: seen },
+    countries,
+    routes,
+    base,
+    routeSets: shared(perTrip.map((t) => t.legs)).map(({ trips, item }) => ({ trips, legs: item })),
+    landSets: shared(perTrip.map((t) => t.countries))
+      .filter(({ item }) => item.length)
+      .map(({ trips, item }) => ({ trips, countries: item })),
+    labelSets: shared(perTrip.map((t) => t.layers)).map(({ trips, item }) => ({ trips, layers: item })),
+  };
+}

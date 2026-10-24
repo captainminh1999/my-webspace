@@ -79,18 +79,21 @@ interface DialogProps {
   title: string;
   freshness?: Freshness;
   stamp?: "text" | "dot";
-  /** Sized to the content: lists read at 42rem, a photograph gets 48rem. */
-  width?: "narrow" | "wide";
+  /** Sized to the content: lists read at 42rem, a photograph gets 48rem, a map beside a list 76rem. */
+  width?: "narrow" | "wide" | "atlas";
+  /** The body pads itself (and marks the scroll area data-scroller for its own client code): Travel's pinned map. */
+  flush?: boolean;
   children: ReactNode;
 }
 
 const WIDTH = {
   narrow: "w-[min(44.5rem,calc(100vw-2rem))]",
   wide: "w-[min(50.5rem,calc(100vw-2rem))]",
+  atlas: "w-[min(76rem,calc(100vw-2rem))]",
 };
 
 /** The widget's full view: a native <dialog>, opened by DialogController via ?w=<id>. */
-export function WidgetDialog({ id, folio, title, freshness, stamp = "text", width = "narrow", children }: DialogProps) {
+export function WidgetDialog({ id, folio, title, freshness, stamp = "text", width = "narrow", flush = false, children }: DialogProps) {
   return (
     <dialog
       id={`dialog-${id}`}
@@ -125,7 +128,13 @@ export function WidgetDialog({ id, folio, title, freshness, stamp = "text", widt
             STALE · last successful fetch {longStamp(freshness.at)}
           </p>
         )}
-        <div className="overflow-y-auto p-5">{children}</div>
+        {flush ? (
+          <div className="overflow-y-auto overscroll-contain" data-scroller>
+            {children}
+          </div>
+        ) : (
+          <div className="overflow-y-auto p-5">{children}</div>
+        )}
       </div>
     </dialog>
   );

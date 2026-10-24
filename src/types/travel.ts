@@ -8,7 +8,7 @@ export interface Place {
 }
 
 /** How a journey was made. */
-export type Mode = "air" | "land" | "sea";
+export type Mode = "air" | "land" | "rail" | "sea";
 
 /**
  * One journey: from a place stayed in to the next one. The connections on the way are not places:

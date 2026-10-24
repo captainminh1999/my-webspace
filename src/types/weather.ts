@@ -17,7 +17,7 @@ export interface DailyItem {
 export interface WeatherData {
   updated: number;                 // timestamp the fetch occurred
   current: { temp: number; icon: string };
-  hourly: HourlyItem[];            // first 12 hourly entries
+  hourly: HourlyItem[];            // 15 hourly entries from the hour the feed ran (it runs every 3 h)
   daily: DailyItem[];              // first 7 daily entries
 }
 

@@ -103,7 +103,8 @@ test('stored journeys are checked at the door: bad ones are dropped, good ones n
   const good = { from: { city: ' Sydney ', country: 'au', lat: -33.8688, lon: 151.2093 }, to: { city: 'Hanoi', country: 'VN', lat: 21.0285, lon: 105.8542, iata: 'HAN' }, year: 2025, month: 11, by: 'Air', _id: 'x', basis: 'not shown' };
   assert.deepEqual(parseJourneys([good]), [{ from: SYD, to: HANOI, year: 2025, month: 11, by: 'air' }]);
   assert.deepEqual(parseJourneys([{ ...good, month: undefined, by: undefined }])[0], { from: SYD, to: HANOI, year: 2025 });
-  assert.deepEqual(parseJourneys([{ ...good, by: 'train' }])[0], { from: SYD, to: HANOI, year: 2025, month: 11 }, 'an unknown mode loses the mode, not the journey');
+  assert.deepEqual(parseJourneys([{ ...good, by: 'boat' }])[0], { from: SYD, to: HANOI, year: 2025, month: 11 }, 'an unknown mode loses the mode, not the journey');
+  assert.equal(parseJourneys([{ ...good, by: 'rail' }])[0].by, 'rail');
   for (const bad of [
     { ...good, from: undefined },
     { ...good, to: 'Hanoi' },

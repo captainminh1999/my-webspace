@@ -1,4 +1,4 @@
-// Scheduled feed: weather (hourly at :10 UTC). Runs only while FEEDS_VIA_NETLIFY=true — see feeds/lib.ts.
+// Scheduled feed: weather (every 3 hours at :10 UTC: 00:10, 03:10 … 21:10). Runs only while FEEDS_VIA_NETLIFY=true — see feeds/lib.ts.
 import type { Config } from "@netlify/functions";
 import { runFeed } from "./feeds/lib";
 import { weather } from "./feeds/sources";
@@ -6,4 +6,4 @@ import { weather } from "./feeds/sources";
 const handler = async () => runFeed("weather", weather);
 export default handler;
 
-export const config: Config = { schedule: "10 * * * *" };
+export const config: Config = { schedule: "10 */3 * * *" };
