@@ -46,7 +46,7 @@ With `MONGODB_URI` set, every page reads that database too — not the live func
 
 Requires Node 22.12 or newer (`@netlify/functions` 6 asks for it); `npm test` needs 22.18 or newer, where Node runs the `.ts` test files with its own type stripping. Netlify builds with the Node named in `.nvmrc` and runs the functions on `nodejs22.x`.
 
-`next` is held to `~16.3` on purpose: the edge function stamps nonces on the tags Next.js writes, so a new minor should arrive as a deliberate bump, followed by `npm test` and the local proof below — a new kind of tag shows up there as "tag without the header's nonce". (The `overrides` entry that pointed Next 15's pinned `postcss` at the root one went with the move to Next 16, which pins a fixed `postcss` itself; `npm audit` reads 0 without it.)
+`next` is held to `~16.3` on purpose: the edge function stamps nonces on the tags Next.js writes, so a new minor should arrive as a deliberate bump, followed by `npm test` and the local proof below — a new kind of tag shows up there as "tag without the header's nonce". (The `overrides` entry that pointed Next 15's pinned `postcss` at the root one went with the move to Next 16, which pins a fixed `postcss` itself.) `npm audit` reads 5 high, all one chain in the linter only — `braces` ≤ 3.0.3 under `eslint-config-next`'s `fast-glob`, with no fixed `braces` published yet (2026-10-13); nothing of it reaches the site. Next is on 16.3.8 for the 2026-09 advisories (`next/og` ImageResponse, ISR cache poisoning, image optimisation).
 
 ## Scripts
 
@@ -60,6 +60,7 @@ Requires Node 22.12 or newer (`@netlify/functions` 6 asks for it); `npm test` ne
 | `npm run lint` | ESLint over `src/` with Next's flat config (`eslint.config.mjs`). Next 16 has no `next lint`, and `next build` no longer lints — this script is the only place it happens |
 | `npm run typecheck` | TypeScript, the site and then `netlify/` (functions and the edge function) |
 | `npm test` | Unit tests (`node --test`): `src/` and the scheduled feeds in `netlify/functions/feeds/__tests__/`, which run each feed offline against saved upstream responses |
+| `npm run test:e2e` | Browser tests (`scripts/e2e.mjs`, Playwright + `node --test`): builds the site against `e2e/stub.mjs` (invented trips in `e2e/fixtures/journeys.json`, never the owner's), starts it on :3100 and drives the Travel card and dialog at laptop, tablet and phone widths. `E2E_SKIP_BUILD=1` reuses `.next`. Needs ports 3100 and 8888 free and a Chromium (`npx playwright install chromium`, or `PLAYWRIGHT_CHROMIUM=<path>`) |
 
 ## Environment
 
@@ -81,7 +82,7 @@ Each feed is a **Netlify Scheduled Function** (`netlify/functions/feed-*.ts`, lo
 
 | Feed | Function | Schedule (UTC) | Source | Writes |
 |---|---|---|---|---|
-| weather | `feed-weather` | hourly at :10 | OpenWeather One Call (Sydney) | `singletons/weather` |
+| weather | `feed-weather` | every 3 hours at :10 (00:10, 03:10 … UTC) | OpenWeather One Call (Sydney) | `singletons/weather` |
 | tech | `feed-tech` | every 3 h | Hacker News top 10 (with score) | `tech` |
 | space | `feed-space` | 08:05 | NASA APOD, EPIC | `singletons/space`, `singletons/epic` |
 | camera | `feed-camera` | 08:00 | Unsplash random landscape | `singletons/photography` |

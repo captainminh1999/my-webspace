@@ -6,7 +6,7 @@ import { useEffect } from "react";
 // first tick runs on mount, then one on every minute boundary, and one more
 // whenever the tab comes back to the foreground. Under 1 KB, no state, no
 // re-render. The text rules mirror stampText() in src/lib/freshness.ts.
-const LIMITS: Record<string, [number, number]> = { hourly: [2, 6], daily: [30, 72] };
+const LIMITS: Record<string, [number, number]> = { "3-hourly": [4, 9], daily: [30, 72] }; // as in src/lib/freshness.ts
 const HM = new Intl.DateTimeFormat("en-AU", { timeZone: "Australia/Sydney", hour: "2-digit", minute: "2-digit", hour12: false });
 
 function rel(from: Date, now: Date) {

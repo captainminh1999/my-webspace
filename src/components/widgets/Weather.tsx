@@ -2,13 +2,14 @@ import type { WeatherData } from "@/types/weather";
 import { Sparkline } from "@/components/dashboard/Sparkline";
 import { WeatherGlyph, glyphFor } from "@/lib/weatherGlyphs";
 import { hour24, toDate, weekday } from "@/lib/time";
+import { upcomingHours } from "@/utils/weather";
 
 const r = (n: number) => Math.round(n);
 
-function Hourly({ data, cells }: { data: WeatherData; cells: number }) {
+function Hourly({ data, cells, now }: { data: WeatherData; cells: number; now: Date }) {
   return (
     <div className="raster mt-3" style={{ gridTemplateColumns: `repeat(${cells}, minmax(0, 1fr))` }}>
-      {(data.hourly ?? []).slice(0, cells).map((h) => {
+      {upcomingHours(data, now, cells).map((h) => {
         const d = toDate(h.dt)!;
         return (
           <div key={h.dt} className="py-1.5 text-center font-mono text-source leading-4 overflow-hidden">
@@ -57,8 +58,8 @@ function Daily({ data }: { data: WeatherData }) {
   );
 }
 
-/** Card body: the page's biggest live number, the 12-hour sparkline, hourly row, 7-day table. */
-export function WeatherCard({ data }: { data: WeatherData }) {
+/** Card body: the page's biggest live number, the 12-hour sparkline, hourly row, 7-day table. The hours start at the one under way at `now`. */
+export function WeatherCard({ data, now }: { data: WeatherData; now: Date }) {
   if (typeof data?.current?.temp !== "number") return <p className="font-mono text-dense text-ink-3">No items</p>;
   const { word } = glyphFor(data.current.icon);
   return (
@@ -74,15 +75,15 @@ export function WeatherCard({ data }: { data: WeatherData }) {
         </div>
         <WeatherGlyph code={data.current.icon} size={40} decorative className="text-ink-2 shrink-0 mt-1" />
       </div>
-      <Sparkline values={(data.hourly ?? []).slice(0, 12).map((h) => h.temp)} className="mt-4" stretch />
-      <Hourly data={data} cells={12} />
+      <Sparkline values={upcomingHours(data, now).map((h) => h.temp)} className="mt-4" stretch />
+      <Hourly data={data} cells={12} now={now} />
       <Daily data={data} />
     </div>
   );
 }
 
 /** Dialog body: the same diagrams, roomier, plus every hourly reading. */
-export function WeatherFull({ data }: { data: WeatherData }) {
+export function WeatherFull({ data, now }: { data: WeatherData; now: Date }) {
   if (typeof data?.current?.temp !== "number") return <p className="font-mono text-dense text-ink-3">No items</p>;
   const { word } = glyphFor(data.current.icon);
   return (
@@ -97,8 +98,8 @@ export function WeatherFull({ data }: { data: WeatherData }) {
         <WeatherGlyph code={data.current.icon} size={56} decorative className="text-ink-2 shrink-0" />
       </div>
       <p className="stamp text-ink-3 mt-6">Next 12 hours</p>
-      <Sparkline values={(data.hourly ?? []).slice(0, 12).map((h) => h.temp)} height={64} className="mt-2" />
-      <Hourly data={data} cells={12} />
+      <Sparkline values={upcomingHours(data, now).map((h) => h.temp)} height={64} className="mt-2" />
+      <Hourly data={data} cells={12} now={now} />
       <p className="stamp text-ink-3 mt-6">Next 7 days</p>
       <Daily data={data} />
       <p className="font-mono text-source text-ink-3 mt-6">Source: OpenWeather One Call · lat −33.87, lon 151.21</p>

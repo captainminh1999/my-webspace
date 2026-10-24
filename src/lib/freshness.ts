@@ -6,7 +6,7 @@
 import type { DashboardData, WidgetId } from "@/types/dashboard";
 import { relativeAge, toDate } from "./time";
 
-export type Budget = "hourly" | "daily";
+export type Budget = "3-hourly" | "daily";
 export type Source = "fetched" | "content" | "none";
 export type State = "fresh" | "aging" | "stale" | "unknown";
 
@@ -23,7 +23,7 @@ export interface Freshness {
 }
 
 export const BUDGET: Record<WidgetId, Budget> = {
-  weather: "hourly",
+  weather: "3-hourly", // feed-weather runs every 3 hours
   tech: "daily",
   space: "daily",
   camera: "daily",
@@ -33,8 +33,8 @@ export const BUDGET: Record<WidgetId, Budget> = {
   youtube: "daily",
 };
 
-// fresh / aging thresholds in hours
-const LIMITS: Record<Budget, [number, number]> = { hourly: [2, 6], daily: [30, 72] };
+// fresh / aging thresholds in hours: a run's interval plus an hour's grace, then two missed runs (FreshnessTicker mirrors these)
+const LIMITS: Record<Budget, [number, number]> = { "3-hourly": [4, 9], daily: [30, 72] };
 
 function newest(dates: Array<string | number | undefined | null>): Date | null {
   let best: Date | null = null;

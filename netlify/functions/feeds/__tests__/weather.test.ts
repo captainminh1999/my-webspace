@@ -7,7 +7,7 @@ import { fakeDb, fixtureJson, frozenAt, json, replaced, upstream, urls, withEnv 
 const KEY = "test-weather-key";
 const ONECALL = `https://api.openweathermap.org/data/3.0/onecall?lat=-33.87&lon=151.21&units=metric&exclude=minutely,alerts&appid=${KEY}`;
 
-test("stores now, the next 12 hours and the next 7 days: temperature and icon only", async (t) => {
+test("stores now, the next 15 hours (the saved response has 14) and the next 7 days: temperature and icon only", async (t) => {
   withEnv(t, { WEATHER_KEY: KEY });
   frozenAt(t, "2026-10-11T00:10:27Z");
   const sent = upstream(t, { [ONECALL]: "openweather-onecall.json" });
@@ -33,6 +33,8 @@ test("stores now, the next 12 hours and the next 7 days: temperature and icon on
         { dt: 1791709200, temp: 17.9, icon: "04n" },
         { dt: 1791712800, temp: 17.31, icon: "04n" },
         { dt: 1791716400, temp: 16.88, icon: "02n" },
+        { dt: 1791720000, temp: 16.54, icon: "01n" },
+        { dt: 1791723600, temp: 16.2, icon: "01n" },
       ],
       daily: [
         { dt: 1791680400, min: 15.9, max: 22.3, icon: "10d" },
