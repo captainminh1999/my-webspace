@@ -1,0 +1,277 @@
+{
+  "vRt7Qx2LmPk": {
+    "kind": "youtube#video",
+    "etag": "etag-vRt7Qx2LmPk",
+    "id": "vRt7Qx2LmPk",
+    "snippet": {
+      "publishedAt": "2026-10-09T15:00:12Z",
+      "channelId": "UCHnyfMqiRRG1u-2MsSQLbXA",
+      "title": "The Surprising Physics of Spinning Tops",
+      "description": "Sample description …",
+      "thumbnails": {
+        "high": {
+          "url": "https://i.ytimg.com/vi/vRt7Qx2LmPk/hqdefault.jpg",
+          "width": 480,
+          "height": 360
+        }
+      },
+      "channelTitle": "Veritasium",
+      "liveBroadcastContent": "none"
+    },
+    "player": {
+      "embedHtml": "<iframe width=\"1280\" height=\"720\" src=\"//www.youtube.com/embed/vRt7Qx2LmPk\" frameborder=\"0\" allowfullscreen></iframe>",
+      "embedHeight": "720",
+      "embedWidth": "1280"
+    }
+  },
+  "Kz8sN4qWd1E": {
+    "kind": "youtube#video",
+    "etag": "etag-Kz8sN4qWd1E",
+    "id": "Kz8sN4qWd1E",
+    "snippet": {
+      "publishedAt": "2026-10-07T14:00:01Z",
+      "channelId": "UCsXVk37bltHxD1rDPwtNM8Q",
+      "title": "What If You Fell Into a Neutron Star?",
+      "description": "Sample description …",
+      "thumbnails": {
+        "high": {
+          "url": "https://i.ytimg.com/vi/Kz8sN4qWd1E/hqdefault.jpg",
+          "width": 480,
+          "height": 360
+        }
+      },
+      "channelTitle": "Kurzgesagt – In a Nutshell",
+      "liveBroadcastContent": "none"
+    },
+    "player": {
+      "embedHtml": "<iframe width=\"1280\" height=\"720\" src=\"//www.youtube.com/embed/Kz8sN4qWd1E\" frameborder=\"0\" allowfullscreen></iframe>",
+      "embedHeight": "720",
+      "embedWidth": "1280"
+    }
+  },
+  "Hf3ePq9ZyXo": {
+    "kind": "youtube#video",
+    "etag": "etag-Hf3ePq9ZyXo",
+    "id": "Hf3ePq9ZyXo",
+    "snippet": {
+      "publishedAt": "2026-10-10T17:30:00Z",
+      "channelId": "UCMb0O2CdPBNi-QqPk5T3gsQ",
+      "title": "I Tested Every Hand Grinder Under &#39;$100&#39;",
+      "description": "Sample description …",
+      "thumbnails": {
+        "high": {
+          "url": "https://i.ytimg.com/vi/Hf3ePq9ZyXo/hqdefault.jpg",
+          "width": 480,
+          "height": 360
+        }
+      },
+      "channelTitle": "James Hoffmann",
+      "liveBroadcastContent": "none"
+    },
+    "player": {
+      "embedHtml": "<iframe width=\"1280\" height=\"720\" src=\"//www.youtube.com/embed/Hf3ePq9ZyXo\" frameborder=\"0\" allowfullscreen></iframe>",
+      "embedHeight": "720",
+      "embedWidth": "1280"
+    }
+  },
+  "Sh0rtPq1aZx": {
+    "kind": "youtube#video",
+    "etag": "etag-Sh0rtPq1aZx",
+    "id": "Sh0rtPq1aZx",
+    "snippet": {
+      "publishedAt": "2026-10-11T20:00:00Z",
+      "channelId": "UCXuqSBlHAE6Xw-yeJA0Tunw",
+      "title": "This one weird cable trick #shorts",
+      "description": "Sample description …",
+      "thumbnails": {
+        "high": {
+          "url": "https://i.ytimg.com/vi/Sh0rtPq1aZx/hqdefault.jpg",
+          "width": 480,
+          "height": 360
+        }
+      },
+      "channelTitle": "Linus Tech Tips",
+      "liveBroadcastContent": "none"
+    },
+    "player": {
+      "embedHtml": "<iframe width=\"405\" height=\"720\" src=\"//www.youtube.com/embed/Sh0rtPq1aZx\" frameborder=\"0\" allowfullscreen></iframe>",
+      "embedHeight": "720",
+      "embedWidth": "405"
+    }
+  },
+  "Sq9arEbXy2c": {
+    "kind": "youtube#video",
+    "etag": "etag-Sq9arEbXy2c",
+    "id": "Sq9arEbXy2c",
+    "snippet": {
+      "publishedAt": "2026-10-11T20:00:00Z",
+      "channelId": "UCXuqSBlHAE6Xw-yeJA0Tunw",
+      "title": "Square clip",
+      "description": "Sample description …",
+      "thumbnails": {
+        "high": {
+          "url": "https://i.ytimg.com/vi/Sq9arEbXy2c/hqdefault.jpg",
+          "width": 480,
+          "height": 360
+        }
+      },
+      "channelTitle": "Linus Tech Tips",
+      "liveBroadcastContent": "none"
+    },
+    "player": {
+      "embedHtml": "<iframe width=\"720\" height=\"720\" src=\"//www.youtube.com/embed/Sq9arEbXy2c\" frameborder=\"0\" allowfullscreen></iframe>",
+      "embedHeight": "720",
+      "embedWidth": "720"
+    }
+  },
+  "Lt4gQm2BvNs": {
+    "kind": "youtube#video",
+    "etag": "etag-Lt4gQm2BvNs",
+    "id": "Lt4gQm2BvNs",
+    "snippet": {
+      "publishedAt": "2026-10-10T19:00:44Z",
+      "channelId": "UCXuqSBlHAE6Xw-yeJA0Tunw",
+      "title": "We Built a PC Inside a Fish Tank &amp; It Worked",
+      "description": "Sample description …",
+      "thumbnails": {
+        "high": {
+          "url": "https://i.ytimg.com/vi/Lt4gQm2BvNs/hqdefault.jpg",
+          "width": 480,
+          "height": 360
+        }
+      },
+      "channelTitle": "Linus Tech Tips",
+      "liveBroadcastContent": "none"
+    },
+    "player": {
+      "embedHtml": "<iframe width=\"1280\" height=\"720\" src=\"//www.youtube.com/embed/Lt4gQm2BvNs\" frameborder=\"0\" allowfullscreen></iframe>",
+      "embedHeight": "720",
+      "embedWidth": "1280"
+    }
+  },
+  "Cy5hWr7TkJa": {
+    "kind": "youtube#video",
+    "etag": "etag-Cy5hWr7TkJa",
+    "id": "Cy5hWr7TkJa",
+    "snippet": {
+      "publishedAt": "2026-10-05T09:12:30Z",
+      "channelId": "UCcyq283he07B7_KUX07mmtA",
+      "title": "Ten Years of Building Synthesizers",
+      "description": "Sample description …",
+      "thumbnails": {
+        "high": {
+          "url": "https://i.ytimg.com/vi/Cy5hWr7TkJa/hqdefault.jpg",
+          "width": 480,
+          "height": 360
+        }
+      },
+      "channelTitle": "Sample Channel F",
+      "liveBroadcastContent": "none"
+    },
+    "player": {
+      "embedHtml": "<iframe width=\"1280\" height=\"720\" src=\"//www.youtube.com/embed/Cy5hWr7TkJa\" frameborder=\"0\" allowfullscreen></iframe>",
+      "embedHeight": "720",
+      "embedWidth": "1280"
+    }
+  },
+  "Ky6jXs8UlBb": {
+    "kind": "youtube#video",
+    "etag": "etag-Ky6jXs8UlBb",
+    "id": "Ky6jXs8UlBb",
+    "snippet": {
+      "publishedAt": "2026-10-08T22:00:05Z",
+      "channelId": "UCKy1dAqELo0zrOtPkf0eTMw",
+      "title": "A Field Guide to Urban Birds",
+      "description": "Sample description …",
+      "thumbnails": {
+        "high": {
+          "url": "https://i.ytimg.com/vi/Ky6jXs8UlBb/hqdefault.jpg",
+          "width": 480,
+          "height": 360
+        }
+      },
+      "channelTitle": "Sample Channel G",
+      "liveBroadcastContent": "none"
+    },
+    "player": {
+      "embedHtml": "<iframe width=\"1280\" height=\"720\" src=\"//www.youtube.com/embed/Ky6jXs8UlBb\" frameborder=\"0\" allowfullscreen></iframe>",
+      "embedHeight": "720",
+      "embedWidth": "1280"
+    }
+  },
+  "Dz7kYt9VmCc": {
+    "kind": "youtube#video",
+    "etag": "etag-Dz7kYt9VmCc",
+    "id": "Dz7kYt9VmCc",
+    "snippet": {
+      "publishedAt": "2026-10-03T16:45:00Z",
+      "channelId": "UCimDIuJiUB7KRYEfCu6YfxQ",
+      "title": "Restoring a 1970s Calculator",
+      "description": "Sample description …",
+      "thumbnails": {
+        "high": {
+          "url": "https://i.ytimg.com/vi/Dz7kYt9VmCc/hqdefault.jpg",
+          "width": 480,
+          "height": 360
+        }
+      },
+      "channelTitle": "Sample Channel H",
+      "liveBroadcastContent": "none"
+    },
+    "player": {
+      "embedHtml": "<iframe width=\"1280\" height=\"720\" src=\"//www.youtube.com/embed/Dz7kYt9VmCc\" frameborder=\"0\" allowfullscreen></iframe>",
+      "embedHeight": "720",
+      "embedWidth": "1280"
+    }
+  },
+  "Fw8lZu0WnDd": {
+    "kind": "youtube#video",
+    "etag": "etag-Fw8lZu0WnDd",
+    "id": "Fw8lZu0WnDd",
+    "snippet": {
+      "publishedAt": "2026-10-06T11:20:18Z",
+      "channelId": "UCsBjURrPoezykLs9EqgamOA",
+      "title": "How Typefaces Are Drawn",
+      "description": "Sample description …",
+      "thumbnails": {
+        "high": {
+          "url": "https://i.ytimg.com/vi/Fw8lZu0WnDd/hqdefault.jpg",
+          "width": 480,
+          "height": 360
+        }
+      },
+      "channelTitle": "Sample Channel I",
+      "liveBroadcastContent": "none"
+    },
+    "player": {
+      "embedHtml": "<iframe width=\"1280\" height=\"720\" src=\"//www.youtube.com/embed/Fw8lZu0WnDd\" frameborder=\"0\" allowfullscreen></iframe>",
+      "embedHeight": "720",
+      "embedWidth": "1280"
+    }
+  },
+  "OnlyShrt01a": {
+    "kind": "youtube#video",
+    "etag": "etag-OnlyShrt01a",
+    "id": "OnlyShrt01a",
+    "snippet": {
+      "publishedAt": "2026-10-09T08:00:00Z",
+      "channelId": "UCo4K5kzinPI9AHRDp_V4T0w",
+      "title": "A Short",
+      "description": "Sample description …",
+      "thumbnails": {
+        "high": {
+          "url": "https://i.ytimg.com/vi/OnlyShrt01a/hqdefault.jpg",
+          "width": 480,
+          "height": 360
+        }
+      },
+      "channelTitle": "Sample Channel C",
+      "liveBroadcastContent": "none"
+    },
+    "player": {
+      "embedHtml": "<iframe width=\"405\" height=\"720\" src=\"//www.youtube.com/embed/OnlyShrt01a\" frameborder=\"0\" allowfullscreen></iframe>",
+      "embedHeight": "720",
+      "embedWidth": "405"
+    }
+  }
+}

@@ -10,9 +10,10 @@ import { useEffect, useRef } from "react";
  *
  * The trip being read is the last one whose top has passed the reading line: a third of the way down the
  * scroll area beside the map (but above the first trip at the top, so the dialog opens on the overview however
- * tall the screen), or 24px under the map where the map is pinned above the list. Over the last stretch of
- * scroll the line slides down, so the oldest trips, which can never reach it, each still get a turn. A trip
- * heading focused from the keyboard lights its trip until the reader scrolls a third of a screen on.
+ * tall the screen), or a third of the way down the list below the map where the map is pinned above it. Over
+ * the last stretch of scroll the line slides down, so the oldest trips, which can never reach it, each still get
+ * a turn. A trip heading focused from the keyboard lights its trip until the reader scrolls a third of a screen
+ * on.
  *
  * It also keeps two lengths the CSS cannot know: the pinned map's height as the scroll area's scroll-padding
  * (so a heading reached by keyboard, and a page of PageDown, clear the map), and the pinned column's chrome
@@ -78,7 +79,9 @@ export function TravelSpotlight() {
       }
       if (max < 3 || !tops.length) return set("");
 
-      const L = pinH ? pinH + 24 : Math.max(0, Math.min(h / 3, tops[0] - 40));
+      // Stacked, the line is a third of the way down the list below the map, not just under it: a trip's year
+      // heading sits above it, and the trip should light as it comes into view, not once that heading is gone.
+      const L = Math.max(pinH ? pinH + 24 : 0, Math.min(pinH + (h - pinH) / 3, tops[0] - 40));
       // The oldest trip reaches the line 48px before the end: over the D px before that the line slides down by
       // S, as far as that trip falls short of it, at most half as fast as the list moves.
       const E = Math.min(48, max / 2);
