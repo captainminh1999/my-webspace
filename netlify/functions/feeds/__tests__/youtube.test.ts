@@ -1,15 +1,20 @@
-// netlify/functions/feeds/__tests__/youtube.test.ts — the youtube feed against saved YouTube Data API search.list responses
-// (one per channel in CHANNELS) and the HEAD answers of i.ytimg.com for each video's larger thumbnails.
+// netlify/functions/feeds/__tests__/youtube.test.ts — the youtube feed against saved YouTube Data API playlistItems.list
+// responses (each channel's uploads, one per channel in CHANNELS), the videos.list resources of those uploads, and the
+// HEAD answers of i.ytimg.com for each video's larger thumbnails.
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { youtube } from "../sources.ts";
 import { fakeDb, fixtureJson, json, replaced, upstream, urls, withEnv, type Answer } from "./harness.ts";
 
 const KEY = "test-youtube-key";
-const SEARCH = fixtureJson("youtube-search.json");
-const CHANNELS = Object.keys(SEARCH);
-const search = (channelId: string) =>
-  `https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=${channelId}&maxResults=1&order=date&type=video&key=${KEY}`;
+const UPLOADS = fixtureJson("youtube-uploads.json");
+const VIDEOS = fixtureJson("youtube-videos.json");
+const CHANNELS = Object.keys(UPLOADS);
+const uploads = (channelId: string) =>
+  `https://www.googleapis.com/youtube/v3/playlistItems?part=contentDetails&playlistId=UU${channelId.slice(2)}&maxResults=10&key=${KEY}`;
+const videos = (ids: string[]) => `https://www.googleapis.com/youtube/v3/videos?part=snippet,player&maxWidth=1280&id=${ids.join(",")}&key=${KEY}`;
+// Every upload in the fixture, in the channels' order: the one videos.list call a run makes.
+const ALL = CHANNELS.flatMap((id) => UPLOADS[id].items.map((it: { contentDetails: { videoId: string } }) => it.contentDetails.videoId));
 
 // Which thumbnails exist: maxresdefault for most; one video only has sddefault, one has neither (hqdefault always
 // exists, and is never asked about), and for one the request for maxresdefault fails outright.
@@ -29,12 +34,16 @@ const THUMBS: Record<string, Answer> = {
   "Fw8lZu0WnDd/maxresdefault": 200,
 };
 
-/** The API's answers by channel (`answers` overrides some), and the thumbnails above. */
+/** The API's answers by channel (`answers` overrides some), the videos those uploads name, and the thumbnails above. */
 const youTube = (answers: Record<string, Answer> = {}) => (url: string, init: RequestInit): Answer | undefined => {
   const u = new URL(url);
-  if (u.host === "www.googleapis.com") {
-    const channelId = u.searchParams.get("channelId") ?? "";
-    return answers[channelId] ?? (url === search(channelId) && channelId in SEARCH ? () => json(SEARCH[channelId]) : undefined);
+  if (u.host === "www.googleapis.com" && u.pathname.endsWith("/playlistItems")) {
+    const channelId = `UC${(u.searchParams.get("playlistId") ?? "").slice(2)}`;
+    return answers[channelId] ?? (url === uploads(channelId) && channelId in UPLOADS ? () => json(UPLOADS[channelId]) : undefined);
+  }
+  if (u.host === "www.googleapis.com" && u.pathname.endsWith("/videos")) {
+    const ids = (u.searchParams.get("id") ?? "").split(",");
+    return url === videos(ids) ? () => json({ kind: "youtube#videoListResponse", items: ids.filter((id) => id in VIDEOS).map((id) => VIDEOS[id]) }) : undefined;
   }
   const thumb = url.match(/^https:\/\/i\.ytimg\.com\/vi\/([\w-]{11}\/\w+)\.jpg$/)?.[1];
   return thumb && init.method === "HEAD" ? THUMBS[thumb] : undefined;
@@ -49,20 +58,20 @@ const video = (channelId: string, videoId: string, rendition: string, title: str
   publishedAt,
 });
 
-test("the latest video of each channel, in the channels' order, with the largest thumbnail that exists", async (t) => {
+test("the latest landscape video of each channel, in the channels' order, with the largest thumbnail that exists", async (t) => {
   withEnv(t, { YOUTUBE_KEY: KEY });
   const sent = upstream(t, youTube());
   const fake = fakeDb();
 
   await youtube(fake.db);
 
-  assert.deepEqual(urls(sent).slice(0, 9), CHANNELS.map(search));
-  assert.deepEqual(urls(sent, true).slice(9).sort(), [
+  assert.deepEqual(urls(sent).slice(0, 10), [...CHANNELS.map(uploads), videos(ALL)]);
+  assert.deepEqual(urls(sent, true).slice(10).sort(), [
     ...["vRt7Qx2LmPk", "Kz8sN4qWd1E", "Hf3ePq9ZyXo", "Lt4gQm2BvNs", "Cy5hWr7TkJa", "Ky6jXs8UlBb", "Dz7kYt9VmCc", "Fw8lZu0WnDd"].map((id) => `HEAD https://i.ytimg.com/vi/${id}/maxresdefault.jpg`),
     ...["Hf3ePq9ZyXo", "Cy5hWr7TkJa", "Ky6jXs8UlBb"].map((id) => `HEAD https://i.ytimg.com/vi/${id}/sddefault.jpg`),
   ].sort());
   // Titles are stored as the API sends them, entities and all: the page decodes every stored string (src/lib/dashboard.ts).
-  // The third channel has no video and is left out.
+  // The third channel has only a Short and is left out; the fourth's newest uploads (a Short, then a square clip) are passed over.
   assert.deepEqual(fake.calls, [
     replaced("youtubeRecs", {
       items: [
@@ -72,22 +81,31 @@ test("the latest video of each channel, in the channels' order, with the largest
         video("UCXuqSBlHAE6Xw-yeJA0Tunw", "Lt4gQm2BvNs", "maxresdefault", "We Built a PC Inside a Fish Tank &amp; It Worked", "Linus Tech Tips", "2026-10-10T19:00:44Z"),
         video("UCcyq283he07B7_KUX07mmtA", "Cy5hWr7TkJa", "hqdefault", "Ten Years of Building Synthesizers", "Sample Channel F", "2026-10-05T09:12:30Z"),
         video("UCKy1dAqELo0zrOtPkf0eTMw", "Ky6jXs8UlBb", "sddefault", "A Field Guide to Urban Birds", "Sample Channel G", "2026-10-08T22:00:05Z"),
-        video("UC1D3yD4wlPMico0dss264XA", "Dz7kYt9VmCc", "maxresdefault", "Restoring a 1970s Calculator", "Sample Channel H", "2026-10-03T16:45:00Z"),
-        video("UCftwRNsjfRo08xYE31tkiyw", "Fw8lZu0WnDd", "maxresdefault", "How Typefaces Are Drawn", "Sample Channel I", "2026-10-06T11:20:18Z"),
+        video("UCimDIuJiUB7KRYEfCu6YfxQ", "Dz7kYt9VmCc", "maxresdefault", "Restoring a 1970s Calculator", "Sample Channel H", "2026-10-03T16:45:00Z"),
+        video("UCsBjURrPoezykLs9EqgamOA", "Fw8lZu0WnDd", "maxresdefault", "How Typefaces Are Drawn", "Sample Channel I", "2026-10-06T11:20:18Z"),
       ],
     }),
   ]);
 });
 
-test("no channel with a video writes nothing", async (t) => {
+test("no channel with a landscape video writes nothing", async (t) => {
   withEnv(t, { YOUTUBE_KEY: KEY });
-  const empty = SEARCH["UCo4K5kzinPI9AHRDp_V4T0w"];
-  const sent = upstream(t, youTube(Object.fromEntries(CHANNELS.map((id) => [id, () => json(empty)]))));
+  const shortsOnly = UPLOADS["UCo4K5kzinPI9AHRDp_V4T0w"];
+  const sent = upstream(t, youTube(Object.fromEntries(CHANNELS.map((id) => [id, () => json(shortsOnly)]))));
   const fake = fakeDb();
 
   await assert.rejects(youtube(fake.db), /^Error: no YouTube results$/);
   assert.deepEqual(fake.calls, []);
-  assert.equal(sent.length, CHANNELS.length, "no thumbnail is looked for");
+  assert.equal(sent.length, CHANNELS.length + 1, "no thumbnail is looked for");
+});
+
+test("no uploads at all asks for no videos", async (t) => {
+  withEnv(t, { YOUTUBE_KEY: KEY });
+  const none = { kind: "youtube#playlistItemListResponse", pageInfo: { totalResults: 0, resultsPerPage: 10 }, items: [] };
+  const sent = upstream(t, youTube(Object.fromEntries(CHANNELS.map((id) => [id, () => json(none)]))));
+
+  await assert.rejects(youtube(fakeDb().db), /^Error: no YouTube results$/);
+  assert.deepEqual(urls(sent), CHANNELS.map(uploads));
 });
 
 test("one search the API refuses (the daily quota) fails the run; the error carries no key", async (t) => {

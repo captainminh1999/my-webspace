@@ -309,8 +309,8 @@ const CHANNELS = [
   "UCXuqSBlHAE6Xw-yeJA0Tunw",
   "UCcyq283he07B7_KUX07mmtA",
   "UCKy1dAqELo0zrOtPkf0eTMw",
-  "UC1D3yD4wlPMico0dss264XA",
-  "UCftwRNsjfRo08xYE31tkiyw",
+  "UCimDIuJiUB7KRYEfCu6YfxQ",
+  "UCsBjURrPoezykLs9EqgamOA",
 ];
 
 /** The largest thumbnail a video has. Only "hq" is guaranteed; the card's 16:9 frame crops the bars of the 4:3 renditions. */
@@ -322,30 +322,37 @@ async function bestThumbnail(videoId: string): Promise<string> {
   return `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`;
 }
 
+/** How far back each channel's uploads are read for a landscape video: a channel posting many Shorts can bury one. */
+const UPLOADS = 10;
+
 export async function youtube(db: Db) {
   const key = requireEnv("YOUTUBE_KEY");
-  const results = await Promise.all(
+  // A channel's uploads playlist is its id with "UU" for "UC", newest first (1 quota unit, where a search costs 100).
+  const uploads = await Promise.all(
     CHANNELS.map((channelId) =>
       getJson<Any>(
-        `https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=${channelId}&maxResults=1&order=date&type=video&key=${key}`,
-      ).then((r) => {
-        const it = r?.items?.[0];
-        return it?.id?.videoId
-          ? {
-              channelId,
-              videoId: it.id.videoId,
-              title: it.snippet.title,
-              thumbnail: it.snippet.thumbnails?.medium?.url ?? "",
-              channelTitle: it.snippet.channelTitle,
-              publishedAt: it.snippet.publishedAt,
-            }
-          : null;
-      }),
+        `https://www.googleapis.com/youtube/v3/playlistItems?part=contentDetails&playlistId=UU${channelId.slice(2)}&maxResults=${UPLOADS}&key=${key}`,
+      ).then((r) => ({ channelId, ids: (r?.items ?? []).map((it: Any) => it?.contentDetails?.videoId).filter(Boolean) as string[] })),
     ),
   );
-  const found = results.filter((r): r is NonNullable<typeof r> => !!r);
+  // Every candidate's player size, 50 to a call: a Short is never wider than it is tall, a normal video always is.
+  const all = uploads.flatMap((u) => u.ids);
+  const videos = new Map<string, Any>();
+  for (let i = 0; i < all.length; i += 50) {
+    const r = await getJson<Any>(
+      `https://www.googleapis.com/youtube/v3/videos?part=snippet,player&maxWidth=1280&id=${all.slice(i, i + 50).join(",")}&key=${key}`,
+    );
+    for (const v of r?.items ?? []) if (v?.id) videos.set(v.id, v);
+  }
+  const landscape = (v: Any | undefined) => Number(v?.player?.embedWidth) > Number(v?.player?.embedHeight);
+  const found = uploads.flatMap(({ channelId, ids }) => {
+    const v = videos.get(ids.find((id) => landscape(videos.get(id))) ?? "");
+    return v
+      ? [{ channelId, videoId: v.id as string, title: v.snippet.title, channelTitle: v.snippet.channelTitle, publishedAt: v.snippet.publishedAt }]
+      : [];
+  });
   if (!found.length) throw new Error("no YouTube results");
-  // The API's search result only offers renditions up to 480px; the card draws the pictures wider than that.
+  // The API's thumbnails only go up to 480px in every rendition it promises; the card draws the pictures wider than that.
   const items = await Promise.all(found.map(async (it) => ({ ...it, thumbnail: await bestThumbnail(it.videoId) })));
   await writeSingleton(db, "youtubeRecs", { items });
 }

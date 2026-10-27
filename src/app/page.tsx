@@ -77,15 +77,15 @@ export default async function Page() {
       card: <GamesCard data={data.games} now={now} />, full: <GamesFull data={data.games} now={now} />,
     },
     {
-      id: "youtube", folio: "09", title: "YOUTUBE", span: "md:col-span-6 lg:col-span-12 md:order-9",
-      footer: <span>Source: YouTube</span>,
-      card: <YouTubeCard data={data.youtube} now={now} />, full: <YouTubeFull data={data.youtube} now={now} />,
-    },
-    {
       // Edited by hand, not a feed, so no freshness stamp.
-      id: "travel", folio: "10", title: "TRAVEL", span: "md:col-span-6 lg:col-span-12 md:order-10", width: "atlas", flush: true,
+      id: "travel", folio: "09", title: "TRAVEL", span: "md:col-span-6 lg:col-span-12 md:order-9", width: "atlas", flush: true,
       footer: data.travel.length ? <span className="truncate">Source: travel bookings</span> : null,
       card: <TravelCard journeys={data.travel} />, full: <TravelFull journeys={data.travel} />,
+    },
+    {
+      id: "youtube", folio: "10", title: "YOUTUBE", span: "md:col-span-6 lg:col-span-12 md:order-10",
+      footer: <span>Source: YouTube</span>,
+      card: <YouTubeCard data={data.youtube} now={now} />, full: <YouTubeFull data={data.youtube} now={now} />,
     },
   ] as const;
 
